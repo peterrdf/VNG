@@ -1,0 +1,17 @@
+services:
+  vngservice:
+    image: vngservice:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prebuilt
+    ports:
+      - "1140:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    volumes:
+      - vng_data:/vng/service
+    restart: unless-stopped
+
+volumes:
+  vng_data:

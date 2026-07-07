@@ -1,0 +1,48 @@
+services:
+
+  vngportal:
+    container_name: vngportal
+    depends_on:
+       - vngtriplestore
+       - vngservice
+    image: vngportal:latest
+    ports:
+      - "1145:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    volumes:
+      - portal_data:/vng/portal
+    restart: unless-stopped
+
+  vngtriplestore:
+    container_name: vngtriplestore    
+    depends_on:
+      - vngservice
+    image: vngtriplestore:latest
+    ports:
+      - "3030:3030"
+    environment:
+      ADMIN_PASSWORD: admin123
+      JVM_ARGS: -Xmx2g
+      JAVA_OPTIONS: "-Djava.library.path=/usr/lib"
+    volumes:
+      - fuseki_data:/fuseki
+    restart: unless-stopped
+
+  vngservice:
+    container_name: vngservice
+    image: vngservice:latest
+    ports:
+      - "1140:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    volumes:
+      - service_data:/vng/service
+    restart: unless-stopped
+
+volumes:
+  portal_data:
+  fuseki_data:
+  service_data:

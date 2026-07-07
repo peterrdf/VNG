@@ -1,0 +1,18 @@
+services:
+  vngtriplestore:
+    image: vngtriplestore
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prebuilt
+    ports:
+      - "3030:3030"
+    environment:
+      ADMIN_PASSWORD: admin123
+      JVM_ARGS: -Xmx2g
+      JAVA_OPTIONS: "-Djava.library.path=/usr/lib"
+    volumes:
+      - fuseki_data:/fuseki
+    restart: unless-stopped
+
+volumes:
+  fuseki_data:

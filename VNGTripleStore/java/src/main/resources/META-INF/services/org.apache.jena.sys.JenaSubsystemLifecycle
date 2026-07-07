@@ -1,0 +1,9 @@
+org.example.CubeVolumeInit
+org.example.GetBuildingsInit
+org.example.GetParcelsInit
+org.example.ProjectionInit
+org.example.TopologicalRelationInit
+org.example.GetSpatialPlansDestinationAreasInit
+org.example.BBoxInit
+org.example.GetAreasInit
+org.example.GetPDOKFeatureInit

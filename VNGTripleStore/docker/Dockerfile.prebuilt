@@ -1,0 +1,23 @@
+FROM stain/jena-fuseki:latest
+
+COPY java/target/vng-functions.jar /jena-fuseki/extra/vng-functions.jar
+
+USER root
+
+# Injects JAR
+# #!/bin/sh (not bash) is required because Alpine may not have bash at /bin/sh.
+# Shell form is required to expand $JVM_ARGS / $JAVA_OPTIONS at runtime.
+RUN printf '#!/bin/sh\n\
+exec java $JVM_ARGS $JAVA_OPTIONS \\\n\
+  -cp "/jena-fuseki/fuseki-server.jar:/jena-fuseki/extra/vng-functions.jar" \\\n\
+  org.apache.jena.fuseki.cmd.FusekiCmd "$@"\n' \
+    > /jena-fuseki/fuseki-launch.sh \
+  && chmod +x /jena-fuseki/fuseki-launch.sh
+
+USER fuseki
+
+ENV JAVA_OPTIONS="-Djava.library.path=/usr/lib"
+
+# Replaces the original `java -jar fuseki-server.jar` CMD.
+# The entrypoint will exec this in the background and wait for port 3030.
+CMD ["/jena-fuseki/fuseki-launch.sh"]

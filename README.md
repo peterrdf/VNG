@@ -65,7 +65,6 @@ docker-compose up -d
 
 4. **Set API Keys**
    Ensure you have set the necessary API keys in the environment variables or configuration files
-   Ensure you have set the necessary API keys in the environment variables or configuration files
    - .\set-api-key.ps1 -ServiceName "bag" -APIKey "your-api-key-here"<br>
    - .\set-api-key.ps1 -ServiceName "dso" -APIKey "your-api-key-here"<br>
 

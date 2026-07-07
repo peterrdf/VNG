@@ -54,38 +54,21 @@ Before you begin, ensure you have the following installed:
 
 ### Using Docker (Recommended)
 
-1. **Clone the repository**
+1. **Clone the repository**<br>
 git clone https://github.com/peterrdf/VNG.git cd VNG
 
-2. **Navigate to the Docker directory**
+2. **Navigate to the Docker directory**<br>
 cd Docker-Production
 
-3. **Start the application**
+3. **Start the application**<br>
 docker-compose up -d
 
 4. **Set API Keys**
-   Ensure you have set the necessary API keys in the environment variables or configuration files					.
-.\set-api-key.ps1 -ServiceName "bag" -APIKey "your-api-key-here"
-.\set-api-key.ps1 -ServiceName "dso" -APIKey "your-api-key-here"
+   Ensure you have set the necessary API keys in the environment variables or configuration files<br>					.
+   .\set-api-key.ps1 -ServiceName "bag" -APIKey "your-api-key-here"<br>
+   .\set-api-key.ps1 -ServiceName "dso" -APIKey "your-api-key-here"<br>
 
-5. **Access the application**   
+5. **Access the application**<br>
    Open your browser and navigate to: http://localhost:1145/
    
 6. **Follow the on-screen instructions**
-
-### Using Local Development
-
-1. **Clone and navigate to the service**
-git clone https://github.com/peterrdf/VNG.git cd VNG
-
-2. **Navigate to the service directory**
-cd VNG
-
-3. **Restore dependencies**
-dotnet restore
-
-4. **Run the application**
-dotnet run
-
-5. **Access the application**   
-   Open your browser and navigate to: http://localhost:1145/

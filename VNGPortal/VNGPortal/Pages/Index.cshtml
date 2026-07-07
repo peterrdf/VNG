@@ -1,0 +1,183 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+</div>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-10">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Upload IFC File</h5>
+                    <form id="uploadForm" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="ifcFile" class="form-label">Select IFC File</label>
+                            <input type="file" class="form-control" id="ifcFile" name="IfcFile" accept=".ifc" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="uploadFile">Upload</button>
+                    </form>
+                    <div id="messageContainer" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/signalr/signalr.min.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/statusHub")
+        .withAutomaticReconnect([0, 2000, 5000, 10000, 30000]) // Automatic reconnection
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    connection.serverTimeoutInMilliseconds = 60000; // 60 seconds
+    connection.keepAliveIntervalInMilliseconds = 15000; // 15 seconds
+
+    connection.on("ReceiveStatusUpdate", function (data) {
+        const serverStatus = JSON.parse(data);
+        if (serverStatus.taskDescriptorUpdate?.Status !== 'Running') {
+            document.getElementById('ifcFile').disabled = false;
+            document.getElementById('uploadFile').disabled = false;
+        }
+    });
+
+    connection.on("ReceiveProgressUpdate", function (progress) {
+        const messageDiv = document.createElement("div");
+        if (progress.error) {
+            messageDiv.innerHTML = `<div class="alert alert-danger">${progress.message}</div>`;
+            // Re-enable on error
+            document.getElementById('ifcFile').disabled = false;
+            document.getElementById('uploadFile').disabled = false;
+        } else {
+            messageDiv.innerHTML = `<div class="alert alert-info">${progress.message}</div>`;
+        }
+        const messageContainer = document.getElementById('messageContainer');
+        messageContainer.appendChild(messageDiv);
+    });
+
+    connection.on("ReceiveQueryUpdate", function (querySelector) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "alert alert-info"
+        if (querySelector.query) {
+            const label = document.createElement("label");
+            label.textContent = querySelector.type;
+            label.className = "form-label mt-2";
+
+            const textArea = document.createElement("textarea");
+            textArea.value = querySelector.query;
+            textArea.className = "form-control";
+            textArea.readOnly = true;
+            textArea.rows = 5;
+            textArea.wrap = "off";
+
+            messageDiv.appendChild(label);
+            messageDiv.appendChild(textArea);
+        }
+
+        if (querySelector.result) {
+            const label = document.createElement("label");
+            label.textContent = querySelector.type;
+            label.className = "form-label mt-2";
+
+            const textArea = document.createElement("textarea");
+            textArea.value = querySelector.result;
+            textArea.className = "form-control";
+            textArea.readOnly = true;
+            textArea.rows = 5;
+            textArea.wrap = "off";
+            if (querySelector.error) {
+                textArea.style.backgroundColor = "#ffe6e6";
+                textArea.style.borderColor = "#dc3545";
+                textArea.style.borderWidth = "2px";
+                const errorIcon = document.createElement("span");
+                errorIcon.className = "text-danger fw-bold";
+                errorIcon.innerHTML = " ❌ Error";
+                label.appendChild(errorIcon);
+            } else {
+                textArea.style.backgroundColor = "#d4edda";
+                textArea.style.borderColor = "#28a745";
+                textArea.style.borderWidth = "2px";
+                const successIcon = document.createElement("span");
+                successIcon.className = "text-success fw-bold";
+                successIcon.innerHTML = " ✅ Success";
+                label.appendChild(successIcon);
+            }
+
+            messageDiv.appendChild(label);
+            messageDiv.appendChild(textArea);
+        }
+
+        const messageContainer = document.getElementById('messageContainer');
+        messageContainer.appendChild(messageDiv);
+    });
+
+    connection.onreconnecting((error) => {
+        console.warn('SignalR reconnecting...', error);
+    });
+
+    connection.onreconnected((connectionId) => {
+        console.log('SignalR reconnected:', connectionId);
+    });
+
+    connection.onclose((error) => {
+        console.error('SignalR connection closed:', error);
+        // Attempt to restart after 5 seconds
+        setTimeout(() => startConnection(), 5000);
+    });
+
+    async function startConnection() {
+        try {
+            await connection.start();
+            console.log("StatusHub connected");
+        } catch (err) {
+            console.error('Error starting StatusHub connection:', err);
+            setTimeout(() => startConnection(), 5000);
+        }
+    }
+
+    // Start the connection
+    startConnection();
+
+    // Handle form submission via AJAX
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const messageContainer = document.getElementById('messageContainer');
+
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.error) {
+                messageContainer.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
+            } else if (result.taskId) {
+                messageContainer.innerHTML = `<div class="alert alert-success"> Model uploaded successfully.</div>`;
+                // Join the SignalR group for this task
+                if (connection.state === signalR.HubConnectionState.Connected) {
+                    await connection.invoke("JoinGroup", result.taskId);
+                }
+                // Update UI
+                document.getElementById('ifcFile').value ='';
+                document.getElementById('ifcFile').disabled = true;
+                document.getElementById('uploadFile').disabled = true;
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            messageContainer.innerHTML = `<div class="alert alert-danger">An error occurred during upload.</div>`;
+        }
+    });
+</script>

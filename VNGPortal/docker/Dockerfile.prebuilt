@@ -1,0 +1,24 @@
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-noble
+
+WORKDIR /app
+
+# Install OpenJDK
+RUN apt-get update && \
+    apt-get install -y openjdk-21-jre-headless && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY VNGPortal/bin/Release/net9.0/publish/ .
+
+# Make the .so files executable
+RUN chmod +x libifcengine.so
+
+# Register /app in the linker cache
+RUN echo "/app" > /etc/ld.so.conf.d/vng.conf && ldconfig
+
+ENV ASPNETCORE_URLS=http://+:8080
+
+# Force libifcengine.so to be loaded before 
+ENV LD_PRELOAD=/app/libifcengine.so
+
+ENTRYPOINT ["dotnet", "VNGPortal.dll"]

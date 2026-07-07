@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/VNGPortal/.vs/VNGPortal
+/VNGPortal/VNGPortal/bin
+/VNGPortal/VNGPortal/obj

@@ -34,9 +34,9 @@ VNG is a web application that integrates with Dutch government APIs (BAG, DSO) t
 - **BAG API Integration** - Dutch Address and Building registry lookup
 - **Geometry Processing** - Handle and process geographic data
 - **Land Registry Services** - Manage cadastral information
+- **Jena-Fuseki SPARQL Endpoint** - SHACL-compliant SPARQL endpoint for semantic data queries
 - **Docker Support** - Fully containerized for easy deployment
 - **Structured Logging** - Serilog integration with file-based logging
-- **Large File Support** - Handles uploads up to 2GB
 
 ---
 
@@ -65,8 +65,8 @@ docker-compose up -d
 
 4. **Set API Keys**<br>
    Ensure you have set the necessary API keys in the environment variables or configuration files
-   - .\set-api-key.ps1 -ServiceName "bag" -APIKey "your-api-key-here"<br>
-   - .\set-api-key.ps1 -ServiceName "dso" -APIKey "your-api-key-here"<br>
+     .\set-api-key.ps1 -ServiceName "bag" -APIKey "your-api-key-here"<br>
+     .\set-api-key.ps1 -ServiceName "dso" -APIKey "your-api-key-here"<br>
 
 5. **Access the application**<br>
    Open your browser and navigate to: http://localhost:1145/

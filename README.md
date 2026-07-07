@@ -14,11 +14,6 @@ A .NET 9 ASP.NET Core Razor Pages application for processing and serving Dutch s
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
-- [Configuration](#configuration)
-- [Project Structure](#project-structure)
-- [Development](#development)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
 
 ---
 

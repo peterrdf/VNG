@@ -63,11 +63,15 @@ cd Docker-Production
 3. **Start the application**
 docker-compose up -d
 
-4. **Access the application**   
-   Open your browser and navigate to: http://localhost:1145/
+4. **Set API Keys**
+   Ensure you have set the necessary API keys in the environment variables or configuration files					.
+.\set-api-key.ps1 -ServiceName "bag" -APIKey "your-api-key-here"
+.\set-api-key.ps1 -ServiceName "dso" -APIKey "your-api-key-here"
 
+5. **Access the application**   
+   Open your browser and navigate to: http://localhost:1145/
    
-5. **Follow the on-screen instructions**
+6. **Follow the on-screen instructions**
 
 ### Using Local Development
 

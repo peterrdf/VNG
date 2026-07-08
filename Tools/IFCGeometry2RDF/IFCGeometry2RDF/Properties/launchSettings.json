@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IFCGeometry2RDF": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\GH\\VNG\\SPARQL\\IFCtoRDF\\Kievitsweg_R23_ILS.ifc\""
+    }
+  }
+}

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IFCGeometry2RDF;
-using RDF;
+﻿using RDF;
 
 #if _IFCENGINE
 using stepengine = RDF.ifcengine;

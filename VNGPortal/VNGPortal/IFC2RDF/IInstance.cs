@@ -12,7 +12,7 @@ using int_t = System.Int64;
 using int_t = System.Int32;
 #endif
 
-namespace IFCGeometry2RDF
+namespace VNGPortal.IFC2RDF
 {
     public interface IInstance
     {

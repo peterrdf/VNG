@@ -1,5 +1,4 @@
-﻿using IFCGeometry2RDF;
-using RDF;
+﻿using RDF;
 
 #if _IFCENGINE
 using stepengine = RDF.ifcengine;

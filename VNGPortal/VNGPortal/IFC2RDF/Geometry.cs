@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using IFCGeometry2RDF;
 using RDF;
 
 #if _IFCENGINE

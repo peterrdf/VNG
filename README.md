@@ -17,13 +17,13 @@ A .NET 9 ASP.NET Core Razor Pages application for processing and serving Dutch s
 
 ---
 
-## 🎯 Overview
+<h2 id="features">✨ Features</h2>
 
 VNG is a web application that integrates with Dutch government APIs (BAG, DSO) to process spatial planning data, manage land registry information, and provide geometry processing capabilities.
 
 ---
 
-## ✨ Features
+<h2 id="features">✨ Features</h2>
 
 - **Spatial Planning Data Processing** - Integration with DSO (Digitaal Stelsel Omgevingswet)
 - **BAG API Integration** - Dutch Address and Building registry lookup
@@ -35,7 +35,7 @@ VNG is a web application that integrates with Dutch government APIs (BAG, DSO) t
 
 ---
 
-## 📦 Prerequisites
+<h2 id="prerequisites">📦 Prerequisites</h2>
 
 Before you begin, ensure you have the following installed:
 
@@ -45,7 +45,7 @@ Before you begin, ensure you have the following installed:
 
 ---
 
-## 🚀 Quick Start
+<h2 id="quick-start">🚀 Quick Start</h2>
 
 ### Using Docker (Recommended)
 
@@ -60,10 +60,13 @@ docker-compose up -d
 
 4. **Set API Keys**<br>
    Ensure you have set the necessary API keys in the environment variables or configuration files<br>
-     .\set-api-key.ps1 -ServiceName "bag" -APIKey "your-api-key-here"<br>
-     .\set-api-key.ps1 -ServiceName "dso" -APIKey "your-api-key-here"<br>
+     .\Tools\set-api-key.ps1 -ServiceName "bag" -APIKey "your-api-key-here"<br>
+     .\Tools\set-api-key.ps1 -ServiceName "dso" -APIKey "your-api-key-here"<br>
 
 5. **Access the application**<br>
    Open your browser and navigate to: http://localhost:1145/
    
 6. **Follow the on-screen instructions**
+
+### Manual execution
+**Follow the instruction in .\Workflow.docx**<br>

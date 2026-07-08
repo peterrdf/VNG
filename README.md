@@ -70,3 +70,9 @@ docker-compose up -d
 
 ### Manual execution
 **Follow the instruction in .\Workflow.docx**<br>
+
+## Third‑party Licenses
+
+This project includes or uses code from `IFCtoLBD` by Jyrki Oraskari:
+- Source: https://github.com/jyrkioraskari/IFCtoLBD/tree/master/IFCtoRDF
+- License: [Apache License, Version 2.0] — see https://github.com/jyrkioraskari/IFCtoLBD/blob/master/IFCtoRDF/LICENSE

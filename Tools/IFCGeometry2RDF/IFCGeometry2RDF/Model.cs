@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IFCGeometry2RDF;
 using RDF;
 
 #if _IFCENGINE
@@ -382,7 +383,7 @@ namespace IFCGeometry2RDF
         protected virtual void Reset()
         {
             _iInstanceID = 1;
-            FilePath = null;
+            FilePath = "";
             if (Instance != 0)
             {
                 ifcengine.sdaiCloseModel(Instance);
@@ -414,65 +415,17 @@ namespace IFCGeometry2RDF
             }
         }
 
-        public static int_t GetObjectProperty(long iInstance, string strProperty)
-        {
-            long iModel = RDF.engine.GetModel(iInstance);
-
-            IntPtr values;
-            long iCard = 0;
-
-            RDF.engine.GetObjectProperty(
-                iInstance,
-                RDF.engine.GetPropertyByName(iModel, strProperty),
-                out values,
-                out iCard);
-
-            if (iCard == 1)
-            {
-                unsafe
-                {
-                    return ((int_t*)values.ToPointer())[0];
-                }
-            }
-
-            return 0;
-        }
-
-        public static double GetDoubleProperty(int_t iInstance, string strProperty)
-        {
-            long iModel = RDF.engine.GetModel(iInstance);
-
-            IntPtr values;
-            long iCard = 0;
-
-            RDF.engine.GetDatatypeProperty(
-                iInstance,
-                RDF.engine.GetPropertyByName(iModel, strProperty),
-                out values,
-                out iCard);
-
-            if (iCard == 1)
-            {
-                unsafe
-                {
-                    return ((double*)values.ToPointer())[0];
-                }
-            }
-
-            return 0;
-        }
-
         #endregion // Methods
 
         #region Events
 
-        public event EventHandler ModelLoaded;
+        public event EventHandler? ModelLoaded ;
 
         #endregion // Events
 
         #region Properties
 
-        public string FilePath { get; protected set; }
+        public string FilePath { get; protected set; } = "";
         public int_t Instance { get; protected set; }
         public ModelType Type { get; protected set; }
         protected bool UpdteVertexBuffers { get; set; } = true;

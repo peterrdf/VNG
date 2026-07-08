@@ -1,4 +1,5 @@
-﻿using RDF;
+﻿using IFCGeometry2RDF;
+using RDF;
 
 #if _IFCENGINE
 using stepengine = RDF.ifcengine;
@@ -52,7 +53,7 @@ namespace IFCGeometry2RDF.IFC
 
         public int_t ID => _iID;
         public Geometry Geometry => this;
-        public _matrix4x4 Transformation => null;
+        public _matrix4x4? Transformation { get; set; } = null;
         public bool Enabled { get; set; } = false;
 
         #endregion // IInstance

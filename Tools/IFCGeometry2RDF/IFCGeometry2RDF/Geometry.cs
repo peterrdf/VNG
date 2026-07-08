@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using IFCGeometry2RDF;
 using RDF;
 
 #if _IFCENGINE
@@ -21,7 +22,6 @@ namespace IFCGeometry2RDF
 
     public class Geometry : _geometry
     {
-
         #region Methods
 
         public Geometry(GeometryType type)
@@ -45,8 +45,6 @@ namespace IFCGeometry2RDF
             ifcengine.owlBuildInstance(iSdaiModel, Instance, out owlInstance);
 
             OwlInstance = owlInstance;
-
-            Debug.WriteLine("*** END INSTANCE");
         }
 
         #endregion // Methods
@@ -54,7 +52,7 @@ namespace IFCGeometry2RDF
         #region Properties
 
         public GeometryType Type { get; private set; }
-        public List<IInstance> Instances = new List<IInstance>();
+        public List<IInstance> Instances = new();
 
         #endregion // Properties
     }

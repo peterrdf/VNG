@@ -283,6 +283,11 @@ namespace IFCGeometry2RDF
                 return;
             }
 
+            if (Vertices == null || Indices == null)
+            {
+                return;
+            }
+
             uint VERTEX_LENGTH = GetVertexLength();
 
             if (Triangles.Count > 0)
@@ -293,12 +298,12 @@ namespace IFCGeometry2RDF
                         iIndex < primitive.StartIndex + primitive.IndicesCount;
                         iIndex++)
                     {
-                        fXmin = float.Min(fXmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0]);
-                        fXmax = float.Max(fXmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0]);
-                        fYmin = float.Min(fYmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1]);
-                        fYmax = float.Max(fYmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1]);
-                        fZmin = float.Min(fZmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
-                        fZmax = float.Max(fZmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
+                        fXmin = float.Min(fXmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? fXmin);
+                        fXmax = float.Max(fXmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? fXmax);
+                        fYmin = float.Min(fYmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? fYmin);
+                        fYmax = float.Max(fYmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? fYmax);
+                        fZmin = float.Min(fZmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? fZmin);
+                        fZmax = float.Max(fZmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? fZmax);
                     }
                 }
             }
@@ -311,12 +316,12 @@ namespace IFCGeometry2RDF
                         iIndex < primitive.StartIndex + primitive.IndicesCount;
                         iIndex++)
                     {
-                        fXmin = float.Min(fXmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0]);
-                        fXmax = float.Max(fXmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0]);
-                        fYmin = float.Min(fYmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1]);
-                        fYmax = float.Max(fYmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1]);
-                        fZmin = float.Min(fZmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
-                        fZmax = float.Max(fZmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
+                        fXmin = float.Min(fXmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? fXmin);
+                        fXmax = float.Max(fXmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? fXmax);
+                        fYmin = float.Min(fYmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? fYmin);
+                        fYmax = float.Max(fYmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? fYmax);
+                        fZmin = float.Min(fZmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? fZmin);
+                        fZmax = float.Max(fZmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? fZmax);
                     }
                 }
             }
@@ -329,12 +334,12 @@ namespace IFCGeometry2RDF
                         iIndex < primitive.StartIndex + primitive.IndicesCount;
                         iIndex++)
                     {
-                        fXmin = float.Min(fXmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0]);
-                        fXmax = float.Max(fXmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0]);
-                        fYmin = float.Min(fYmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1]);
-                        fYmax = float.Max(fYmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1]);
-                        fZmin = float.Min(fZmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
-                        fZmax = float.Max(fZmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
+                        fXmin = float.Min(fXmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? fXmin);
+                        fXmax = float.Max(fXmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? fXmax);
+                        fYmin = float.Min(fYmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? fYmin);
+                        fYmax = float.Max(fYmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? fYmax);
+                        fZmin = float.Min(fZmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? fZmin);
+                        fZmax = float.Max(fZmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? fZmax);
                     }
                 }
             }
@@ -347,19 +352,19 @@ namespace IFCGeometry2RDF
                         iIndex < primitive.StartIndex + primitive.IndicesCount;
                         iIndex++)
                     {
-                        fXmin = float.Min(fXmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0]);
-                        fXmax = float.Max(fXmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0]);
-                        fYmin = float.Min(fYmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1]);
-                        fYmax = float.Max(fYmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1]);
-                        fZmin = float.Min(fZmin, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
-                        fZmax = float.Max(fZmax, Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
+                        fXmin = float.Min(fXmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? fXmin);
+                        fXmax = float.Max(fXmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? fXmax);
+                        fYmin = float.Min(fYmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? fYmin);
+                        fYmax = float.Max(fYmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? fYmax);
+                        fZmin = float.Min(fZmin, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? fZmin);
+                        fZmax = float.Max(fZmax, Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? fZmax);
                     }
                 }
             }
         }
 
         public void CalculateMinMax(
-            _matrix4x4 transformation,
+            _matrix4x4? transformation,
             ref float fXmin, ref float fXmax,
             ref float fYmin, ref float fYmax,
             ref float fZmin, ref float fZmax)
@@ -379,6 +384,11 @@ namespace IFCGeometry2RDF
                 return;
             }
 
+            if (Vertices == null || Indices == null)
+            {
+                return;
+            }
+
             uint VERTEX_LENGTH = GetVertexLength();
 
             if (Triangles.Count > 0)
@@ -390,9 +400,9 @@ namespace IFCGeometry2RDF
                         iIndex++)
                     {
                         _vector3 point = new _vector3(
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0],
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1],
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? 0,
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? 0,
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? 0);
                         _vector3.Transform(point, transformation, point);
 
                         fXmin = float.Min(fXmin, point.X);
@@ -414,9 +424,9 @@ namespace IFCGeometry2RDF
                         iIndex++)
                     {
                         _vector3 point = new _vector3(
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0],
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1],
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? 0,
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? 0,
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? 0);
                         _vector3.Transform(point, transformation, point);
 
                         fXmin = float.Min(fXmin, point.X);
@@ -438,9 +448,9 @@ namespace IFCGeometry2RDF
                         iIndex++)
                     {
                         _vector3 point = new _vector3(
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0],
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1],
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? 0,
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? 0,
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? 0);
                         _vector3.Transform(point, transformation, point);
 
                         fXmin = float.Min(fXmin, point.X);
@@ -462,9 +472,9 @@ namespace IFCGeometry2RDF
                         iIndex++)
                     {
                         _vector3 point = new _vector3(
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 0],
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 1],
-                            Vertices[(Indices[iIndex] * VERTEX_LENGTH) + 2]);
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 0] ?? 0,
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 1] ?? 0,
+                            Vertices?[(Indices[iIndex] * VERTEX_LENGTH) + 2] ?? 0);
                         _vector3.Transform(point, transformation, point);
 
                         fXmin = float.Min(fXmin, point.X);
@@ -485,13 +495,16 @@ namespace IFCGeometry2RDF
                 return;
             }
 
-            uint VERTEX_LENGTH = GetVertexLength();
-
-            for (var iVertex = 0; iVertex < Vertices.Length / VERTEX_LENGTH; iVertex++)
+            if (Vertices != null)
             {
-                Vertices[(iVertex * VERTEX_LENGTH) + 0] /= fScaleFactor;
-                Vertices[(iVertex * VERTEX_LENGTH) + 1] /= fScaleFactor;
-                Vertices[(iVertex * VERTEX_LENGTH) + 2] /= fScaleFactor;
+                uint VERTEX_LENGTH = GetVertexLength();
+
+                for (var iVertex = 0; iVertex < Vertices.Length / VERTEX_LENGTH; iVertex++)
+                {
+                    Vertices[(iVertex * VERTEX_LENGTH) + 0] /= fScaleFactor;
+                    Vertices[(iVertex * VERTEX_LENGTH) + 1] /= fScaleFactor;
+                    Vertices[(iVertex * VERTEX_LENGTH) + 2] /= fScaleFactor;
+                }
             }
         }
 
@@ -538,13 +551,13 @@ namespace IFCGeometry2RDF
         // Metadata
         public int_t Instance { get; protected set; }
         public long OwlInstance { get; protected set; }
-        public string Entity { get; protected set; }
+        public string? Entity { get; protected set; }
         public string Name { get; protected set; } = "NA";
         public string UniqueName { get; protected set; } = string.Empty;
         
         // Geometry
-        public float[] Vertices { get; protected set; }
-        public int[] Indices { get; protected set; }
+        public float[]? Vertices { get; protected set; }
+        public int[]? Indices { get; protected set; }
         public long ConceptualFacesCount { get; protected set; }
         public bool HasGeometry => (Vertices != null && Vertices.Length > 0) && (Indices != null && Indices.Length > 0);
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IFCGeometry2RDF;
+
 
 #if _WIN64
 using int_t = System.Int64;
@@ -18,7 +20,7 @@ namespace IFCGeometry2RDF
 
         int_t ID { get; }
         Geometry Geometry { get; }
-        _matrix4x4 Transformation { get; }
+        _matrix4x4? Transformation { get; }
         bool Enabled { get; set; }
 
         #endregion // Properties

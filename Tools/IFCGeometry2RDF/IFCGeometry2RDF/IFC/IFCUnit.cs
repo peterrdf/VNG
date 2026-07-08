@@ -148,32 +148,35 @@ namespace IFCGeometry2RDF.IFC
 
                         if (IsInstanceOf(iModel, iUnitComponentInstance, "IFCSIUNIT"))
                         {
-                            ifcengine.sdaiGetAttrBN(iUnitComponentInstance, "UnitType", ifcengine.sdaiUNICODE, out IntPtr unitType);
+                            ifcengine.sdaiGetAttrBN(iUnitComponentInstance, "UnitType", ifcengine.sdaiSTRING, out IntPtr unitType);
 
-                            string strUnitType = string.Empty;
+                            string? strUnitType = string.Empty;
                             if (unitType != IntPtr.Zero)
                             {
-                                strUnitType = Marshal.PtrToStringUni(unitType);
+                                strUnitType = Marshal.PtrToStringAnsi(unitType);
                             }
 
-                            ifcengine.sdaiGetAttrBN(iUnitComponentInstance, "Prefix", ifcengine.sdaiUNICODE, out IntPtr prefix);
+                            ifcengine.sdaiGetAttrBN(iUnitComponentInstance, "Prefix", ifcengine.sdaiSTRING, out IntPtr prefix);
 
-                            string strPrefix = string.Empty;
+                            string? strPrefix = string.Empty;
                             if (prefix != IntPtr.Zero)
                             {
-                                strPrefix = Marshal.PtrToStringUni(prefix);
+                                strPrefix = Marshal.PtrToStringAnsi(prefix);
                             }
 
-                            ifcengine.sdaiGetAttrBN(iUnitComponentInstance, "Name", ifcengine.sdaiUNICODE, out IntPtr name);
+                            ifcengine.sdaiGetAttrBN(iUnitComponentInstance, "Name", ifcengine.sdaiSTRING, out IntPtr name);
 
-                            string strName = string.Empty;
+                            string? strName = string.Empty;
                             if (name != IntPtr.Zero)
                             {
-                                strName = Marshal.PtrToStringUni(name);
+                                strName = Marshal.PtrToStringAnsi(name);
                             }
 
-                            IFCUnit ifcUnit = new IFCUnit(strUnitType, strPrefix, strName);
-                            dicUnits[ifcUnit.TypeAsStr] = ifcUnit;
+                            if (!string.IsNullOrEmpty(strName) && !string.IsNullOrEmpty(strUnitType) && !string.IsNullOrEmpty(strPrefix))
+                            {
+                                IFCUnit ifcUnit = new IFCUnit(strUnitType, strPrefix, strName);
+                                dicUnits[ifcUnit.TypeAsStr] = ifcUnit;
+                            }
                         }
                     }
                 } // if (IsInstanceOf(iModel, iUnitInstance, "IFCCONVERSIONBASEDUNIT"))
@@ -181,32 +184,35 @@ namespace IFCGeometry2RDF.IFC
                 {
                     if (IsInstanceOf(iModel, iUnitInstance, "IFCSIUNIT"))
                     {
-                        ifcengine.sdaiGetAttrBN(iUnitInstance, "UnitType", ifcengine.sdaiUNICODE, out IntPtr unitType);
+                        ifcengine.sdaiGetAttrBN(iUnitInstance, "UnitType", ifcengine.sdaiSTRING, out IntPtr unitType);
 
-                        string strUnitType = string.Empty;
+                        string? strUnitType = string.Empty;
                         if (unitType != IntPtr.Zero)
                         {
-                            strUnitType = Marshal.PtrToStringUni(unitType);
+                            strUnitType = Marshal.PtrToStringAnsi(unitType);
                         }
 
-                        ifcengine.sdaiGetAttrBN(iUnitInstance, "Prefix", ifcengine.sdaiUNICODE, out IntPtr prefix);
+                        ifcengine.sdaiGetAttrBN(iUnitInstance, "Prefix", ifcengine.sdaiSTRING, out IntPtr prefix);
 
-                        string strPrefix = string.Empty;
+                        string? strPrefix = string.Empty;
                         if (prefix != IntPtr.Zero)
                         {
-                            strPrefix = Marshal.PtrToStringUni(prefix);
+                            strPrefix = Marshal.PtrToStringAnsi(prefix);
                         }
 
-                        ifcengine.sdaiGetAttrBN(iUnitInstance, "Name", ifcengine.sdaiUNICODE, out IntPtr name);
+                        ifcengine.sdaiGetAttrBN(iUnitInstance, "Name", ifcengine.sdaiSTRING, out IntPtr name);
 
-                        string strName = string.Empty;
+                        string? strName = string.Empty;
                         if (name != IntPtr.Zero)
                         {
-                            strName = Marshal.PtrToStringUni(name);
+                            strName = Marshal.PtrToStringAnsi(name);
                         }
 
-                        IFCUnit ifcUnit = new IFCUnit(strUnitType, strPrefix, strName);
-                        dicUnits[ifcUnit.TypeAsStr] = ifcUnit;
+                        if (!string.IsNullOrEmpty(strName) && !string.IsNullOrEmpty(strUnitType) && !string.IsNullOrEmpty(strPrefix))
+                        {
+                            IFCUnit ifcUnit = new IFCUnit(strUnitType, strPrefix, strName);
+                            dicUnits[ifcUnit.TypeAsStr] = ifcUnit;
+                        }
                     } // if (IsInstanceOf(iModel, iUnitInstance, "IFCSIUNIT"))
                 } // if (IsInstanceOf(iModel, iUnitInstance, "IFCSIUNIT"))
             } // for (int_t iUnit = ...

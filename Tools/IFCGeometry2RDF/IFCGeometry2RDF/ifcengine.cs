@@ -5,10 +5,12 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using System.Xml.Linq;
 
+#pragma warning disable
+
 #if _WIN64
 		using int_t = System.Int64;
 #else
-		using int_t = System.Int32;
+using int_t = System.Int32;
 #endif
 
 namespace RDF
@@ -248,18 +250,19 @@ namespace RDF
 		public const int_t sdaiEXPRESSSTRING = sdaiUNICODE + 1;
 		public const int_t engiGLOBALID      = sdaiEXPRESSSTRING + 1;
 
-		public const string IFCEngineDLL = @"IFCEngine.dll";
+        //public const string IFCEngineDLL = @"IFCEngine.dll"; // Windows shared library
+        public const string IFCEngineDLL = "libifcengine.so"; // Linux shared library (Docker)
 
         //
         //  Instance Header API Calls
         //
 
-		/// <summary>
-		///		SetSPFFHeader                                           (https://rdf.bg/ifcdoc/CS64/SetSPFFHeader.html)
-		///
-		///	This call is an aggregate of several SetSPFFHeaderItem calls. In several cases the header can be set easily with this call. In case an argument is zero, this argument will not be updated, i.e. it will not be filled with 0.
-		/// </summary>
-		[DllImport(IFCEngineDLL, EntryPoint = "SetSPFFHeader")]
+        /// <summary>
+        ///		SetSPFFHeader                                           (https://rdf.bg/ifcdoc/CS64/SetSPFFHeader.html)
+        ///
+        ///	This call is an aggregate of several SetSPFFHeaderItem calls. In several cases the header can be set easily with this call. In case an argument is zero, this argument will not be updated, i.e. it will not be filled with 0.
+        /// </summary>
+        [DllImport(IFCEngineDLL, EntryPoint = "SetSPFFHeader")]
 		public static extern void SetSPFFHeader(int_t model, string description, string implementationLevel, string name, string timeStamp, string author, string organization, string preprocessorVersion, string originatingSystem, string authorization, string fileSchema);
 
 		[DllImport(IFCEngineDLL, EntryPoint = "SetSPFFHeader")]
@@ -6092,8 +6095,8 @@ namespace RDF
 		public const UInt64 flagbit30 = 1073741824;     // 2^^30   0100.0000..0000.0000  0000.0000..0000.0000
 		public const UInt64 flagbit31 = 2147483648;		// 2^^31   1000.0000..0000.0000  0000.0000..0000.0000
 
-		public const string enginedll = @"IFCEngine.dll"; // Windows DLL
-        //public const string enginedll = "libifcengine.so"; // Linux shared library (Docker)    
+		//public const string enginedll = @"IFCEngine.dll"; // Windows DLL
+        public const string enginedll = "libifcengine.so"; // Linux shared library (Docker)    
 
         //
         //  Meta information API Calls

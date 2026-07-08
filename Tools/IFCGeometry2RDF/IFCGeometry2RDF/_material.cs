@@ -16,10 +16,10 @@ namespace IFCGeometry2RDF
     {
         #region Fields
 
-        private static _color _facesDefaultColor;
-        private static _color _pointedInstanceColor;
-        private static _color _selectedInstanceColor;
-        private static _color _linesDefaultColor;
+        private static _color? _facesDefaultColor;
+        private static _color? _pointedInstanceColor;
+        private static _color? _selectedInstanceColor;
+        private static _color? _linesDefaultColor;
 
         #endregion // Fields
 
@@ -88,21 +88,21 @@ namespace IFCGeometry2RDF
         {
             long iModel = RDF.engine.GetModel(iMaterialInstance);
 
-            IntPtr values;
+            IntPtr valuesPtr;
             long iCard = 0;
 
             RDF.engine.GetObjectProperty(
                 iMaterialInstance,
                 RDF.engine.GetPropertyByName(iModel, "color"),
-                out values,
+                out valuesPtr,
                 out iCard);
 
             if (iCard == 1)
             {
-                unsafe
-                {
-                    return ((long*)values.ToPointer())[0];
-                }
+                Int64[] values = new Int64[iCard];
+                System.Runtime.InteropServices.Marshal.Copy(valuesPtr, values, 0, (int)iCard);
+
+                return values[0];
             }
 
             return 0;
@@ -112,21 +112,21 @@ namespace IFCGeometry2RDF
         {
             long iModel = RDF.engine.GetModel(iColorInstance);
 
-            IntPtr values;
+            IntPtr valuesPtr;
             long iCard = 0;
 
             RDF.engine.GetObjectProperty(
                 iColorInstance,
                 RDF.engine.GetPropertyByName(iModel, strColorComponent),
-                out values,
+                out valuesPtr,
                 out iCard);
 
             if (iCard == 1)
             {
-                unsafe
-                {
-                    return ((long*)values.ToPointer())[0];
-                }
+                Int64[] values = new Int64[iCard];
+                System.Runtime.InteropServices.Marshal.Copy(valuesPtr, values, 0, (int)iCard);
+
+                return values[0];
             }
 
             return 0;
@@ -136,21 +136,21 @@ namespace IFCGeometry2RDF
         {
             long iModel = RDF.engine.GetModel(iColorComponentInstance);
 
-            IntPtr values;
+            IntPtr valuesPtr;
             long iCard = 0;
 
             RDF.engine.GetDatatypeProperty(
                 iColorComponentInstance,
                 RDF.engine.GetPropertyByName(iModel, strProperty),
-                out values,
+                out valuesPtr,
                 out iCard);
 
             if (iCard == 1)
             {
-                unsafe
-                {
-                    return ((double*)values.ToPointer())[0];
-                }
+                Int64[] values = new Int64[iCard];
+                System.Runtime.InteropServices.Marshal.Copy(valuesPtr, values, 0, (int)iCard);
+
+                return values[0];
             }
 
             return 0;
@@ -160,28 +160,33 @@ namespace IFCGeometry2RDF
         {
             long iModel = RDF.engine.GetModel(iColorInstance);
 
-            IntPtr values;
+            IntPtr valuesPtr;
             long iCard = 0;
 
             RDF.engine.GetDatatypeProperty(
                 iColorInstance,
                 RDF.engine.GetPropertyByName(iModel, "transparency"),
-                out values,
+                out valuesPtr,
                 out iCard);
 
             if (iCard == 1)
             {
-                unsafe
-                {
-                    return ((double*)values.ToPointer())[0];
-                }
+                double[] values = new double[iCard];
+                System.Runtime.InteropServices.Marshal.Copy(valuesPtr, values, 0, (int)iCard);
+
+                return values[0];
             }
 
             return 0;
         }
 
-        public static int Compare(_color c1, _color c2)
+        public static int Compare(_color? c1, _color? c2)
         {
+            if (c1 == null || c2 == null)
+            {
+                return 0;
+            }
+
             // R
             if (c1.R > c2.R)
             {
@@ -230,7 +235,7 @@ namespace IFCGeometry2RDF
             return c.R.GetHashCode() + c.G.GetHashCode() + c.B.GetHashCode() + c.W.GetHashCode();
         }
 
-        public int GetHashCode()
+        public override int GetHashCode()
         {
             return GetHashCode(this);
         }
@@ -245,10 +250,10 @@ namespace IFCGeometry2RDF
     {
         #region Fields
 
-        private static _material _facesDefaultMaterial;
-        private static _material _pointedInstanceMaterial;
-        private static _material _selectedInstanceMaterial;
-        private static _material _linesDefaultMaterial;
+        private static _material? _facesDefaultMaterial;
+        private static _material? _pointedInstanceMaterial;
+        private static _material? _selectedInstanceMaterial;
+        private static _material? _linesDefaultMaterial;
 
         #endregion // Fields
 
@@ -258,7 +263,7 @@ namespace IFCGeometry2RDF
         {
         }
 
-        public static _material Create(long iConceptualFaceInstance)
+        public static _material? Create(long iConceptualFaceInstance)
         {
             long iMaterialInstance = RDF.engine.GetConceptualFaceMaterial(iConceptualFaceInstance);
             if (iMaterialInstance != 0)
@@ -392,8 +397,13 @@ namespace IFCGeometry2RDF
             return material;
         }
 
-        public bool Equals(_material other)
+        public bool Equals(_material? other)
         {
+            if (other == null)
+            {
+                return false;
+            }
+
             int iResult = _color.Compare(Ambient, other.Ambient);
             if (iResult != 0)
             {
@@ -421,34 +431,39 @@ namespace IFCGeometry2RDF
             return true;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as _material);
         }
 
         public override int GetHashCode()
         {
-            return Ambient.GetHashCode() + Diffuse.GetHashCode() + Emissive.GetHashCode() + Specular.GetHashCode();
+            return (Ambient?.GetHashCode() ?? 0) + (Diffuse?.GetHashCode() ?? 0) + (Emissive?.GetHashCode() ?? 0) + (Specular?.GetHashCode() ?? 0);
         }
 
         #endregion // Methods
 
         #region Properties
 
-        public _color Ambient { get; set; }
-        public _color Diffuse { get; set; }
-        public _color Emissive { get; set; }
-        public _color Specular { get; set; }
+        public _color? Ambient { get; set; }
+        public _color? Diffuse { get; set; }
+        public _color? Emissive { get; set; }
+        public _color? Specular { get; set; }
         public float A { get; set; } = 1.0f;
-        public string Texture { get; set; }
+        public string? Texture { get; set; }
 
         #endregion // Properties
     }
 
     public class _materialComparer : IComparer<_material>
     {
-        public int Compare(_material m1, _material m2)
+        public int Compare(_material? m1, _material? m2)
         {
+            if (m1 == null || m2 == null)
+            {
+                return 0;
+            }
+
             int iResult = _color.Compare(m1.Ambient, m2.Ambient);
             if (iResult != 0)
             {
@@ -479,27 +494,32 @@ namespace IFCGeometry2RDF
 
     public class _materialEqualityComparer : IEqualityComparer<_material>
     {
-        public bool Equals(_material m1, _material m2)
+        public bool Equals(_material? m1, _material? m2)
         {
-            int iResult = _color.Compare(m1.Ambient, m2.Ambient);
+            if (m1 == null || m2 == null)
+            {
+                return false;
+            }
+
+            int iResult = _color.Compare(m1?.Ambient, m2?.Ambient);
             if (iResult != 0)
             {
                 return false;
             }
 
-            iResult = _color.Compare(m1.Diffuse, m2.Diffuse);
+            iResult = _color.Compare(m1?.Diffuse, m2?.Diffuse);
             if (iResult != 0)
             {
                 return false;
             }
 
-            iResult = _color.Compare(m1.Emissive, m2.Emissive);
+            iResult = _color.Compare(m1?.Emissive, m2?.Emissive);
             if (iResult != 0)
             {
                 return false;
             }
 
-            iResult = _color.Compare(m1.Specular, m2.Specular);
+            iResult = _color.Compare(m1?.Specular, m2?.Specular);
             if (iResult != 0)
             {
                 return false;
@@ -510,7 +530,7 @@ namespace IFCGeometry2RDF
 
         public int GetHashCode(_material m)
         {
-            return m.Ambient.GetHashCode() + m.Diffuse.GetHashCode() + m.Emissive.GetHashCode() + m.Specular.GetHashCode();
+            return (m.Ambient?.GetHashCode() ?? 0) + (m.Diffuse?.GetHashCode() ?? 0) + (m.Emissive?.GetHashCode() ?? 0) + (m.Specular?.GetHashCode() ?? 0);
         }
     }
     public static class _i64RGBCoder

@@ -56,16 +56,19 @@ namespace IFCGeometry2RDF.IFC
                 return false;
             }
 
-            Instance = ifcengine.sdaiOpenModelBNUnicode(0, Encoding.Unicode.GetBytes(strFilePath), Encoding.Unicode.GetBytes(""));
+            // Add null terminator to byte arrays for P/Invoke marshaling
+            var filePathBytes = Encoding.UTF8.GetBytes(strFilePath + "\0");
+            var schemaBytes = Encoding.UTF8.GetBytes("\0");
+            Instance = ifcengine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
             if (Instance == 0)
             {
                 return false;
             }
 
-            ifcengine.GetSPFFHeaderItem(Instance, 9, 0, ifcengine.sdaiUNICODE, out IntPtr outputValue);
+            ifcengine.GetSPFFHeaderItem(Instance, 9, 0, ifcengine.sdaiSTRING, out IntPtr outputValue);
 
-            string strVersion = Marshal.PtrToStringUni(outputValue);
-            if (!strVersion.Contains("IFC"))
+            string? strVersion = Marshal.PtrToStringAnsi(outputValue);
+            if (strVersion == null || !strVersion.Contains("IFC"))
             {
                 return false;
             }
@@ -170,11 +173,13 @@ namespace IFCGeometry2RDF.IFC
 
             if (iIntancesCount != 0)
             {
-                ifcengine.engiGetEntityName(iParentEntity, ifcengine.sdaiUNICODE, out IntPtr name);
+                ifcengine.engiGetEntityName(iParentEntity, ifcengine.sdaiSTRING, out IntPtr name);
 
-                string strParentEntityName = Marshal.PtrToStringUni(name);
-
-                RetrieveObjects(strParentEntityName, iCircleSegments);
+                string? strParentEntityName = Marshal.PtrToStringAnsi(name);
+                if (strParentEntityName != null)
+                {
+                    RetrieveObjects(strParentEntityName, iCircleSegments);
+                }
             }
 
             iIntancesCount = ifcengine.engiGetEntityCount(Instance);

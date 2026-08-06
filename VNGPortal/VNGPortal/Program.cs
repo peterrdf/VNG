@@ -38,6 +38,20 @@ namespace VNGPortal
             }
             Directory.CreateDirectory(workflowsDir);
 
+            // Copy seed workflow XML files from the SeedData/Workflows directory to the configured workflows directory if they don't already exist
+            var seedSourceDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "Workflows");
+            if (Directory.Exists(seedSourceDir))
+            {
+                foreach (var sourceFile in Directory.EnumerateFiles(seedSourceDir, "*.xml"))
+                {
+                    var destFile = Path.Combine(workflowsDir, Path.GetFileName(sourceFile));
+                    if (!File.Exists(destFile))
+                    {
+                        File.Copy(sourceFile, destFile);
+                    }
+                }
+            }
+
             var logsDir = builder.Configuration[$"{FileStorage}:LogsDir"];
             if (string.IsNullOrEmpty(logsDir))
             {

@@ -45,10 +45,7 @@ namespace VNGPortal
                 foreach (var sourceFile in Directory.EnumerateFiles(seedSourceDir, "*.xml"))
                 {
                     var destFile = Path.Combine(workflowsDir, Path.GetFileName(sourceFile));
-                    if (!File.Exists(destFile))
-                    {
-                        File.Copy(sourceFile, destFile);
-                    }
+                    File.Copy(sourceFile, destFile, true);
                 }
             }
 

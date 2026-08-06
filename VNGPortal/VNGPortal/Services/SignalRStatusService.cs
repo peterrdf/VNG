@@ -16,7 +16,7 @@ namespace VNGPortal.Services
         string Model,       
         string Status = "Pending",
         string Error = "",
-        int Progress = 0, // Progress percentage (0-100)
+        float Progress = 0, // Progress percentage (0-100)
         DateTime LastUpdated = default)
     {
         public TaskDescriptor() : this(string.Empty, string.Empty, string.Empty, string.Empty) { }
@@ -34,7 +34,7 @@ namespace VNGPortal.Services
         Task<int> GetActiveConnectionsCount(string groupName);
         Task SendStatusUpdate(string groupName, string message);
         Task SendStatusUpdate(string groupName, string message, object data);
-        Task SendProgressUpdate(string groupName, int progress, string message, bool error);
+        Task SendProgressUpdate(string groupName, float progress, string message, bool error);
         Task SendQueryUpdate(string groupName, string type, string query, string result, bool error);
     }
 
@@ -275,7 +275,7 @@ namespace VNGPortal.Services
             }
         }
 
-        public async Task SendProgressUpdate(string groupName, int progress, string message, bool error)
+        public async Task SendProgressUpdate(string groupName, float progress, string message, bool error)
         {
             var connections = await _connectionState.GetConnectionsInGroup(groupName);
             if (connections.Any())

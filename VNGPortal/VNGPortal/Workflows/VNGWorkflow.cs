@@ -338,7 +338,7 @@ namespace VNGPortal.Workflows
 
         public override async Task<bool> ExecuteAsync(TaskDescriptor taskDescriptor)
         {
-            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, 100, "Workflow started...", false);
+            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, 0, "Workflow started...", false);
 
             var currentStep = 0;
             var stepsCount = 3/*Pre-processing*/ + _workflow.Steps.Count;
@@ -369,7 +369,7 @@ namespace VNGPortal.Workflows
                 throw new Exception($"IFC to RDF conversion failed for model {taskDescriptor.TaskId} with exit code {exitCode}");
             }
             _logger.LogInformation("IFC to RDF conversion completed successfully.");
-            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, stepsCount / stepsCount, $"(Step {currentStep}/{stepsCount}) IFC to RDF conversion completed successfully.", false);
+            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) IFC to RDF conversion completed successfully.", false);
 
             //
             // Geometry to RDF conversion
@@ -381,7 +381,7 @@ namespace VNGPortal.Workflows
                 var geometry2RDF = new Geometry2RDF(_logger);
                 await geometry2RDF.Run(filePath);
                 _logger.LogInformation("Geometry to RDF conversion completed successfully.");
-                await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, stepsCount / stepsCount, $"(Step {currentStep}/{stepsCount}) Geometry to RDF conversion completed successfully.", false);
+                await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Geometry to RDF conversion completed successfully.", false);
             }
             catch (Exception ex)
             {
@@ -405,9 +405,13 @@ namespace VNGPortal.Workflows
                 Path.Combine(modelDir, Path.GetFileNameWithoutExtension(filePath) + "_geometry.trig")
             });
             _logger.LogInformation("IFC file processed and data added to SPARQL dataset.");
-            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, stepsCount / stepsCount, $"(Step {currentStep}/{stepsCount}) IFC file processed and data added to SPARQL dataset.", false);
+            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) IFC file processed and data added to SPARQL dataset.", false);
 
             var datasetName = "test1"; //#todo modelId or taskId instead of hardcoded "test1"
+
+            //
+            // Execute workflow steps
+            //
 
             for (int i = 0; _workflow.Steps != null && i < _workflow.Steps.Count; i++)
             {
@@ -421,14 +425,14 @@ namespace VNGPortal.Workflows
                         case "SPARQL":
                             string query = step.Parameters["query"];
 
-                            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, stepsCount / stepsCount, $"(Step {currentStep}/{stepsCount}) Executing workflow step: {step.Name}...", false);
+                            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Executing workflow step: {step.Name}...", false);
                             await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SPARQL Query", query, "", false);
                             if (!await sparqlServer.ExecuteInsertAsync(datasetName, query))
                             {
                                 return false;
                             }
                             _logger.LogInformation("Workflow step {StepName} executed successfully.", step.Name);
-                            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, stepsCount / stepsCount, $"(Step {currentStep}/{stepsCount}) Workflow step: {step.Name} executed successfully.", false);
+                            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Workflow step: {step.Name} executed successfully.", false);
                             break;
 
                         case "SHACL":

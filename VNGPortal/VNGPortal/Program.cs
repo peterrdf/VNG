@@ -31,6 +31,13 @@ namespace VNGPortal
             }
             Directory.CreateDirectory(modelsDir);
 
+            var workflowsDir = builder.Configuration[$"{FileStorage}:WorkflowsDir"];
+            if (string.IsNullOrEmpty(workflowsDir))
+            {
+                throw new InvalidOperationException("Workflows path is not configured.");
+            }
+            Directory.CreateDirectory(workflowsDir);
+
             var logsDir = builder.Configuration[$"{FileStorage}:LogsDir"];
             if (string.IsNullOrEmpty(logsDir))
             {

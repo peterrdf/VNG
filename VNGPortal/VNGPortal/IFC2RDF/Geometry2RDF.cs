@@ -27,7 +27,7 @@ namespace VNGPortal.IFC2RDF
 
         public Geometry2RDF(ILogger logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public Task Run(string inputFile)

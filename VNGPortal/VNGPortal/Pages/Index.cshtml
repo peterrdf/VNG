@@ -5,7 +5,7 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+    <h1 class="display-4">VNG</h1>
 </div>
 
 <div class="container mt-4">
@@ -13,11 +13,20 @@
         <div class="col-md-8 col-lg-10">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Upload IFC File</h5>
                     <form id="uploadForm" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
+                            <label for="workflowSelect" class="form-label">Select Workflow</label>
+                            <select class="form-select" id="workflowSelect" name="SelectedWorkflowId" required>
+                                <option value="" disabled selected>-- Select a workflow --</option>
+                                @foreach (var workflow in Model.Workflows.Values)
+                                {
+                                    <option value="@workflow.Id">@workflow.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="ifcFile" class="form-label">Select IFC File</label>
-                            <input type="file" class="form-control" id="ifcFile" name="IfcFile" accept=".ifc" required />
+                            <input type="file" class="form-control" id="ifcFile" name="IfcFile" accept=".ifc" required disabled />
                         </div>
                         <button type="submit" class="btn btn-primary" id="uploadFile">Upload</button>
                     </form>
@@ -44,6 +53,7 @@
         if (serverStatus.taskDescriptorUpdate?.Status !== 'Running') {
             document.getElementById('ifcFile').disabled = false;
             document.getElementById('uploadFile').disabled = false;
+            document.getElementById('workflowSelect').disabled = false;
         }
     });
 
@@ -54,6 +64,7 @@
             // Re-enable on error
             document.getElementById('ifcFile').disabled = false;
             document.getElementById('uploadFile').disabled = false;
+            document.getElementById('workflowSelect').disabled = false;
         } else {
             messageDiv.innerHTML = `<div class="alert alert-info">${progress.message}</div>`;
         }
@@ -144,6 +155,12 @@
     // Start the connection
     startConnection();
 
+    // Enable the file input once a workflow is selected
+    document.getElementById('workflowSelect').addEventListener('change', function () {
+        const ifcFile = document.getElementById('ifcFile');
+        ifcFile.disabled = !this.value;
+    });
+
     // Handle form submission via AJAX
     document.getElementById('uploadForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -171,9 +188,10 @@
                     await connection.invoke("JoinGroup", result.taskId);
                 }
                 // Update UI
-                document.getElementById('ifcFile').value ='';
+                document.getElementById('ifcFile').value = '';
                 document.getElementById('ifcFile').disabled = true;
                 document.getElementById('uploadFile').disabled = true;
+                document.getElementById('workflowSelect').disabled = true;
             }
         } catch (error) {
             console.error('Upload error:', error);

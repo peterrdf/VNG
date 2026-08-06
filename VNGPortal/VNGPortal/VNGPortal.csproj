@@ -34,6 +34,9 @@
 		<None Update="SeedData\Workflows\vng_workflow1.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\Workflows\vng_workflow2.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>

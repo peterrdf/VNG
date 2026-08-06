@@ -20,7 +20,12 @@ public class IndexModel : PageModel
     [BindProperty]
     public IFormFile? IfcFile { get; set; }
 
+    [BindProperty]
+    public string? SelectedWorkflowId { get; set; }
+
     public string? Message { get; set; }
+
+    public IDictionary<string, Workflow> Workflows { get; private set; } = new Dictionary<string, Workflow>();
 
     public IndexModel(IConfiguration configuration, ILogger<IndexModel> logger, ISignalRStatusService signalRStatus)
     {
@@ -31,6 +36,7 @@ public class IndexModel : PageModel
 
     public void OnGet()
     {
+        Workflows = GetWorkflows();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -179,5 +185,11 @@ public class IndexModel : PageModel
         } // while (sdaiAttr != 0)
 
         return Task.FromResult(true);
+    }
+
+    public IDictionary<string, Workflow> GetWorkflows()
+    {
+        WorkflowStorage workflowStorage = new WorkflowStorage(_configuration, _logger);
+        return workflowStorage.LoadWorkflows();
     }
 }

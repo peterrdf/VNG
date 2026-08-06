@@ -99,7 +99,13 @@ public class IndexModel : PageModel
         //using var stream = System.IO.File.Create(taskXMLPath);
         //serializer.Serialize(stream, taskDescriptor);
 
-        await _signalRStatus.AddTask(modelId, modelId, "VNG", Path.GetFileName(IfcFile.FileName), "Pending");
+        if (string.IsNullOrEmpty(SelectedWorkflowId))
+        {
+            Message = "Please select a workflow.";
+            return new JsonResult(new { taskId = (string?)null, error = Message });
+        }
+
+        await _signalRStatus.AddTask(modelId, modelId, SelectedWorkflowId, Path.GetFileName(IfcFile.FileName), "Pending");
 
         return new JsonResult(new { taskId = (string?)modelId, error = (string?)null });
     }

@@ -10,29 +10,20 @@ namespace VNGPortal.Workflows
         protected readonly IConfiguration _configuration;
         protected readonly ISignalRStatusService _signalRStatus;
         protected readonly string _groupName;
-        protected readonly Dictionary<string, string>? _options;
+        protected readonly Workflow _workflow;
         #endregion // Fields
 
         #region Methods
-        public _Workflow(IConfiguration configuration, ILogger logger, ISignalRStatusService signalRStatus, string groupName, Dictionary<string, string>? options)
+        public _Workflow(IConfiguration configuration, ILogger logger, ISignalRStatusService signalRStatus, string groupName, Workflow workflow)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _signalRStatus = signalRStatus ?? throw new ArgumentNullException(nameof(signalRStatus));
             _groupName = groupName ?? throw new ArgumentNullException(nameof(groupName));
-            _options = options;
+            _workflow = workflow ?? throw new ArgumentNullException(nameof(workflow));
         }
 
         public abstract Task<bool> ExecuteAsync(TaskDescriptor taskDescriptor);
-
-        protected string GetOption(string key, string defaultValue = "")
-        {
-            if (_options != null && _options.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-            return defaultValue;
-        }
 
         protected async Task<int> ExecuteProcess(string exePath, string args, string workingDirectory = "", int timeoutHours = 1, IEnumerable<string>? extraPathEntries = null)
         {

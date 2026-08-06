@@ -12,7 +12,7 @@ namespace VNGPortal.Services
     public record TaskDescriptor(
         string TaskId,
         string GroupName,
-        string Workflow,
+        string WorkflowId,
         string Model,       
         string Status = "Pending",
         string Error = "",
@@ -393,20 +393,27 @@ namespace VNGPortal.Services
         {
             try
             {
-                await UpdateTask(taskDescriptor.TaskId, "Running");
-                if (taskDescriptor.Workflow == "VNG")
+                if (string.IsNullOrEmpty(taskDescriptor.WorkflowId))
                 {
-                    var workflow = new VNGWorkflow(_configuration, _logger, this, taskDescriptor.TaskId, null);
-                    if (await workflow.ExecuteAsync(taskDescriptor))
-                    {
-                        await CompleteTask(taskDescriptor.TaskId, "");
-                        return;
-                    }
+                    _logger.LogError("WorkflowId is null or empty.");
+                    await CompleteTask(taskDescriptor.TaskId, "WorkflowId is null or empty.");
+                    return;
                 }
-                else
+
+                WorkflowStorage workflowStorage = new WorkflowStorage(_configuration, _logger);
+                var workflows = workflowStorage.LoadWorkflows();
+                if ((workflows == null) || !workflows.ContainsKey(taskDescriptor.WorkflowId))
                 {
-                    _logger.LogError("Invalid workflow specified.");
-                    await CompleteTask(taskDescriptor.TaskId, "Invalid workflow specified.");
+                    _logger.LogError($"Workflow '{taskDescriptor.WorkflowId}' not found.");
+                    await CompleteTask(taskDescriptor.TaskId, $"Workflow '{taskDescriptor.WorkflowId}' not found.");
+                    return;
+                }
+
+                await UpdateTask(taskDescriptor.TaskId, "Running");
+                var workflow = new VNGWorkflow(_configuration, _logger, this, taskDescriptor.TaskId, workflows[taskDescriptor.WorkflowId]);
+                if (await workflow.ExecuteAsync(taskDescriptor))
+                {
+                    await CompleteTask(taskDescriptor.TaskId, "");
                     return;
                 }
 

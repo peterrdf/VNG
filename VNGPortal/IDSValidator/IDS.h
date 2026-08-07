@@ -17,6 +17,7 @@
 
 #include "_xml.h"
 #include "ifcengine.h"
+#include <list>
 
 namespace RDF
 {

@@ -18,6 +18,8 @@ using namespace RDF::IDS;
 
 #include <climits>
 #include <cfloat>
+#include <math.h>
+#include <stdarg.h>
 
 /// <summary>
 /// 

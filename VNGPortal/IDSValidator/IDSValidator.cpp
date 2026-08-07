@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 	}
 
 	// IDS
-	fs::path pathIDS = argv[2];
+	fs::path pathIDS = argv[2];	
 
 	RDF::IDS::File ids;
 	if (ids.Read(pathIDS.wstring().c_str())) {

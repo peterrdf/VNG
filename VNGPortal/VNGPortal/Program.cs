@@ -17,6 +17,7 @@ namespace VNGPortal
             //
             // Create folders for settings, models, and logs if they don't exist
             // 
+
             var settingsDir = builder.Configuration[$"{FileStorage}:SettingsDir"];
             if (string.IsNullOrEmpty(settingsDir))
             {
@@ -38,13 +39,31 @@ namespace VNGPortal
             }
             Directory.CreateDirectory(workflowsDir);
 
-            // Copy seed workflow XML files from the SeedData/Workflows directory to the configured workflows directory if they don't already exist
+            // Copy always seed workflow XML files from the SeedData/Workflows directory to the configured workflows directory
             var seedSourceDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "Workflows");
             if (Directory.Exists(seedSourceDir))
             {
                 foreach (var sourceFile in Directory.EnumerateFiles(seedSourceDir, "*.xml"))
                 {
                     var destFile = Path.Combine(workflowsDir, Path.GetFileName(sourceFile));
+                    File.Copy(sourceFile, destFile, true);
+                }
+            }
+
+            var idsDir = builder.Configuration[$"{FileStorage}:IDSDir"];
+            if (string.IsNullOrEmpty(idsDir))
+            {
+                throw new InvalidOperationException("IDS path is not configured.");
+            }
+            Directory.CreateDirectory(idsDir);
+
+            // Copy always seed IDS XML files from the SeedData/IDS directory to the configured IDS directory
+            var seedIdsSourceDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "IDS");
+            if (Directory.Exists(seedIdsSourceDir))
+            {
+                foreach (var sourceFile in Directory.EnumerateFiles(seedIdsSourceDir, "*.ids"))
+                {
+                    var destFile = Path.Combine(idsDir, Path.GetFileName(sourceFile));
                     File.Copy(sourceFile, destFile, true);
                 }
             }

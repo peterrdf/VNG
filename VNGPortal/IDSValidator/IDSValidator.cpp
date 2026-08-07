@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
 	}
 
 	// Input
-	std::cout << "Model: " << argv[1] << "\n";
-	std::cout << "IDS: " << argv[2] << "\n";
+	//std::cout << "Model: " << argv[1] << "\n";
+	//std::cout << "IDS: " << argv[2] << "\n";
 
 	// Model
 	fs::path pathModel = argv[1];

@@ -12,7 +12,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
     volumes:
-      - portal_data:/vng/portal
+      - C:\vng\portal:/vng/portal
     restart: unless-stopped
 
   vngtriplestore:
@@ -43,6 +43,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  portal_data:
   fuseki_data:
   service_data:

@@ -30,12 +30,9 @@ public:
 int main(int argc, char* argv[])
 {
 	if (argc != 3) {
-		std::cerr << "Error: invalid number of arguments." << "\n";
+		std::cout << "Error: invalid number of arguments." << "\n";
 		return -1;
 	}
-
-	// Revision
-	std::cout << "Revision: " << GetRevision() << "\n";
 
 	// Input
 	std::cout << "Model: " << argv[1] << "\n";
@@ -45,7 +42,7 @@ int main(int argc, char* argv[])
 	fs::path pathModel = argv[1];
 	auto sdaiModel = sdaiOpenModelBN(0, pathModel.string().c_str(), "");
 	if (!sdaiModel) {
-		std::cerr << "Error: failed to open model." << "\n";
+		std::cout << "Error: failed to open model." << "\n";
 		return -1;
 	}
 
@@ -53,20 +50,20 @@ int main(int argc, char* argv[])
 	fs::path pathIDS = argv[2];	
 
 	RDF::IDS::File ids;
+	bool ok = false;
 	if (ids.Read(pathIDS.wstring().c_str())) {
 
 		std::string strLog;
 		IDSConsole output(strLog);
-		bool ok = ids.Check(sdaiModel, false, RDF::IDS::MsgLevel::Error, &output);
+		ok = ids.Check(sdaiModel, false, RDF::IDS::MsgLevel::Error, &output);
 
-		strLog.append(ok ? "Result: OK\n\n" : "Result: FAIL\n\n");
 		std::cout << strLog;
 	}
 	else {
-		std::cerr << "Error: failed to open IDS file." << "\n";
+		std::cout << "Error: failed to open IDS file." << "\n";
 	}
 
 	sdaiCloseModel(sdaiModel);
 
-	return 0;
+	return ok ? 0 : -1;
 }

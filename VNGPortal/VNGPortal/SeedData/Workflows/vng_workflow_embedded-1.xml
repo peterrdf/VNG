@@ -4,6 +4,15 @@
 	<description><![CDATA[Description of VNG Workflow 1]]></description>
 	<steps>
 		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[IDS Ruimten voor Kievietsweg v001.ids]]>
+				</ids_file>
+			</parameters>
+		</step>
+		<step>
 			<name><![CDATA[Insert Buildings]]></name>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>

@@ -22,9 +22,10 @@ namespace VNGPortal.Workflows
             var fileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
 
             var modelsDir = _configuration[$"{fileStorage}:ModelsDir"]!;
+            var idsDir = _configuration[$"{fileStorage}:IDSDir"]!;
 
             var modelDir = Path.Combine(modelsDir, taskDescriptor.TaskId);
-            var filePath = Path.Combine(modelDir, taskDescriptor.Model);
+            var modelPath = Path.Combine(modelDir, taskDescriptor.Model);
 
             //
             // IFC to RDF conversion
@@ -33,12 +34,12 @@ namespace VNGPortal.Workflows
 
             var jarPath = Path.Combine(Directory.GetCurrentDirectory(), "IFC2RDF", "ifc2rdf-1.4.7-shaded.jar");
             var javaPath = _configuration[$"{(isLinuxPlatform ? "ToolsLinux" : "Tools")}:JavaPath"]!;
-            int exitCode = await ExecuteProcess(
+            var (output, error, exitCode) = await ExecuteProcess(
                 exePath: javaPath,
                 args: $"-jar \"{jarPath}\" --baseURI http://vng.nl/geometry/ --dir \"{modelDir}\""
             );
             if (exitCode != 0)
-            {                
+            {
                 _logger.LogError("IFC to RDF conversion failed for model {ModelId} with exit code {ExitCode}", taskDescriptor.TaskId, exitCode);
                 await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, 0, "IFC to RDF conversion failed.", true);
                 throw new Exception($"IFC to RDF conversion failed for model {taskDescriptor.TaskId} with exit code {exitCode}");
@@ -54,7 +55,7 @@ namespace VNGPortal.Workflows
             try
             {
                 var geometry2RDF = new Geometry2RDF(_logger);
-                await geometry2RDF.Run(filePath);
+                await geometry2RDF.Run(modelPath);
                 _logger.LogInformation("Geometry to RDF conversion completed successfully.");
                 await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Geometry to RDF conversion completed successfully.", false);
             }
@@ -76,8 +77,8 @@ namespace VNGPortal.Workflows
             // Add data to the Jena-Fuseki database
             sparqlServer.AddData("test1", new List<string>
             {
-                Path.Combine(modelDir, Path.GetFileNameWithoutExtension(filePath) + ".ttl"),
-                Path.Combine(modelDir, Path.GetFileNameWithoutExtension(filePath) + "_geometry.trig")
+                Path.Combine(modelDir, Path.GetFileNameWithoutExtension(modelPath) + ".ttl"),
+                Path.Combine(modelDir, Path.GetFileNameWithoutExtension(modelPath) + "_geometry.trig")
             });
             _logger.LogInformation("IFC file processed and data added to SPARQL dataset.");
             await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) IFC file processed and data added to SPARQL dataset.", false);
@@ -90,7 +91,7 @@ namespace VNGPortal.Workflows
 
             for (int i = 0; _workflow.Steps != null && i < _workflow.Steps.Count; i++)
             {
-                var step = _workflow.Steps[i]; 
+                var step = _workflow.Steps[i];
                 currentStep++;
 
                 try
@@ -102,12 +103,17 @@ namespace VNGPortal.Workflows
 
                             await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...", false);
                             await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SPARQL Query", query, "", false);
-                            if (!await sparqlServer.ExecuteInsertAsync(datasetName, query))
+
+                            if (await sparqlServer.ExecuteInsertAsync(datasetName, query))
                             {
-                                return false;
+                                _logger.LogInformation("Workflow step {StepName} executed successfully.", step.Name);
+                                await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.", false);
                             }
-                            _logger.LogInformation("Workflow step {StepName} executed successfully.", step.Name);
-                            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.", false);
+                            else
+                            {
+                                await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' failed.", true);
+                                _logger.LogError("SPARQL query execution failed for model {ModelId}.", taskDescriptor.TaskId);
+                            }                                
                             break;
 
                         case "SHACL":
@@ -119,11 +125,37 @@ namespace VNGPortal.Workflows
                             var result = await sparqlServer.ExecuteSHACLAsync(datasetName, "https://vng.nl/geometries/", shape);
                             if (!string.IsNullOrEmpty(result))
                             {
+                                _logger.LogInformation("SHACL validation completed for model {ModelId}. Result: {Result}", taskDescriptor.TaskId, result);
                                 await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Validation Report", "", result, result.IndexOf("sh:Violation") != -1);
                             }
 
                             _logger.LogInformation("Workflow step {StepName} executed successfully.", step.Name);
                             await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.", false);
+                            break;
+
+                        case "IDS":
+                            string idsFile = step.Parameters["ids_file"];
+                            var idsPath = Path.Combine(idsDir, idsFile);
+                            var idsFileContent = await File.ReadAllTextAsync(idsPath);
+
+                            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...", false);
+                            await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "IDS File", FormatXML(idsFileContent), "", false);
+                            
+                            (output, error, exitCode) = await ExecuteProcess(
+                                    exePath: isLinuxPlatform ? "./IDSValidator" : "./IDSValidator.exe",
+                                    args: $"\"{modelPath}\" \"{idsPath}\""
+                                );
+                            if (exitCode == 0)
+                            {
+                                _logger.LogInformation("IDS Validation completed successfully.");
+                                await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "IDS Validation Report", "", output, output.IndexOf("ERROR") != -1);
+                                await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.", false);
+                            }
+                            else
+                            {
+                                _logger.LogError("IDS Validation failed for model {ModelId} with exit code {ExitCode}", taskDescriptor.TaskId, exitCode);
+                                await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "IDS Validation Report", "", output, true);
+                            }
                             break;
 
                         default:
@@ -133,7 +165,7 @@ namespace VNGPortal.Workflows
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error executing workflow step: '{StepName}'",  step.Name);
+                    _logger.LogError(ex, "Error executing workflow step: '{StepName}'", step.Name);
                     await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, 0, $"Error executing workflow step: '{step.Name}'.", true);
                     throw;
                 }
@@ -142,6 +174,36 @@ namespace VNGPortal.Workflows
             await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, 100, "Workflow completed successfully.", false);
 
             return true;
+        }
+
+        private string FormatXML(string xml)
+        {
+            try
+            {
+                // Format XML with indentation
+                var xmlDoc = new System.Xml.XmlDocument();
+                xmlDoc.LoadXml(xml);
+
+                var settings = new System.Xml.XmlWriterSettings
+                {
+                    Indent = true,
+                    IndentChars = "  ",
+                    NewLineChars = "\n",
+                    NewLineHandling = System.Xml.NewLineHandling.Replace,
+                    OmitXmlDeclaration = false
+                };
+
+                using var stringWriter = new System.IO.StringWriter();
+                using var xmlWriter = System.Xml.XmlWriter.Create(stringWriter, settings);
+                xmlDoc.Save(xmlWriter);
+
+                return stringWriter.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error formatting XML.");
+                return xml; // Return the original XML if formatting fails
+            }
         }
         #endregion
 

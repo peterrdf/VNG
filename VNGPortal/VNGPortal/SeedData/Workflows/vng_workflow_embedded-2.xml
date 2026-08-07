@@ -4,45 +4,67 @@
 	<description><![CDATA[Description of VNG Workflow 2]]></description>
 	<steps>
 		<step>
-			<name><![CDATA[Insert Buildings]]></name>
-			<type><![CDATA[SPARQL]]></type>
+			<name><![CDATA[IDS Validation]]></name>
+			<type><![CDATA[IDS]]></type>
 			<parameters>
-				<query>
-					<![CDATA[
-				        PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
-                        PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                        PREFIX express: <https://w3id.org/express#>
-                        PREFIX vng:     <http://vng.nl/geometry-ext.ttl#>
-                        PREFIX dso:     <http://vng.nl/areas/>
-
-                        DROP SILENT GRAPH <areas.ttl> ;
-
-                        INSERT {
-                          GRAPH <areas.ttl> {
-                            ?areaUri  a dso:area ;
-                                        dso:id    		?id ;
-                                        dso:name		?name ;
-            				            dso:group		?group ;
-            				            dso:type		?type ;
-            				            dso:geometry 	?geometry .
-                          }
-                        }
-                        WHERE {
-                          {
-                            SELECT ?e ?n WHERE {
-                              ?mc rdf:type                          ifc:IfcMapConversion ;
-                                  ifc:eastings_IfcMapConversion     ?le ;
-                                  ifc:northings_IfcMapConversion    ?ln .
-                              ?le express:hasDouble                 ?e .
-                              ?ln express:hasDouble                 ?n .
-                            } LIMIT 1
-                          }
-                          (?e ?n) vng:dsoArea (?id ?name ?group ?type ?geometry) .
-                          BIND(IRI(CONCAT(STR(dso:), ?id)) AS ?areaUri)
-                        }
-				]]>
-				</query>
-			</parameters>			
+				<ids_file>
+					<![CDATA[IDS Ruimten voor Kievietsweg v001.ids]]>
+				</ids_file>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[IDS voor Omgevingswet Ruimten v1.1.ids]]>
+				</ids_file>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[IDS_for_LoGeRef_50_Georeferencing.ids]]>
+				</ids_file>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[ILS voor ruimten in de omgevingswet-v1.1.ids]]>
+				</ids_file>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[ILS_VOOR_RUIMTE_IN_DE_OMGEVINGSWET 4.2.2.ids]]>
+				</ids_file>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[Omgevingswet-Ruimten-0.2.0.ids]]>
+				</ids_file>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[VDCbase-KEU-ZZ-ZZZ-RG-TOTAL-XX-0001-InformationDeliverySpecification.ids]]>
+				</ids_file>
+			</parameters>
 		</step>
 	</steps>
 </workflow>

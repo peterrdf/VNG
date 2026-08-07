@@ -25,7 +25,12 @@ namespace VNGPortal.Workflows
 
         public abstract Task<bool> ExecuteAsync(TaskDescriptor taskDescriptor);
 
-        protected async Task<int> ExecuteProcess(string exePath, string args, string workingDirectory = "", int timeoutHours = 1, IEnumerable<string>? extraPathEntries = null)
+        protected async Task<Tuple<string, string, int>> ExecuteProcess(
+            string exePath, 
+            string args,
+            string workingDirectory = "", 
+            int timeoutHours = 1, 
+            IEnumerable<string>? extraPathEntries = null)
         {
             var process = new System.Diagnostics.Process
             {
@@ -93,10 +98,10 @@ namespace VNGPortal.Workflows
             {
                 _logger.LogError($"Process timed out after {timeoutHours} hours. Killing process...");
                 process.Kill(entireProcessTree: true);
-                return -1;
+                return Tuple.Create(outputBuilder.ToString(), errorBuilder.ToString(), -1);
             }
 
-            return process.ExitCode;
+            return Tuple.Create(outputBuilder.ToString(), errorBuilder.ToString(), process.ExitCode);
         }
         #endregion // Methods
 

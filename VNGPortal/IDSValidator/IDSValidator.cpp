@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
 		std::string strLog;
 		IDSConsole output(strLog);
-		ok = ids.Check(sdaiModel, false, RDF::IDS::MsgLevel::Error, &output);
+		ok = ids.Check(sdaiModel, false, RDF::IDS::MsgLevel::All, &output);
 
 		std::cout << strLog;
 	}

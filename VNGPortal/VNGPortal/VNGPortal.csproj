@@ -55,10 +55,10 @@
 		<None Update="SeedData\IDS\VDCbase-KEU-ZZ-ZZZ-RG-TOTAL-XX-0001-InformationDeliverySpecification.ids">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow1.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-1.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow2.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-2.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

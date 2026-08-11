@@ -209,7 +209,7 @@ namespace VNGPortal.SPARQL
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while insetting into dataset '{DatasetName}'", datasetName);
+                _logger.LogError(ex, "Exception occurred while inserting into dataset '{DatasetName}'", datasetName);
                 throw;
             }
         }

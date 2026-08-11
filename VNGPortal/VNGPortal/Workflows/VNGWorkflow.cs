@@ -72,10 +72,10 @@ namespace VNGPortal.Workflows
             currentStep++;
 
             var sparqlServer = new SPARQL.Server(_logger);
-            sparqlServer.CreateDataset("test1");
+            sparqlServer.CreateDataset(taskDescriptor.TaskId);
 
             // Add data to the Jena-Fuseki database
-            sparqlServer.AddData("test1", new List<string>
+            sparqlServer.AddData(taskDescriptor.TaskId, new List<string>
             {
                 Path.Combine(modelDir, Path.GetFileNameWithoutExtension(modelPath) + ".ttl"),
                 Path.Combine(modelDir, Path.GetFileNameWithoutExtension(modelPath) + "_geometry.trig")
@@ -83,7 +83,7 @@ namespace VNGPortal.Workflows
             _logger.LogInformation("IFC file processed and data added to SPARQL dataset.");
             await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) IFC file processed and data added to SPARQL dataset.", false);
 
-            var datasetName = "test1"; //#todo modelId or taskId instead of hardcoded "test1"
+            var datasetName = taskDescriptor.TaskId;
 
             //
             // Execute workflow steps

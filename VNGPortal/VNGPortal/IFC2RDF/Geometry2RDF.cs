@@ -94,7 +94,7 @@ namespace VNGPortal.IFC2RDF
 
                     if (prGeometry.Value.OwlInstance != 0 && !string.IsNullOrEmpty(globalId))
                     {
-                        var modelPath = Path.Combine(Path.GetTempPath(), "temp.bin");
+                        var modelPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".bin");
 
                         long owlTransformationInstance = CreateMapConversionTransformation(sdaiModel, dScale, out double dEastings, out double dNorthings);
                         if (owlTransformationInstance != 0)

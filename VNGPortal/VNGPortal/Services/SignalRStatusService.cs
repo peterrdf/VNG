@@ -360,32 +360,26 @@ namespace VNGPortal.Services
         {
             while (true)
             {
-                var runningTasks = _tasks.Values
-                .Where(t => !string.IsNullOrEmpty(t.Status) && RunningStatuses.Contains(t.Status))
-                .ToList();
-                if (runningTasks.Count == 0)
+                var pendingTasks = _tasks.Values.Where(t => string.Equals(t.Status, "Pending", StringComparison.OrdinalIgnoreCase)).ToList();
+                if (pendingTasks.Count > 0)
                 {
-                    var pendingTasks = _tasks.Values.Where(t => string.Equals(t.Status, "Pending", StringComparison.OrdinalIgnoreCase)).ToList();
-                    if (pendingTasks.Count > 0)
-                    {
-                        var taskDescriptor = pendingTasks.First();
+                    var taskDescriptor = pendingTasks.First();
 
-                        _ = Task.Run(async () =>
+                    _ = Task.Run(async () =>
+                    {
+                        try
                         {
-                            try
-                            {
-                                await RunTask(taskDescriptor);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(ex, $"Error executing task {taskDescriptor.TaskId}: {ex.Message}");
-                            }
-                        });
-                    }
+                            await RunTask(taskDescriptor);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Error executing task {taskDescriptor.TaskId}: {ex.Message}");
+                        }
+                    });
                 }
 
-                // Check for tasks every 10 seconds
-                await Task.Delay(10 * 1000); 
+                // Check for tasks every 5 seconds
+                await Task.Delay(5 * 1000); 
             }
         }
 

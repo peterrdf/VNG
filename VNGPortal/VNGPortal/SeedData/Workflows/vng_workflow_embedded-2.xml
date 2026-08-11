@@ -1,70 +1,17 @@
 <workflow>
-	<id><![CDATA[VNG Workflow 2]]></id>
-	<name><![CDATA[VNG Workflow 2]]></name>
-	<description><![CDATA[Description of VNG Workflow 2]]></description>
+	<id><![CDATA[Regel #2]]></id>
+	<name><![CDATA[Regel #2: Maximale bouwhoogte]]></name>
+	<description><![CDATA[]]></description>
 	<steps>
 		<step>
 			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
 			<parameters>
 				<ids_file>
 					<![CDATA[IDS Ruimten voor Kievietsweg v001.ids]]>
 				</ids_file>
 			</parameters>
-		</step>
-		<step>
-			<name><![CDATA[IDS Validation]]></name>
-			<type><![CDATA[IDS]]></type>
-			<parameters>
-				<ids_file>
-					<![CDATA[IDS voor Omgevingswet Ruimten v1.1.ids]]>
-				</ids_file>
-			</parameters>
-		</step>
-		<step>
-			<name><![CDATA[IDS Validation]]></name>
-			<type><![CDATA[IDS]]></type>
-			<parameters>
-				<ids_file>
-					<![CDATA[IDS_for_LoGeRef_50_Georeferencing.ids]]>
-				</ids_file>
-			</parameters>
-		</step>
-		<step>
-			<name><![CDATA[IDS Validation]]></name>
-			<type><![CDATA[IDS]]></type>
-			<parameters>
-				<ids_file>
-					<![CDATA[ILS voor ruimten in de omgevingswet-v1.1.ids]]>
-				</ids_file>
-			</parameters>
-		</step>
-		<step>
-			<name><![CDATA[IDS Validation]]></name>
-			<type><![CDATA[IDS]]></type>
-			<parameters>
-				<ids_file>
-					<![CDATA[ILS_VOOR_RUIMTE_IN_DE_OMGEVINGSWET 4.2.2.ids]]>
-				</ids_file>
-			</parameters>
-		</step>
-		<step>
-			<name><![CDATA[IDS Validation]]></name>
-			<type><![CDATA[IDS]]></type>
-			<parameters>
-				<ids_file>
-					<![CDATA[Omgevingswet-Ruimten-0.2.0.ids]]>
-				</ids_file>
-			</parameters>
-		</step>
-		<step>
-			<name><![CDATA[IDS Validation]]></name>
-			<type><![CDATA[IDS]]></type>
-			<parameters>
-				<ids_file>
-					<![CDATA[VDCbase-KEU-ZZ-ZZZ-RG-TOTAL-XX-0001-InformationDeliverySpecification.ids]]>
-				</ids_file>
-			</parameters>
-		</step>
+		</step>		
 	</steps>
 </workflow>

@@ -1,10 +1,11 @@
 <workflow>
-	<id><![CDATA[VNG Workflow 1]]></id>
-	<name><![CDATA[VNG Workflow 1]]></name>
-	<description><![CDATA[Description of VNG Workflow 1]]></description>
+	<id><![CDATA[Regel #1]]></id>
+	<name><![CDATA[Regel #1: Gebruiksfunctie komt overeen met bestemming]]></name>
+	<description><![CDATA[]]></description>
 	<steps>
 		<step>
 			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
 			<parameters>
 				<ids_file>
@@ -14,40 +15,43 @@
 		</step>
 		<step>
 			<name><![CDATA[Insert Buildings]]></name>
+			<description>
+				<![CDATA[
+			        Rebuild the buildings dataset by finding which registered buildings from the national registry match the location of the IFC building model, and save them for later use.
+			    ]]>
+			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
 				<query>
 					<![CDATA[
-				        PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
-                        PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+				        PREFIX vng:     <http://vng.nl/geometry-ext.ttl#>
+                        PREFIX bldg:    <http://vng.nl/buildings/>
+                        PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
                         PREFIX express: <https://w3id.org/express#>
-                        PREFIX vng:     <http://vng.nl/geometry-ext.ttl#>
-                        PREFIX dso:     <http://vng.nl/areas/>
+                        PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-                        DROP SILENT GRAPH <areas.ttl> ;
+                        DROP SILENT GRAPH <buildings.ttl> ;
 
                         INSERT {
-                          GRAPH <areas.ttl> {
-                            ?areaUri  a dso:area ;
-                                        dso:id    		?id ;
-                                        dso:name		?name ;
-            				            dso:group		?group ;
-            				            dso:type		?type ;
-            				            dso:geometry 	?geometry .
+                          GRAPH <buildings.ttl> {
+                            ?buildingUri  a             bldg:Building ;
+                                          bldg:id    	?id ;
+                                          bldg:name  	?name ;
+				                          bldg:geometry ?geometry .
                           }
                         }
                         WHERE {
                           {
                             SELECT ?e ?n WHERE {
-                              ?mc rdf:type                          ifc:IfcMapConversion ;
-                                  ifc:eastings_IfcMapConversion     ?le ;
-                                  ifc:northings_IfcMapConversion    ?ln .
-                              ?le express:hasDouble                 ?e .
-                              ?ln express:hasDouble                 ?n .
+                              ?mc rdf:type                       ifc:IfcMapConversion ;
+                                  ifc:eastings_IfcMapConversion  ?le ;
+                                  ifc:northings_IfcMapConversion ?ln .
+                              ?le express:hasDouble ?e .
+                              ?ln express:hasDouble ?n .
                             } LIMIT 1
                           }
-                          (?e ?n) vng:dsoArea (?id ?name ?group ?type ?geometry) .
-                          BIND(IRI(CONCAT(STR(dso:), ?id)) AS ?areaUri)
+                          ("Buildings" ?e ?n) vng:pdokFeature (?id ?name ?geometry) .
+                          BIND(IRI(CONCAT(STR(bldg:), ?id)) AS ?buildingUri)
                         }
 				]]>
 				</query>
@@ -55,6 +59,11 @@
 		</step>
 		<step>
 			<name><![CDATA[Insert Parcels]]></name>
+			<description>
+				<![CDATA[
+			        Rebuild the land parcels dataset by finding which cadastral parcels the building sits on or near, based on its location in the IFC model.
+			    ]]>
+			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
 				<query>
@@ -94,6 +103,11 @@
 		</step>
 		<step>
 			<name><![CDATA[Insert Areas]]></name>
+			<description>
+				<![CDATA[
+			        Rebuild the areas dataset by finding which geographic service areas contain the building, based on its location in the IFC model.
+			    ]]>
+			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
 				<query>
@@ -135,6 +149,11 @@
 		</step>
 		<step>
 			<name><![CDATA[Insert BBoxes]]></name>
+			<description>
+				<![CDATA[
+			        Calculate and store the 3D bounding box for every geometry that doesn't have one yet.
+			    ]]>
+			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
 				<query>
@@ -166,6 +185,11 @@
 		</step>
 		<step>
 			<name><![CDATA[Insert Projections]]></name>
+			<description>
+				<![CDATA[
+			        Generate and store a 2D map projection for every 3D geometry that doesn't have one yet.
+			    ]]>
+			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
 				<query>
@@ -192,6 +216,11 @@
 		</step>
 		<step>
 			<name><![CDATA[Insert Topological Relations]]></name>
+			<description>
+				<![CDATA[
+			        Determine and update whether each wall in the building model spatially overlaps with residential ("wonen") planning zones.
+			    ]]>
+			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
 				<query>
@@ -253,6 +282,11 @@
 		</step>
 		<step>
 			<name><![CDATA[Validate Topological Relations]]></name>
+			<description>
+				<![CDATA[
+			        Validate that every geometry in the model is fully contained within a designated planning zone — and flag any that are not.
+			    ]]>
+			</description>
 			<type><![CDATA[SHACL]]></type>
 			<parameters>
 				<shape>
@@ -294,6 +328,11 @@
 		</step>
 		<step>
 			<name><![CDATA[Validate BBoxes]]></name>
+			<description>
+				<![CDATA[
+			        Validate that every geometry has a realistic physical size — not too small and not too large — in all three dimensions.
+			    ]]>
+			</description>
 			<type><![CDATA[SHACL]]></type>
 			<parameters>
 				<shape>
@@ -344,6 +383,11 @@
 		</step>
 		<step>
 			<name><![CDATA[Validate Model BBox]]></name>
+			<description>
+				<![CDATA[
+			        Validate that the combined physical footprint of the entire building dataset as a whole has a realistic size — not too small and not too large — in all three dimensions.
+			    ]]>
+			</description>
 			<type><![CDATA[SHACL]]></type>
 			<parameters>
 				<shape>

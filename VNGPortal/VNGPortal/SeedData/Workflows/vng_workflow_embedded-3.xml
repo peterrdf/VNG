@@ -1,0 +1,17 @@
+<workflow>
+	<id><![CDATA[Regel #3]]></id>
+	<name><![CDATA[Regel #3: Maximaal bebouwingspercentage]]></name>
+	<description><![CDATA[]]></description>
+	<steps>
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[IDS Ruimten voor Kievietsweg v001.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+	</steps>
+</workflow>

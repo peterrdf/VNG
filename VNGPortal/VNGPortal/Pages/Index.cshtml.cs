@@ -74,17 +74,6 @@ public class IndexModel : PageModel
         Message = $"File '{IfcFile.FileName}' uploaded successfully!";
         _logger.LogInformation("IFC file uploaded: {FileName} saved at {FilePath}", IfcFile.FileName, filePath);
 
-        //#todo: use IDS
-        //if (await IsGeoReferenced(filePath))
-        //{
-        //    _logger.LogInformation("IFC file is georeferenced: {FileName}", IfcFile.FileName);
-        //}
-        //else
-        //{
-        //    _logger.LogWarning("IFC file is NOT georeferenced: {FileName}", IfcFile.FileName);
-        //    Message = $"The uploaded IFC file '{IfcFile.FileName}' is not georeferenced.";
-        //    return new JsonResult(new { taskId = (string?)null, error = Message });
-        //}
 
         //#todo: create a task status file in the tasks directory
         //var taskDescriptor = new TaskDescriptor(

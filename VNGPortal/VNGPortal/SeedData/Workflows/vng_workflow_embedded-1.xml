@@ -173,8 +173,7 @@
                         }
                         WHERE {
                             GRAPH <https://vng.nl/geometries/> {
-                                ?instance a geom:Geometry ;
-                                          geom:base64Data ?base64Data .
+                                ?instance geom:base64Data ?base64Data .
                                 FILTER NOT EXISTS { ?instance geom:bboxMinX ?any }
                             }
                             (?minX ?minY ?minZ ?maxX ?maxY ?maxZ) pf:BBoxPropFunction ?base64Data .
@@ -204,8 +203,7 @@
                         }
                         WHERE {
                             GRAPH <https://vng.nl/geometries/> {
-                                ?instance   a               geom:Geometry ;
-                                            geom:base64Data ?base64Data .
+                                ?instance   geom:base64Data ?base64Data .
                                 BIND(ext:projection(?base64Data) AS ?projection)
                                 FILTER NOT EXISTS { ?instance geom:projectionBase64Data ?any }
                             }
@@ -252,8 +250,7 @@
                                             express:hasString           ?globalIdValue .
 
                             GRAPH <https://vng.nl/geometries/> {
-                                ?geometry   rdf:type                    geom:Geometry ;
-                                            geom:globalId               ?globalIdValue ;
+                                ?geometry   geom:globalId               ?globalIdValue ;
                                             geom:projectionBase64Data   ?base64Data1 .
                             }
 
@@ -298,7 +295,7 @@
 
                         geom:GeometryShape
                             a sh:NodeShape ;
-                            sh:targetClass geom:Geometry ;
+                            sh:targetSubjectsOf geom:globalId ;
 
                             sh:sparql [
                                 sh:prefixes [
@@ -344,7 +341,7 @@
 
                         geom:GeometryShape
                             a sh:NodeShape ;
-                            sh:targetClass geom:Geometry ;
+                            sh:targetSubjectsOf geom:globalId ;
 
                             sh:sparql [
                                 sh:prefixes [
@@ -418,8 +415,7 @@
                                                 (MIN(?bboxMinZ)              AS ?globalMinZ)
                                                 (MAX(?bboxMaxZ)              AS ?globalMaxZ)
                                             WHERE {
-                                                ?geom a              geom:Geometry ;
-                                                      geom:eastings  ?eastings ;
+                                                ?geom geom:eastings  ?eastings ;
                                                       geom:northings ?northings ;
                                                       geom:bboxMinX  ?bboxMinX ;
                                                       geom:bboxMaxX  ?bboxMaxX ;

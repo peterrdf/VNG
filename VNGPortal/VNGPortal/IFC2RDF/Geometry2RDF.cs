@@ -36,7 +36,7 @@ namespace VNGPortal.IFC2RDF
 
             try
             {
-                if (!File.Exists(inputFile))
+                if (!System.IO.File.Exists(inputFile))
                 {
                     _logger.LogError("Input file does not exist: {InputFile}", inputFile);
                     throw new FileNotFoundException($"Input file does not exist: {inputFile}", inputFile);
@@ -74,6 +74,7 @@ namespace VNGPortal.IFC2RDF
                 sb.AppendLine("@prefix geom:     <https://vng.nl/geometry/> .");
                 sb.AppendLine("@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .");
                 sb.AppendLine("@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .");
+                sb.AppendLine("@prefix ifc:      <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#> .");
                 sb.AppendLine();
 
                 // Open named graph
@@ -130,7 +131,7 @@ namespace VNGPortal.IFC2RDF
                         var subjectName = $"{safeEntityName}_{safeExpressId}";
 
                         sb.AppendLine($"    geom:{subjectName}");
-                        sb.AppendLine($"            rdf:type             geom:Geometry ;");
+                        sb.AppendLine($"            rdf:type             ifc:{prGeometry.Value.Entity} ;");
                         sb.AppendLine($"            geom:globalId        \"{globalId}\" ;");
                         sb.AppendLine($"            geom:eastings        \"{dEastings.ToString(System.Globalization.CultureInfo.InvariantCulture)}\"^^<http://www.w3.org/2001/XMLSchema#double> ;");
                         sb.AppendLine($"            geom:northings        \"{dNorthings.ToString(System.Globalization.CultureInfo.InvariantCulture)}\"^^<http://www.w3.org/2001/XMLSchema#double> ;");

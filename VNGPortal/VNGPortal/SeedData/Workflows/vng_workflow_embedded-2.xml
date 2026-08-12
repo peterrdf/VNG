@@ -12,6 +12,283 @@
 					<![CDATA[IDS Ruimten voor Kievietsweg v001.ids]]>
 				</ids_file>
 			</parameters>
-		</step>		
+		</step>
+		<step>
+			<name><![CDATA[Insert Areas]]></name>
+			<description>
+				<![CDATA[
+			        Build the areas dataset by finding which geographic service areas contain the building, based on its location in the IFC model.
+			    ]]>
+			</description>
+			<type><![CDATA[SPARQL]]></type>
+			<parameters>
+				<query>
+					<![CDATA[
+				        PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
+                        PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX express: <https://w3id.org/express#>
+                        PREFIX vng:     <http://vng.nl/geometry-ext.ttl#>
+                        PREFIX dso:     <http://vng.nl/areas/>
+
+                        DROP SILENT GRAPH <areas.ttl> ;
+
+                        INSERT {
+                          GRAPH <areas.ttl> {
+                            ?areaUri  a dso:area ;
+                                        dso:id    		?id ;
+                                        dso:name		?name ;
+            				            dso:group		?group ;
+            				            dso:type		?type ;
+            				            dso:geometry 	?geometry .
+                          }
+                        }
+                        WHERE {
+                          {
+                            SELECT ?e ?n WHERE {
+                              ?mc rdf:type                          ifc:IfcMapConversion ;
+                                  ifc:eastings_IfcMapConversion     ?le ;
+                                  ifc:northings_IfcMapConversion    ?ln .
+                              ?le express:hasDouble                 ?e .
+                              ?ln express:hasDouble                 ?n .
+                            } LIMIT 1
+                          }
+                          (?e ?n) vng:dsoArea (?id ?name ?group ?type ?geometry) .
+                          BIND(IRI(CONCAT(STR(dso:), ?id)) AS ?areaUri)
+                        }
+				]]>
+				</query>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[Insert BBoxes]]></name>
+			<description>
+				<![CDATA[
+			        Calculate and store the 3D bounding box for every geometry that doesn't have one yet.
+			    ]]>
+			</description>
+			<type><![CDATA[SPARQL]]></type>
+			<parameters>
+				<query>
+					<![CDATA[
+				        PREFIX geom: <https://vng.nl/geometry/>
+                        PREFIX pf:   <java:org.example.>
+
+                        INSERT {
+                            GRAPH <https://vng.nl/geometries/> {
+                                ?instance geom:bboxMinX ?minX ;
+                                          geom:bboxMinY ?minY ;
+                                          geom:bboxMinZ ?minZ ;
+                                          geom:bboxMaxX ?maxX ;
+                                          geom:bboxMaxY ?maxY ;
+                                          geom:bboxMaxZ ?maxZ .
+                            }
+                        }
+                        WHERE {
+                            GRAPH <https://vng.nl/geometries/> {
+                                ?instance geom:base64Data ?base64Data .
+                                FILTER NOT EXISTS { ?instance geom:bboxMinX ?any }
+                            }
+                            (?minX ?minY ?minZ ?maxX ?maxY ?maxZ) pf:BBoxPropFunction ?base64Data .
+                        }
+				]]>
+				</query>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[Insert Projections]]></name>
+			<description>
+				<![CDATA[
+			        Generate and store a 2D map projection for every 3D geometry that doesn't have one yet.
+			    ]]>
+			</description>
+			<type><![CDATA[SPARQL]]></type>
+			<parameters>
+				<query>
+					<![CDATA[
+				        PREFIX geom:    <https://vng.nl/geometry/>
+                        PREFIX ext:     <http://vng.nl/geometry-ext.ttl#>
+
+                        INSERT {
+                            GRAPH <https://vng.nl/geometries/> {
+                                ?instance geom:projectionBase64Data ?projection .
+                            }
+                        }
+                        WHERE {
+                            GRAPH <https://vng.nl/geometries/> {
+                                ?instance   geom:base64Data ?base64Data .
+                                BIND(ext:projection(?base64Data) AS ?projection)
+                                FILTER NOT EXISTS { ?instance geom:projectionBase64Data ?any }
+                            }
+                        }
+				]]>
+				</query>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[Insert Topological Relations]]></name>
+			<description>
+				<![CDATA[
+			        Determine and update whether each wall in the building model spatially overlaps with residential ("wonen") planning zones.
+			    ]]>
+			</description>
+			<type><![CDATA[SPARQL]]></type>
+			<parameters>
+				<query>
+					<![CDATA[
+				        PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
+                        PREFIX express: <https://w3id.org/express#>
+                        PREFIX geom:    <https://vng.nl/geometry/>
+                        PREFIX dso:     <http://vng.nl/areas/>
+                        PREFIX ext:     <http://vng.nl/geometry-ext.ttl#>
+                        PREFIX topo:    <http://vng.nl/topology/>
+
+                        DELETE {
+                            GRAPH <https://vng.nl/geometries/> {
+                                ?geometry geom:topologicalRelation ?oldRelation .
+                            }
+                        }
+                        INSERT {
+                            GRAPH <https://vng.nl/geometries/> {
+                                ?geometry geom:topologicalRelation ?topologicalRelation .
+                            }
+                        }
+                        WHERE {
+                            ?ifcElement     rdf:type                    ?ifcType ;
+                                            ifc:globalId_IfcRoot        ?globalIdNode .
+                            ?globalIdNode   rdf:type                    ifc:IfcGloballyUniqueId ;
+                                            express:hasString           ?globalIdValue .
+
+                            GRAPH <https://vng.nl/geometries/> {
+                                ?geometry   geom:globalId               ?globalIdValue ;
+                                            geom:projectionBase64Data   ?base64Data1 .
+                            }
+
+                            {
+                                SELECT (GROUP_CONCAT(?base64Data2; SEPARATOR="|") AS ?allBase64)
+                                WHERE {
+                                    GRAPH <areas.ttl> {
+                                        [] a             dso:area ;
+                                           dso:group     "wonen" ;
+            				               dso:geometry  ?base64Data2 .
+                                    }
+                                }
+                            }
+
+                            BIND(ext:topologicalRelation(?base64Data1, ?allBase64) AS ?topologicalRelation)
+
+                            OPTIONAL {
+                                GRAPH <https://vng.nl/geometries/> {
+                                    ?geometry geom:topologicalRelation ?oldRelation .
+                                }
+                            }
+                        }
+				]]>
+				</query>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[Validate Topological Relations]]></name>
+			<description>
+				<![CDATA[
+			        Validate that every geometry in the model is fully contained within a designated planning zone — and flag any that are not.
+			    ]]>
+			</description>
+			<type><![CDATA[SHACL]]></type>
+			<parameters>
+				<shape>
+					<![CDATA[
+				        @prefix sh:   <http://www.w3.org/ns/shacl#> .
+                        @prefix geom: <https://vng.nl/geometry/> .
+                        @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                        @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+                        geom:GeometryShape
+                            a sh:NodeShape ;
+							sh:targetSubjectsOf geom:globalId ;
+                            sh:targetSubjectsOf geom:topologicalRelation ;
+
+                            sh:sparql [
+                                sh:prefixes [
+                                    sh:declare [
+                                        sh:prefix "geom" ;
+                                        sh:namespace "https://vng.nl/geometry/"^^xsd:anyURI
+                                    ] ;
+                                    sh:declare [
+                                        sh:prefix "rdf" ;
+                                        sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI
+                                    ]
+                                ] ;
+                                sh:select """
+                                    SELECT $this ?value ?globalId
+                                    WHERE {
+                                        $this geom:globalId            ?globalId ;
+                                              geom:topologicalRelation ?value .
+                                        FILTER(?value != "CONTAINED BY")
+                                    }
+                                """ ;
+                                sh:message "geom:topologicalRelation is NOT 'CONTAINED BY'. GlobalId: {?globalId}" ;
+                            ] ;
+                            sh:severity sh:Violation .
+				]]>
+				</shape>
+			</parameters>
+		</step>
+		<step>
+			<name><![CDATA[Validate Height]]></name>
+			<description>
+				<![CDATA[
+			        Validate that every geometry in the model has a height within the allowed range — and flag any that do not.
+			    ]]>
+			</description>
+			<type><![CDATA[SHACL]]></type>
+			<parameters>
+				<shape>
+					<![CDATA[
+				        @prefix sh:   <http://www.w3.org/ns/shacl#> .
+                        @prefix geom: <https://vng.nl/geometry/> .
+                        @prefix ifc:  <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#> .
+                        @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                        @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+                        geom:IfcElementHeightShape
+                            a sh:NodeShape ;
+							sh:targetSubjectsOf geom:globalId ;
+                            sh:targetSubjectsOf geom:bboxMaxZ ;
+
+                            sh:sparql [
+                                sh:prefixes [
+                                    sh:declare [ sh:prefix "geom" ; sh:namespace "https://vng.nl/geometry/"^^xsd:anyURI ] ;
+                                    sh:declare [ sh:prefix "ifc"  ; sh:namespace "https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#"^^xsd:anyURI ] ;
+                                    sh:declare [ sh:prefix "rdf"  ; sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI ]
+                                ] ;
+                                sh:select """
+                                    SELECT $this ?globalId ?bboxMaxZ ?globalMaxZ
+                                    WHERE {
+									    $this geom:globalId ?globalId .
+                                        $this geom:bboxMaxZ ?bboxMaxZ .
+                                        										
+                                        {
+                                            SELECT (MAX(?z) AS ?globalMaxZ)
+                                            WHERE {
+                                                ?elem rdf:type ?ifcType .
+                                                VALUES ?ifcType {
+                                                    ifc:IfcWall
+                                                }
+                                                ?elem geom:bboxMaxZ ?z .
+                                            }
+                                        }
+
+                                        FILTER(?bboxMaxZ - ?globalMaxZ > 1)
+                                    }
+                                """ ;
+                                sh:message "Height violation for GlobalId {?globalId}: bboxMaxZ={?bboxMaxZ} minus globalMaxZ={?globalMaxZ} exceeds 1." ;
+                            ] ;
+
+                            sh:severity sh:Violation .
+				]]>
+				</shape>
+			</parameters>
+		</step>
 	</steps>
 </workflow>

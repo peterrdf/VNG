@@ -17,7 +17,7 @@
 			<name><![CDATA[Insert Buildings]]></name>
 			<description>
 				<![CDATA[
-			        Rebuild the buildings dataset by finding which registered buildings from the national registry match the location of the IFC building model, and save them for later use.
+			        Build the buildings dataset by finding which registered buildings from the national registry match the location of the IFC building model, and save them for later use.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
@@ -61,7 +61,7 @@
 			<name><![CDATA[Insert Parcels]]></name>
 			<description>
 				<![CDATA[
-			        Rebuild the land parcels dataset by finding which cadastral parcels the building sits on or near, based on its location in the IFC model.
+			        Build the land parcels dataset by finding which cadastral parcels the building sits on or near, based on its location in the IFC model.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
@@ -105,7 +105,7 @@
 			<name><![CDATA[Insert Areas]]></name>
 			<description>
 				<![CDATA[
-			        Rebuild the areas dataset by finding which geographic service areas contain the building, based on its location in the IFC model.
+			        Build the areas dataset by finding which geographic service areas contain the building, based on its location in the IFC model.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>

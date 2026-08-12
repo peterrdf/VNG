@@ -295,7 +295,7 @@
 
                         geom:GeometryShape
                             a sh:NodeShape ;
-                            sh:targetSubjectsOf geom:globalId ;
+                            sh:targetSubjectsOf geom:topologicalRelation ;
 
                             sh:sparql [
                                 sh:prefixes [
@@ -396,7 +396,7 @@
 
                         geom:DatasetBBoxShape
                             a sh:NodeShape ;
-                            sh:targetNode <$graphUri> ;
+                            sh:targetNode <https://vng.nl/geometries/> ;
 
                             sh:sparql [
                                 sh:prefixes [

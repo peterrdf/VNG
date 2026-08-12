@@ -25,6 +25,9 @@ public class Step
     [XmlElement("name")]
     public string Name { get; set; }
 
+    [XmlElement("description")]
+    public string Description { get; set; }
+
     [XmlElement("type")]
     public string Type { get; set; }
 

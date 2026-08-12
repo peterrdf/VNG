@@ -101,7 +101,11 @@ namespace VNGPortal.Workflows
                         case "SPARQL":
                             string query = step.Parameters["query"];
 
-                            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...", false);
+                            await _signalRStatus.SendProgressUpdate(
+                                taskDescriptor.GroupName, 
+                                (float)currentStep / stepsCount, 
+                                $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...<br />ℹ {step.Description}", 
+                                false);
                             await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SPARQL Query", query, "", false);
 
                             if (await sparqlServer.ExecuteInsertAsync(datasetName, query))
@@ -139,7 +143,7 @@ namespace VNGPortal.Workflows
                             var idsFileContent = await File.ReadAllTextAsync(idsPath);
 
                             await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, (float)currentStep / stepsCount, $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...", false);
-                            await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "IDS File", FormatXML(idsFileContent), "", false);
+                            await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, $"IDS File: '{idsFile}'", FormatXML(idsFileContent), "", false);
                             
                             (output, error, exitCode) = await ExecuteProcess(
                                     exePath: isLinuxPlatform ? "./IDSValidator" : "./IDSValidator.exe",

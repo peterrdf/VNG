@@ -13,7 +13,7 @@
 				</ids_file>
 			</parameters>
 		</step>
-		<step>
+		<!--<step>
 			<name><![CDATA[Insert Buildings]]></name>
 			<description>
 				<![CDATA[
@@ -56,8 +56,8 @@
 				]]>
 				</query>
 			</parameters>			
-		</step>
-		<step>
+		</step>-->
+		<!--<step>
 			<name><![CDATA[Insert Parcels]]></name>
 			<description>
 				<![CDATA[
@@ -100,7 +100,7 @@
 				]]>
 				</query>
 			</parameters>
-		</step>
+		</step>-->
 		<step>
 			<name><![CDATA[Insert Areas]]></name>
 			<description>

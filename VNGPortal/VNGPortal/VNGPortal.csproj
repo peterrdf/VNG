@@ -55,6 +55,15 @@
 		<None Update="SeedData\IDS\VDCbase-KEU-ZZ-ZZZ-RG-TOTAL-XX-0001-InformationDeliverySpecification.ids">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SPARQL\InsertTopologicalRelations.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SPARQL\InsertProjections.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SPARQL\InsertBBoxes.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\SPARQL\InsertAreas.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
@@ -112,7 +121,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="SeedData\SPARQL\" />
 	  <Folder Include="Services\" />
 	</ItemGroup>
 

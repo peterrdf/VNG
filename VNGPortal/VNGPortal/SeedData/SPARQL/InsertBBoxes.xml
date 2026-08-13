@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sparql>
+	<id><![CDATA[InsertBBoxes]]></id>
+	<query>
+		<![CDATA[
+PREFIX geom: <https://vng.nl/geometry/>
+PREFIX pf:   <java:org.example.>
+
+INSERT {
+    GRAPH <https://vng.nl/geometries/> {
+        ?instance geom:bboxMinX ?minX ;
+                    geom:bboxMinY ?minY ;
+                    geom:bboxMinZ ?minZ ;
+                    geom:bboxMaxX ?maxX ;
+                    geom:bboxMaxY ?maxY ;
+                    geom:bboxMaxZ ?maxZ .
+    }
+}
+WHERE {
+    GRAPH <https://vng.nl/geometries/> {
+        ?instance geom:base64Data ?base64Data .
+        FILTER NOT EXISTS { ?instance geom:bboxMinX ?any }
+    }
+    (?minX ?minY ?minZ ?maxX ?maxY ?maxZ) pf:BBoxPropFunction ?base64Data .
+}
+		]]>
+	</query>
+</sparql>

@@ -34,6 +34,6 @@ WHERE {
     (?e ?n) vng:dsoArea (?id ?name ?group ?type ?geometry) .
     BIND(IRI(CONCAT(STR(dso:), ?id)) AS ?areaUri)
 }
-				]]>
+	    ]]>
 	</query>
 </sparql>

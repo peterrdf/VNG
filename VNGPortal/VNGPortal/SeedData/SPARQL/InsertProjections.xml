@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sparql>
+	<id><![CDATA[InsertProjections]]></id>
+	<query>
+		<![CDATA[
+PREFIX geom:    <https://vng.nl/geometry/>
+PREFIX ext:     <http://vng.nl/geometry-ext.ttl#>
+
+INSERT {
+    GRAPH <https://vng.nl/geometries/> {
+        ?instance geom:projectionBase64Data ?projection .
+    }
+}
+WHERE {
+    GRAPH <https://vng.nl/geometries/> {
+        ?instance   geom:base64Data ?base64Data .
+        BIND(ext:projection(?base64Data) AS ?projection)
+        FILTER NOT EXISTS { ?instance geom:projectionBase64Data ?any }
+    }
+}
+		]]>
+	</query>
+</sparql>

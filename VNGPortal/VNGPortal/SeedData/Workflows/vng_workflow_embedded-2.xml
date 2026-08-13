@@ -30,128 +30,36 @@
 			<name><![CDATA[Insert BBoxes]]></name>
 			<description>
 				<![CDATA[
-			        Calculate and store the 3D bounding box for every geometry that doesn't have one yet.
+			        Calculate the 3D bounding box for every geometry.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<query>
-					<![CDATA[
-				        PREFIX geom: <https://vng.nl/geometry/>
-                        PREFIX pf:   <java:org.example.>
-
-                        INSERT {
-                            GRAPH <https://vng.nl/geometries/> {
-                                ?instance geom:bboxMinX ?minX ;
-                                          geom:bboxMinY ?minY ;
-                                          geom:bboxMinZ ?minZ ;
-                                          geom:bboxMaxX ?maxX ;
-                                          geom:bboxMaxY ?maxY ;
-                                          geom:bboxMaxZ ?maxZ .
-                            }
-                        }
-                        WHERE {
-                            GRAPH <https://vng.nl/geometries/> {
-                                ?instance geom:base64Data ?base64Data .
-                                FILTER NOT EXISTS { ?instance geom:bboxMinX ?any }
-                            }
-                            (?minX ?minY ?minZ ?maxX ?maxY ?maxZ) pf:BBoxPropFunction ?base64Data .
-                        }
-				]]>
-				</query>
+				<queryRef><![CDATA[InsertBBoxes]]></queryRef>
 			</parameters>
 		</step>
 		<step>
 			<name><![CDATA[Insert Projections]]></name>
 			<description>
 				<![CDATA[
-			        Generate and store a 2D map projection for every 3D geometry that doesn't have one yet.
+			        Generate a 2D map projection for every 3D geometry.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<query>
-					<![CDATA[
-				        PREFIX geom:    <https://vng.nl/geometry/>
-                        PREFIX ext:     <http://vng.nl/geometry-ext.ttl#>
-
-                        INSERT {
-                            GRAPH <https://vng.nl/geometries/> {
-                                ?instance geom:projectionBase64Data ?projection .
-                            }
-                        }
-                        WHERE {
-                            GRAPH <https://vng.nl/geometries/> {
-                                ?instance   geom:base64Data ?base64Data .
-                                BIND(ext:projection(?base64Data) AS ?projection)
-                                FILTER NOT EXISTS { ?instance geom:projectionBase64Data ?any }
-                            }
-                        }
-				]]>
-				</query>
+				<queryRef><![CDATA[InsertProjections]]></queryRef>
 			</parameters>
 		</step>
 		<step>
 			<name><![CDATA[Insert Topological Relations]]></name>
 			<description>
 				<![CDATA[
-			        Determine and update whether each wall in the building model spatially overlaps with residential ("wonen") planning zones.
+			        Calculates whether each geometry in the building model spatially overlaps with residential ("wonen") planning zones.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<query>
-					<![CDATA[
-				        PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                        PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
-                        PREFIX express: <https://w3id.org/express#>
-                        PREFIX geom:    <https://vng.nl/geometry/>
-                        PREFIX dso:     <http://vng.nl/areas/>
-                        PREFIX ext:     <http://vng.nl/geometry-ext.ttl#>
-                        PREFIX topo:    <http://vng.nl/topology/>
-
-                        DELETE {
-                            GRAPH <https://vng.nl/geometries/> {
-                                ?geometry geom:topologicalRelation ?oldRelation .
-                            }
-                        }
-                        INSERT {
-                            GRAPH <https://vng.nl/geometries/> {
-                                ?geometry geom:topologicalRelation ?topologicalRelation .
-                            }
-                        }
-                        WHERE {
-                            ?ifcElement     rdf:type                    ?ifcType ;
-                                            ifc:globalId_IfcRoot        ?globalIdNode .
-                            ?globalIdNode   rdf:type                    ifc:IfcGloballyUniqueId ;
-                                            express:hasString           ?globalIdValue .
-
-                            GRAPH <https://vng.nl/geometries/> {
-                                ?geometry   geom:globalId               ?globalIdValue ;
-                                            geom:projectionBase64Data   ?base64Data1 .
-                            }
-
-                            {
-                                SELECT (GROUP_CONCAT(?base64Data2; SEPARATOR="|") AS ?allBase64)
-                                WHERE {
-                                    GRAPH <areas.ttl> {
-                                        [] a             dso:area ;
-                                           dso:group     "wonen" ;
-            				               dso:geometry  ?base64Data2 .
-                                    }
-                                }
-                            }
-
-                            BIND(ext:topologicalRelation(?base64Data1, ?allBase64) AS ?topologicalRelation)
-
-                            OPTIONAL {
-                                GRAPH <https://vng.nl/geometries/> {
-                                    ?geometry geom:topologicalRelation ?oldRelation .
-                                }
-                            }
-                        }
-				]]>
-				</query>
+				<queryRef><![CDATA[InsertTopologicalRelations]]></queryRef>
 			</parameters>
 		</step>
 		<step>

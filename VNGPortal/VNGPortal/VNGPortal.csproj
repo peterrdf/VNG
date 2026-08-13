@@ -55,6 +55,18 @@
 		<None Update="SeedData\IDS\VDCbase-KEU-ZZ-ZZZ-RG-TOTAL-XX-0001-InformationDeliverySpecification.ids">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SHACL\ValidateHeight.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\ValidateModelBBoxes.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\ValidateBBoxes.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\ValidateTopologicalRelations.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\SPARQL\InsertTopologicalRelations.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

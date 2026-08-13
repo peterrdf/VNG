@@ -124,6 +124,7 @@ namespace VNGPortal.Workflows
 
             WorkflowStorage workflowStorage = new WorkflowStorage(_configuration, _logger);
             var sparqlQueries = workflowStorage.LoadSPARQLQueries();
+            var shaclShapes = workflowStorage.LoadSHACLShapes();
 
             for (int i = 0; _workflow.Steps != null && i < _workflow.Steps.Count; i++)
             {
@@ -190,7 +191,32 @@ namespace VNGPortal.Workflows
                             break;
 
                         case "SHACL":
-                            string shape = step.Parameters["shape"];
+                            string shape = string.Empty;
+                            if (step.Parameters.ContainsKey("shape"))
+                            {
+                                shape = step.Parameters["shape"];
+                            }
+
+                            if (string.IsNullOrEmpty(shape) && step.Parameters.ContainsKey("shapeRef"))
+                            {
+                                var shapeRef = step.Parameters["shapeRef"];
+                                if (!string.IsNullOrEmpty(shapeRef) &&
+                                    shaclShapes.TryGetValue(shapeRef, out var shaclShape))
+                                {
+                                    shape = shaclShape.Shape;
+                                }
+                            }
+
+                            if (string.IsNullOrEmpty(shape))
+                            {
+                                _logger.LogWarning("SHACL shape is empty for workflow step: '{StepName}'", step.Name);
+                                await _signalRStatus.SendProgressUpdate(
+                                    taskDescriptor.GroupName,
+                                    (float)currentStep / stepsCount,
+                                    $"(Step {currentStep}/{stepsCount}) SHACL shape is empty for workflow step: '{step.Name}'.",
+                                    true);
+                                continue;
+                            }
 
                             await _signalRStatus.SendProgressUpdate(
                                 taskDescriptor.GroupName,

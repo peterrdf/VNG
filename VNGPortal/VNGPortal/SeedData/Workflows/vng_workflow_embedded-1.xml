@@ -142,7 +142,7 @@
 			<name><![CDATA[Insert Topological Relations]]></name>
 			<description>
 				<![CDATA[
-			        Calculates whether each geometry in the building model spatially overlaps with residential ("wonen") planning zones.
+			        Calculates whether every geometry in the building model spatially overlaps with residential ("wonen") planning zones.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
@@ -154,170 +154,36 @@
 			<name><![CDATA[Validate Topological Relations]]></name>
 			<description>
 				<![CDATA[
-			        Validate that every geometry in the model is fully contained within a designated planning zone — and flag any that are not.
+			        Validate that every geometry in the building is fully contained within residential ("wonen") planning zones.
 			    ]]>
 			</description>
 			<type><![CDATA[SHACL]]></type>
 			<parameters>
-				<shape>
-					<![CDATA[
-				        @prefix sh:   <http://www.w3.org/ns/shacl#> .
-                        @prefix geom: <https://vng.nl/geometry/> .
-                        @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                        @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
-
-                        geom:GeometryShape
-                            a sh:NodeShape ;
-							sh:targetSubjectsOf geom:globalId ;
-                            sh:targetSubjectsOf geom:topologicalRelation ;
-
-                            sh:sparql [
-                                sh:prefixes [
-                                    sh:declare [
-                                        sh:prefix "geom" ;
-                                        sh:namespace "https://vng.nl/geometry/"^^xsd:anyURI
-                                    ] ;
-                                    sh:declare [
-                                        sh:prefix "rdf" ;
-                                        sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI
-                                    ]
-                                ] ;
-                                sh:select """
-                                    SELECT $this ?value ?globalId
-                                    WHERE {
-                                        $this geom:globalId            ?globalId ;
-                                              geom:topologicalRelation ?value .
-                                        FILTER(?value != "CONTAINED BY")
-                                    }
-                                """ ;
-                                sh:message "geom:topologicalRelation is NOT 'CONTAINED BY'. GlobalId: {?globalId}" ;
-                            ] ;
-                            sh:severity sh:Violation .
-				]]>
-				</shape>
+				<shapeRef><![CDATA[ValidateTopologicalRelations]]></shapeRef>
 			</parameters>
 		</step>
 		<step>
 			<name><![CDATA[Validate BBoxes]]></name>
 			<description>
 				<![CDATA[
-			        Validate that every geometry has a realistic physical size — not too small and not too large — in all three dimensions.
+			        Validate that every geometry has a realistic physical size — not too small and not too large.
 			    ]]>
 			</description>
 			<type><![CDATA[SHACL]]></type>
 			<parameters>
-				<shape>
-					<![CDATA[
-				        @prefix sh:   <http://www.w3.org/ns/shacl#> .
-                        @prefix geom: <https://vng.nl/geometry/> .
-                        @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                        @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
-
-                        geom:GeometryShape
-                            a sh:NodeShape ;
-                            sh:targetSubjectsOf geom:globalId ;
-						    sh:targetSubjectsOf geom:bboxMinX ;
-						    sh:targetSubjectsOf geom:bboxMaxX ;
-						    sh:targetSubjectsOf geom:bboxMinY ;
-						    sh:targetSubjectsOf geom:bboxMaxY ;
-						    sh:targetSubjectsOf geom:bboxMinZ ;
-						    sh:targetSubjectsOf geom:bboxMaxZ ;
-						
-                            sh:sparql [
-                                sh:prefixes [
-                                    sh:declare [
-                                        sh:prefix "geom" ;
-                                        sh:namespace "https://vng.nl/geometry/"^^xsd:anyURI
-                                    ]
-                                ] ;
-                                sh:select """
-                                    SELECT $this ?globalId ?deltaX ?deltaY ?deltaZ
-                                    WHERE {
-                                        $this   geom:globalId   ?globalId ;
-                                                geom:bboxMinX   ?minX ;
-                                                geom:bboxMaxX   ?maxX ;
-                                                geom:bboxMinY   ?minY ;
-                                                geom:bboxMaxY   ?maxY ;
-                                                geom:bboxMinZ   ?minZ ;
-                                                geom:bboxMaxZ   ?maxZ .
-                                        BIND((?maxX - ?minX) AS ?deltaX)
-                                        BIND((?maxY - ?minY) AS ?deltaY)
-                                        BIND((?maxZ - ?minZ) AS ?deltaZ)
-
-                                        FILTER(
-                                            ?deltaX < 1 || ?deltaX > 100 ||
-                                            ?deltaY < 1 || ?deltaY > 100 ||
-                                            ?deltaZ < 1 || ?deltaZ > 100
-                                        )
-                                    }
-                                """ ;
-                                sh:message "BBox violation for GlobalId {?globalId}: deltaX={?deltaX}, deltaY={?deltaY}, deltaZ={?deltaZ}. All axis deltas must be in [1, 100]." ;
-                            ] ;
-                            sh:severity sh:Violation .
-				]]>
-				</shape>
+				<shapeRef><![CDATA[ValidateBBoxes]]></shapeRef>
 			</parameters>
 		</step>
 		<step>
 			<name><![CDATA[Validate Model BBox]]></name>
 			<description>
 				<![CDATA[
-			        Validate that the combined physical footprint of the entire building dataset as a whole has a realistic size — not too small and not too large — in all three dimensions.
+			        Validate that the combined physical footprint of the entire building dataset as a whole has a realistic size — not too small and not too large.
 			    ]]>
 			</description>
 			<type><![CDATA[SHACL]]></type>
 			<parameters>
-				<shape>
-					<![CDATA[
-				        @prefix sh:   <http://www.w3.org/ns/shacl#> .
-                        @prefix geom: <https://vng.nl/geometry/> .
-                        @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                        @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
-
-                        geom:DatasetBBoxShape
-                            a sh:NodeShape ;
-                            sh:targetNode <https://vng.nl/geometries/> ;
-
-                            sh:sparql [
-                                sh:prefixes [
-                                    sh:declare [ sh:prefix "geom" ; sh:namespace "https://vng.nl/geometry/"^^xsd:anyURI ]
-                                ] ;
-                                sh:select """
-                                    SELECT ?this ?globalMinX ?globalMaxX ?globalMinY ?globalMaxY ?globalMinZ ?globalMaxZ
-                                    WHERE {
-
-                                        {
-                                            SELECT
-                                                (MIN(?bboxMinX - ?eastings)  AS ?globalMinX)
-                                                (MAX(?bboxMaxX - ?eastings)  AS ?globalMaxX)
-                                                (MIN(?bboxMinY - ?northings) AS ?globalMinY)
-                                                (MAX(?bboxMaxY - ?northings) AS ?globalMaxY)
-                                                (MIN(?bboxMinZ)              AS ?globalMinZ)
-                                                (MAX(?bboxMaxZ)              AS ?globalMaxZ)
-                                            WHERE {
-                                                ?geom geom:eastings  ?eastings ;
-                                                      geom:northings ?northings ;
-                                                      geom:bboxMinX  ?bboxMinX ;
-                                                      geom:bboxMaxX  ?bboxMaxX ;
-                                                      geom:bboxMinY  ?bboxMinY ;
-                                                      geom:bboxMaxY  ?bboxMaxY ;
-                                                      geom:bboxMinZ  ?bboxMinZ ;
-                                                      geom:bboxMaxZ  ?bboxMaxZ .
-                                            }
-                                        }
-
-                                        FILTER(
-                                            ?globalMaxX - ?globalMinX < 1 || ?globalMaxX - ?globalMinX > 100 ||
-                                            ?globalMaxY - ?globalMinY < 1 || ?globalMaxY - ?globalMinY > 100 ||
-                                            ?globalMaxZ - ?globalMinZ < 1 || ?globalMaxZ - ?globalMinZ > 100
-                                        )
-                                    }
-                                """ ;
-                                sh:message "Dataset BBox violation: globalMinX={?globalMinX}, globalMaxX={?globalMaxX}, globalMinY={?globalMinY}, globalMaxY={?globalMaxY}, globalMinZ={?globalMinZ}, globalMaxZ={?globalMaxZ}. All values must be in [1, 100]." ;
-                            ] ;
-                            sh:severity sh:Violation .
-				    ]]>
-				</shape>
+				<shapeRef><![CDATA[ValidateModelBBoxes]]></shapeRef>
 			</parameters>
 		</step>
 	</steps>

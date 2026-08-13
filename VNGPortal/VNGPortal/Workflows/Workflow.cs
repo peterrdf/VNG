@@ -44,3 +44,13 @@ public class SPARQLQuery
     [XmlElement("query")]
     public string Query { get; set; }
 }
+
+[XmlRoot("shacl")]
+public class SHACLShape
+{
+    [XmlElement("id")]
+    public string Id { get; set; }
+
+    [XmlElement("shape")]
+    public string Shape { get; set; }
+}

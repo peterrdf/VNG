@@ -54,7 +54,7 @@
 			<name><![CDATA[Insert Topological Relations]]></name>
 			<description>
 				<![CDATA[
-			        Calculates whether each geometry in the building model spatially overlaps with residential ("wonen") planning zones.
+			        Calculates whether every geometry in the building model spatially overlaps with residential ("wonen") planning zones.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
@@ -66,103 +66,24 @@
 			<name><![CDATA[Validate Topological Relations]]></name>
 			<description>
 				<![CDATA[
-			        Validate that every geometry in the model is fully contained within a designated planning zone — and flag any that are not.
+			        Validate that every geometry in the building is fully contained within residential ("wonen") planning zones.
 			    ]]>
 			</description>
 			<type><![CDATA[SHACL]]></type>
 			<parameters>
-				<shape>
-					<![CDATA[
-				        @prefix sh:   <http://www.w3.org/ns/shacl#> .
-                        @prefix geom: <https://vng.nl/geometry/> .
-                        @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                        @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
-
-                        geom:GeometryShape
-                            a sh:NodeShape ;
-							sh:targetSubjectsOf geom:globalId ;
-                            sh:targetSubjectsOf geom:topologicalRelation ;
-
-                            sh:sparql [
-                                sh:prefixes [
-                                    sh:declare [
-                                        sh:prefix "geom" ;
-                                        sh:namespace "https://vng.nl/geometry/"^^xsd:anyURI
-                                    ] ;
-                                    sh:declare [
-                                        sh:prefix "rdf" ;
-                                        sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI
-                                    ]
-                                ] ;
-                                sh:select """
-                                    SELECT $this ?value ?globalId
-                                    WHERE {
-                                        $this geom:globalId            ?globalId ;
-                                              geom:topologicalRelation ?value .
-                                        FILTER(?value != "CONTAINED BY")
-                                    }
-                                """ ;
-                                sh:message "geom:topologicalRelation is NOT 'CONTAINED BY'. GlobalId: {?globalId}" ;
-                            ] ;
-                            sh:severity sh:Violation .
-				]]>
-				</shape>
+				<shapeRef><![CDATA[ValidateTopologicalRelations]]></shapeRef>
 			</parameters>
 		</step>
 		<step>
 			<name><![CDATA[Validate Height]]></name>
 			<description>
 				<![CDATA[
-			        Validate that every geometry in the model has a height within the allowed range — and flag any that do not.
+			        Validate that every geometry in the model has a height within the allowed range.
 			    ]]>
 			</description>
 			<type><![CDATA[SHACL]]></type>
 			<parameters>
-				<shape>
-					<![CDATA[
-				        @prefix sh:   <http://www.w3.org/ns/shacl#> .
-                        @prefix geom: <https://vng.nl/geometry/> .
-                        @prefix ifc:  <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#> .
-                        @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                        @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
-
-                        geom:IfcElementHeightShape
-                            a sh:NodeShape ;
-							sh:targetSubjectsOf geom:globalId ;
-                            sh:targetSubjectsOf geom:bboxMaxZ ;
-
-                            sh:sparql [
-                                sh:prefixes [
-                                    sh:declare [ sh:prefix "geom" ; sh:namespace "https://vng.nl/geometry/"^^xsd:anyURI ] ;
-                                    sh:declare [ sh:prefix "ifc"  ; sh:namespace "https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#"^^xsd:anyURI ] ;
-                                    sh:declare [ sh:prefix "rdf"  ; sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI ]
-                                ] ;
-                                sh:select """
-                                    SELECT $this ?globalId ?bboxMaxZ ?globalMaxZ
-                                    WHERE {
-									    $this geom:globalId ?globalId .
-                                        $this geom:bboxMaxZ ?bboxMaxZ .
-                                        										
-                                        {
-                                            SELECT (MAX(?z) AS ?globalMaxZ)
-                                            WHERE {
-                                                ?elem rdf:type ?ifcType .
-                                                VALUES ?ifcType {
-                                                    ifc:IfcWall
-                                                }
-                                                ?elem geom:bboxMaxZ ?z .
-                                            }
-                                        }
-
-                                        FILTER(?bboxMaxZ - ?globalMaxZ > 1)
-                                    }
-                                """ ;
-                                sh:message "Height violation for GlobalId {?globalId}: bboxMaxZ={?bboxMaxZ} minus globalMaxZ={?globalMaxZ} exceeds 1." ;
-                            ] ;
-
-                            sh:severity sh:Violation .
-				]]>
-				</shape>
+				<shapeRef><![CDATA[ValidateHeight]]></shapeRef>
 			</parameters>
 		</step>
 	</steps>

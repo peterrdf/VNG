@@ -48,17 +48,17 @@ namespace VNGPortal.Workflows
             {
                 _logger.LogError("Workflow step: 'IFC to RDF conversion' failed for model {ModelId} with exit code {ExitCode}", taskDescriptor.TaskId, exitCode);
                 await _signalRStatus.SendProgressUpdate(
-                    taskDescriptor.GroupName, 
-                    0, 
-                    "Workflow step: 'IFC to RDF conversion' failed.", 
+                    taskDescriptor.GroupName,
+                    0,
+                    "Workflow step: 'IFC to RDF conversion' failed.",
                     true);
                 throw new Exception($"Workflow step: 'IFC to RDF conversion' failed for model {taskDescriptor.TaskId} with exit code {exitCode}");
             }
             _logger.LogInformation("Workflow step: 'IFC to RDF conversion' completed successfully.");
             await _signalRStatus.SendProgressUpdate(
-                taskDescriptor.GroupName, 
-                (float)currentStep / stepsCount, 
-                $"(Step {currentStep}/{stepsCount}) Workflow step: 'IFC to RDF conversion' completed successfully.", 
+                taskDescriptor.GroupName,
+                (float)currentStep / stepsCount,
+                $"(Step {currentStep}/{stepsCount}) Workflow step: 'IFC to RDF conversion' completed successfully.",
                 false);
 
             //
@@ -79,18 +79,18 @@ namespace VNGPortal.Workflows
 
                 _logger.LogInformation("Workflow step: 'Geometry to RDF conversion' completed successfully.");
                 await _signalRStatus.SendProgressUpdate(
-                    taskDescriptor.GroupName, 
-                    (float)currentStep / stepsCount, 
-                    $"(Step {currentStep}/{stepsCount}) Workflow step: 'Geometry to RDF conversion' completed successfully.", 
+                    taskDescriptor.GroupName,
+                    (float)currentStep / stepsCount,
+                    $"(Step {currentStep}/{stepsCount}) Workflow step: 'Geometry to RDF conversion' completed successfully.",
                     false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Workflow step: 'Geometry to RDF conversion' failed for model {ModelId}", taskDescriptor.TaskId);
                 await _signalRStatus.SendProgressUpdate(
-                    taskDescriptor.GroupName, 
-                    (float)currentStep / stepsCount, 
-                    $"(Step {currentStep}/{stepsCount}) Workflow step: 'Geometry to RDF conversion' failed.", 
+                    taskDescriptor.GroupName,
+                    (float)currentStep / stepsCount,
+                    $"(Step {currentStep}/{stepsCount}) Workflow step: 'Geometry to RDF conversion' failed.",
                     true);
                 throw;
             }
@@ -111,9 +111,9 @@ namespace VNGPortal.Workflows
             });
             _logger.LogInformation("IFC file processed and data added to SPARQL dataset.");
             await _signalRStatus.SendProgressUpdate(
-                taskDescriptor.GroupName, 
-                (float)currentStep / stepsCount, 
-                $"(Step {currentStep}/{stepsCount}) IFC file processed and data added to SPARQL dataset.", 
+                taskDescriptor.GroupName,
+                (float)currentStep / stepsCount,
+                $"(Step {currentStep}/{stepsCount}) IFC file processed and data added to SPARQL dataset.",
                 false);
 
             var datasetName = "test1"; //#todo modelId or taskId instead of hardcoded "test1"
@@ -121,6 +121,9 @@ namespace VNGPortal.Workflows
             //
             // Execute workflow steps
             //
+
+            WorkflowStorage workflowStorage = new WorkflowStorage(_configuration, _logger);
+            var sparqlQueries = workflowStorage.LoadSPARQLQueries();
 
             for (int i = 0; _workflow.Steps != null && i < _workflow.Steps.Count; i++)
             {
@@ -132,12 +135,37 @@ namespace VNGPortal.Workflows
                     switch (step.Type)
                     {
                         case "SPARQL":
-                            string query = step.Parameters["query"];
+                            string query = string.Empty;
+                            if (step.Parameters.ContainsKey("query"))
+                            {
+                                query = step.Parameters["query"];
+                            }
+
+                            if (string.IsNullOrEmpty(query) && step.Parameters.ContainsKey("queryRef"))
+                            {
+                                string queryRef = step.Parameters["queryRef"];
+                                if (!string.IsNullOrEmpty(queryRef) &&
+                                    sparqlQueries.TryGetValue(queryRef, out var sparqlQuery))
+                                {
+                                    query = sparqlQuery.Query;
+                                }
+                            }
+
+                            if (string.IsNullOrEmpty(query))
+                            {
+                                _logger.LogWarning("SPARQL query is empty for workflow step: '{StepName}'", step.Name);
+                                await _signalRStatus.SendProgressUpdate(
+                                    taskDescriptor.GroupName,
+                                    (float)currentStep / stepsCount,
+                                    $"(Step {currentStep}/{stepsCount}) SPARQL query is empty for workflow step: '{step.Name}'.",
+                                    true);
+                                continue;
+                            }
 
                             await _signalRStatus.SendProgressUpdate(
-                                taskDescriptor.GroupName, 
-                                (float)currentStep / stepsCount, 
-                                $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...<br />ℹ {step.Description}", 
+                                taskDescriptor.GroupName,
+                                (float)currentStep / stepsCount,
+                                $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...<br />ℹ {step.Description}",
                                 false);
                             await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SPARQL Query", query, "", false);
 
@@ -145,29 +173,29 @@ namespace VNGPortal.Workflows
                             {
                                 _logger.LogInformation("Workflow step {StepName} executed successfully.", step.Name);
                                 await _signalRStatus.SendProgressUpdate(
-                                    taskDescriptor.GroupName, 
-                                    (float)currentStep / stepsCount, 
-                                    $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.", 
+                                    taskDescriptor.GroupName,
+                                    (float)currentStep / stepsCount,
+                                    $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.",
                                     false);
                             }
                             else
                             {
                                 _logger.LogError("SPARQL query execution failed for model {ModelId}.", taskDescriptor.TaskId);
                                 await _signalRStatus.SendProgressUpdate(
-                                    taskDescriptor.GroupName, 
-                                    (float)currentStep / stepsCount, 
-                                    $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' failed.", 
+                                    taskDescriptor.GroupName,
+                                    (float)currentStep / stepsCount,
+                                    $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' failed.",
                                     true);
-                            }                                
+                            }
                             break;
 
                         case "SHACL":
                             string shape = step.Parameters["shape"];
 
                             await _signalRStatus.SendProgressUpdate(
-                                taskDescriptor.GroupName, 
-                                (float)currentStep / stepsCount, 
-                                $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...", 
+                                taskDescriptor.GroupName,
+                                (float)currentStep / stepsCount,
+                                $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...",
                                 false);
                             await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Shape", shape, "", false);
 
@@ -180,9 +208,9 @@ namespace VNGPortal.Workflows
 
                             _logger.LogInformation("Workflow step: {StepName} executed successfully.", step.Name);
                             await _signalRStatus.SendProgressUpdate(
-                                taskDescriptor.GroupName, 
-                                (float)currentStep / stepsCount, 
-                                $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.", 
+                                taskDescriptor.GroupName,
+                                (float)currentStep / stepsCount,
+                                $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.",
                                 false);
                             break;
 
@@ -192,12 +220,12 @@ namespace VNGPortal.Workflows
                             var idsFileContent = await File.ReadAllTextAsync(idsPath);
 
                             await _signalRStatus.SendProgressUpdate(
-                                taskDescriptor.GroupName, 
-                                (float)currentStep / stepsCount, 
-                                $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...", 
+                                taskDescriptor.GroupName,
+                                (float)currentStep / stepsCount,
+                                $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...",
                                 false);
                             await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, $"IDS File: '{idsFile}'", FormatXML(idsFileContent), "", false);
-                            
+
                             (output, error, exitCode) = await ExecuteProcess(
                                     exePath: isLinuxPlatform ? "./IDSValidator" : "./IDSValidator.exe",
                                     args: $"\"{modelPath}\" \"{idsPath}\""
@@ -207,9 +235,9 @@ namespace VNGPortal.Workflows
                                 _logger.LogInformation("Workflow step: '{StepName}' completed successfully.", step.Name);
                                 await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "IDS Validation Report", "", output, output.IndexOf("ERROR") != -1);
                                 await _signalRStatus.SendProgressUpdate(
-                                    taskDescriptor.GroupName, 
-                                    (float)currentStep / stepsCount, 
-                                    $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.", 
+                                    taskDescriptor.GroupName,
+                                    (float)currentStep / stepsCount,
+                                    $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.",
                                     false);
                             }
                             else
@@ -228,18 +256,18 @@ namespace VNGPortal.Workflows
                 {
                     _logger.LogError(ex, "Error executing workflow step: '{StepName}'", step.Name);
                     await _signalRStatus.SendProgressUpdate(
-                        taskDescriptor.GroupName, 
-                        0, 
-                        $"Error executing workflow step: '{step.Name}'.", 
+                        taskDescriptor.GroupName,
+                        0,
+                        $"Error executing workflow step: '{step.Name}'.",
                         true);
                     throw;
                 }
             }
 
             await _signalRStatus.SendProgressUpdate(
-                taskDescriptor.GroupName, 
-                100, 
-                "Workflow completed successfully.", 
+                taskDescriptor.GroupName,
+                100,
+                "Workflow completed successfully.",
                 false);
 
             return true;

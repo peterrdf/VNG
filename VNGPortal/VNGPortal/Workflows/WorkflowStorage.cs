@@ -80,5 +80,71 @@ namespace VNGPortal.Workflows
 
             return workflows;
         }
+
+        public IDictionary<string, SPARQLQuery> LoadSPARQLQueries()
+        {
+            Dictionary<string, SPARQLQuery> sparqlQueries = new();
+
+            try
+            {
+
+                var isLinuxPlatform = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+                var fileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
+
+                var provider = new PhysicalFileProvider(_configuration![$"{fileStorage}:SPARQLDir"]!);
+                var sparqlXMLs = provider.GetDirectoryContents("/").Where((fileInfo) =>
+                {
+                    if (fileInfo.IsDirectory)
+                        return false;
+
+                    if (!fileInfo.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                        return false;
+
+                    return true;
+                });
+
+                List<TaskStatus> xmlTasks = new();
+                foreach (var sparqlXML in sparqlXMLs)
+                {
+                    if (sparqlXML?.PhysicalPath != null)
+                    {
+                        try
+                        {
+                            SPARQLQuery sparqlQuery = SPARQLQueryDeserializer.Deserialize(sparqlXML.PhysicalPath);
+                            if (sparqlQuery != null)
+                            {
+                                if (string.IsNullOrWhiteSpace(sparqlQuery.Id))
+                                {
+                                    _logger?.LogWarning("SPARQLQuery ID is null or empty for file: {SPARQLXML}", sparqlXML.PhysicalPath);
+                                    continue;
+                                }
+
+                                if (sparqlQueries.ContainsKey(sparqlQuery.Id))
+                                {
+                                    _logger?.LogWarning("Duplicate SPARQLQuery ID '{SPARQLQueryId}' found in file: {SPARQLXML}. Skipping this SPARQLQuery.", sparqlQuery.Id, sparqlXML.PhysicalPath);
+                                    continue;
+                                }
+
+                                sparqlQueries[sparqlQuery.Id] = sparqlQuery;
+                            }
+                            else
+                            {
+                                _logger?.LogWarning("SPARQLQuery deserialization returned null for file: {SPARQLXML}", sparqlXML.PhysicalPath);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger?.LogError(ex, "Error deserializing SPARQLQuery XML file: {SPARQLXML}", sparqlXML.PhysicalPath);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error loading workflows from XML files.");
+            }
+
+            return sparqlQueries;
+        }
     }
 }

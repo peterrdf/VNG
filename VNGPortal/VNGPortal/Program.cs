@@ -40,12 +40,48 @@ namespace VNGPortal
             Directory.CreateDirectory(workflowsDir);
 
             // Copy always seed workflow XML files from the SeedData/Workflows directory to the configured workflows directory
-            var seedSourceDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "Workflows");
-            if (Directory.Exists(seedSourceDir))
+            var seedWorfklowsDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "Workflows");
+            if (Directory.Exists(seedWorfklowsDir))
             {
-                foreach (var sourceFile in Directory.EnumerateFiles(seedSourceDir, "*.xml"))
+                foreach (var sourceFile in Directory.EnumerateFiles(seedWorfklowsDir, "*.xml"))
                 {
                     var destFile = Path.Combine(workflowsDir, Path.GetFileName(sourceFile));
+                    File.Copy(sourceFile, destFile, true);
+                }
+            }
+
+            var sparqlDir = builder.Configuration[$"{FileStorage}:SPARQLDir"];
+            if (string.IsNullOrEmpty(sparqlDir))
+            {
+                throw new InvalidOperationException("SPARQL path is not configured.");
+            }
+            Directory.CreateDirectory(sparqlDir);
+
+            // Copy always seed SPARQL XML files from the SeedData/SPARQL directory to the configured SPARQL directory
+            var seedSPARQLDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "SPARQL");
+            if (Directory.Exists(seedSPARQLDir))
+            {
+                foreach (var sourceFile in Directory.EnumerateFiles(seedSPARQLDir, "*.xml"))
+                {
+                    var destFile = Path.Combine(sparqlDir, Path.GetFileName(sourceFile));
+                    File.Copy(sourceFile, destFile, true);
+                }
+            }
+
+            var shaclDir = builder.Configuration[$"{FileStorage}:SHACLDir"];
+            if (string.IsNullOrEmpty(shaclDir))
+            {
+                throw new InvalidOperationException("SHACL path is not configured.");
+            }
+            Directory.CreateDirectory(shaclDir);
+
+            // Copy always seed SHACL XML files from the SeedData/SHACL directory to the configured SHACL directory
+            var seedSHACLDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "SHACL");
+            if (Directory.Exists(seedSHACLDir))
+            {
+                foreach (var sourceFile in Directory.EnumerateFiles(seedSHACLDir, "*.xml"))
+                {
+                    var destFile = Path.Combine(shaclDir, Path.GetFileName(sourceFile));
                     File.Copy(sourceFile, destFile, true);
                 }
             }

@@ -34,3 +34,13 @@ public class Step
     [XmlElement("parameters")]
     public ParameterDictionary Parameters { get; set; }
 }
+
+[XmlRoot("sparql")]
+public class SPARQLQuery
+{
+    [XmlElement("id")]
+    public string Id { get; set; }
+
+    [XmlElement("query")]
+    public string Query { get; set; }
+}

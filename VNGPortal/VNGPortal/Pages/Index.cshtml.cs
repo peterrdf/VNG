@@ -25,7 +25,7 @@ public class IndexModel : PageModel
 
     public string? Message { get; set; }
 
-    public IDictionary<string, Workflow> Workflows { get; private set; } = new Dictionary<string, Workflow>();
+    public SortedDictionary<int, Workflow> Workflows { get; private set; } = new SortedDictionary<int, Workflow>();
 
     public IndexModel(IConfiguration configuration, ILogger<IndexModel> logger, ISignalRStatusService signalRStatus)
     {
@@ -182,9 +182,24 @@ public class IndexModel : PageModel
         return Task.FromResult(true);
     }
 
-    public IDictionary<string, Workflow> GetWorkflows()
+    public SortedDictionary<int, Workflow> GetWorkflows()
     {
+        SortedDictionary<int, Workflow> sortedWorflows = new SortedDictionary<int, Workflow>();
+
         WorkflowStorage workflowStorage = new WorkflowStorage(_configuration, _logger);
-        return workflowStorage.LoadWorkflows();
+        var worfklows = workflowStorage.LoadWorkflows();
+
+        int fakeWorkflowId = worfklows.Count;
+        foreach (var workflow in worfklows.Values)
+        {
+            if (!int.TryParse(workflow.Id, out int workflowId))
+            {
+                workflowId = fakeWorkflowId++;
+            }
+
+            sortedWorflows.Add(workflowId, workflow);
+        }
+
+        return sortedWorflows;
     }
 }

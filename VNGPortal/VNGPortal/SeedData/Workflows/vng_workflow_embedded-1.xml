@@ -1,5 +1,5 @@
 <workflow>
-	<id><![CDATA[Regel #1]]></id>
+	<id><![CDATA[1]]></id>
 	<name><![CDATA[Regel #1: Gebruiksfunctie komt overeen met bestemming]]></name>
 	<description><![CDATA[]]></description>
 	<steps>

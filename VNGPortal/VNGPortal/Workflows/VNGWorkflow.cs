@@ -221,7 +221,7 @@ namespace VNGPortal.Workflows
                             await _signalRStatus.SendProgressUpdate(
                                 taskDescriptor.GroupName,
                                 (float)currentStep / stepsCount,
-                                $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...",
+                                $"(Step {currentStep}/{stepsCount}) Executing workflow step: '{step.Name}'...<br />ℹ {step.Description}",
                                 false);
                             await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Shape", shape, "", false);
 

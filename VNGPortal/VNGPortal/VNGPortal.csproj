@@ -55,6 +55,9 @@
 		<None Update="SeedData\IDS\VDCbase-KEU-ZZ-ZZZ-RG-TOTAL-XX-0001-InformationDeliverySpecification.ids">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SHACL\ValidateBBoxes-IfcWall.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\SHACL\ValidateHeight.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

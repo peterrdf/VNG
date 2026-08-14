@@ -166,12 +166,12 @@
 			<name><![CDATA[Validate BBoxes]]></name>
 			<description>
 				<![CDATA[
-			        Validates that every geometry has a realistic physical size — not too small and not too large.
+			        Validates that every wall has a realistic physical size — not too small and not too large.
 			    ]]>
 			</description>
 			<type><![CDATA[SHACL]]></type>
 			<parameters>
-				<shapeRef><![CDATA[ValidateBBoxes]]></shapeRef>
+				<shapeRef><![CDATA[ValidateBBoxes-IfcWall]]></shapeRef>
 			</parameters>
 		</step>
 		<step>

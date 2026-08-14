@@ -40,9 +40,12 @@ namespace VNGPortal.Workflows
 
             var jarPath = Path.Combine(Directory.GetCurrentDirectory(), "IFC2RDF", "ifc2rdf-1.4.7-shaded.jar");
             var javaPath = _configuration[$"{(isLinuxPlatform ? "ToolsLinux" : "Tools")}:JavaPath"]!;
+            var jvmArgs = isLinuxPlatform
+                ? "-Xms8g -Xmx8g "
+                : string.Empty;
             var (output, error, exitCode) = await ExecuteProcess(
                 exePath: javaPath,
-                args: $"-jar \"{jarPath}\" --baseURI http://vng.nl/geometry/ --dir \"{modelDir}\""
+                args: $"{jvmArgs}-jar \"{jarPath}\" --baseURI http://vng.nl/geometry/ --dir \"{modelDir}\""
             );
             if (exitCode != 0)
             {

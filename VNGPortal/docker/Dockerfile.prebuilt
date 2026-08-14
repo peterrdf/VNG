@@ -16,9 +16,14 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0-noble
 
 WORKDIR /app
 
-# Install OpenJDK
+# Install JDK 25 (Eclipse Temurin) via Adoptium APT repository
 RUN apt-get update && \
-    apt-get install -y openjdk-21-jre-headless && \
+    apt-get install -y wget apt-transport-https gnupg && \
+    wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor -o /usr/share/keyrings/adoptium.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print $2}' /etc/os-release) main" > /etc/apt/sources.list.d/adoptium.list && \
+    apt-get update && \
+    apt-get install -y temurin-25-jdk && \
+    apt-get purge -y wget gnupg && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

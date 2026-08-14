@@ -106,7 +106,7 @@
 			<name><![CDATA[Insert Areas]]></name>
 			<description>
 				<![CDATA[
-				    Retrieves residential ('wonen') planning zones based on the location of the building in the IFC model from the national registry.
+				    Retrieves residential ('wonen') planning zones based on the location of the building in the IFC model.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
@@ -118,7 +118,7 @@
 			<name><![CDATA[Insert BBoxes]]></name>
 			<description>
 				<![CDATA[
-			        Calculate the 3D bounding box for every geometry.
+			        Calculates the 3D bounding box for every geometry.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
@@ -130,7 +130,7 @@
 			<name><![CDATA[Insert Projections]]></name>
 			<description>
 				<![CDATA[
-			        Generate a 2D map projection for every 3D geometry.
+			        Generates a 2D map projection for every 3D geometry.
 			    ]]>
 			</description>
 			<type><![CDATA[SPARQL]]></type>
@@ -154,7 +154,7 @@
 			<name><![CDATA[Validate Topological Relations]]></name>
 			<description>
 				<![CDATA[
-			        Validate that every geometry in the building is fully contained within residential ("wonen") planning zones.
+			        Validates that every geometry in the building is fully contained within residential ("wonen") planning zones.
 			    ]]>
 			</description>
 			<type><![CDATA[SHACL]]></type>
@@ -166,7 +166,7 @@
 			<name><![CDATA[Validate BBoxes]]></name>
 			<description>
 				<![CDATA[
-			        Validate that every geometry has a realistic physical size — not too small and not too large.
+			        Validates that every geometry has a realistic physical size — not too small and not too large.
 			    ]]>
 			</description>
 			<type><![CDATA[SHACL]]></type>
@@ -178,7 +178,7 @@
 			<name><![CDATA[Validate Model BBox]]></name>
 			<description>
 				<![CDATA[
-			        Validate that the combined physical footprint of the entire building dataset as a whole has a realistic size — not too small and not too large.
+			        Validates that the combined geometry of the entire building has a realistic size — not too small and not too large.
 			    ]]>
 			</description>
 			<type><![CDATA[SHACL]]></type>

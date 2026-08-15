@@ -11,15 +11,8 @@
 
 geom:GeometryShape
     a sh:NodeShape ;
-	sh:targetClass      ifc:IfcWall  ; 
-	sh:targetSubjectsOf geom:globalId ;
-	sh:targetSubjectsOf geom:bboxMinX ;
-	sh:targetSubjectsOf geom:bboxMaxX ;
-	sh:targetSubjectsOf geom:bboxMinY ;
-	sh:targetSubjectsOf geom:bboxMaxY ;
-	sh:targetSubjectsOf geom:bboxMinZ ;
-	sh:targetSubjectsOf geom:bboxMaxZ ;
-						
+	sh:targetClass ifc:IfcWall ;
+
     sh:sparql [
         sh:prefixes [
             sh:declare [

@@ -22,7 +22,6 @@ INSERT {
     }
 }
 WHERE {
-    VALUES ?ifcType { ifc:IfcWall }
 
     ?ifcElement     rdf:type                    ?ifcType ;
                     ifc:globalId_IfcRoot        ?globalIdNode .

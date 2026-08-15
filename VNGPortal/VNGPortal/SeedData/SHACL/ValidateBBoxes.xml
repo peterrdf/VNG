@@ -11,12 +11,6 @@
 geom:GeometryShape
     a sh:NodeShape ;
     sh:targetSubjectsOf geom:globalId ;
-	sh:targetSubjectsOf geom:bboxMinX ;
-	sh:targetSubjectsOf geom:bboxMaxX ;
-	sh:targetSubjectsOf geom:bboxMinY ;
-	sh:targetSubjectsOf geom:bboxMaxY ;
-	sh:targetSubjectsOf geom:bboxMinZ ;
-	sh:targetSubjectsOf geom:bboxMaxZ ;
 						
     sh:sparql [
         sh:prefixes [

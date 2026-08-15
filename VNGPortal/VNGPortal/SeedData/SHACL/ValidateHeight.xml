@@ -12,7 +12,6 @@
 geom:IfcElementHeightShape
     a sh:NodeShape ;
 	sh:targetSubjectsOf geom:globalId ;
-    sh:targetSubjectsOf geom:bboxMaxZ ;
 
     sh:sparql [
         sh:prefixes [

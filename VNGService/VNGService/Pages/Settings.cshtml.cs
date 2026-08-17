@@ -37,7 +37,7 @@ namespace VNGService.Pages
                     case "dso":
                         UpdateAPIKey(service, key);
                         break;
-                    case "planning":
+                    case "sp":
                         UpdateAPIKey(service, key);
                         break;
                     case "bag":
@@ -81,14 +81,14 @@ namespace VNGService.Pages
                     }
                     break;
 
-                case "planning":
-                    if (dicSettings.ContainsKey("planning"))
+                case "sp":
+                    if (dicSettings.ContainsKey("sp"))
                     {
-                        dicSettings["planning"] = key;
+                        dicSettings["sp"] = key;
                     }
                     else
                     {
-                        dicSettings.Add("planning", key);
+                        dicSettings.Add("sp", key);
                     }
                     break;
 

@@ -36,7 +36,7 @@ namespace VNGService.Pages
 
         public async Task<IActionResult> OnGetAreas(double eastings, double northings)
         {
-            var areas = await GetDestinationAreas(eastings, northings);
+            var areas = await GetZonningAreas(eastings, northings);
             if (areas?.Count > 0)
             {
                 return new JsonResult(areas);
@@ -141,14 +141,14 @@ namespace VNGService.Pages
             }
         }
 
-        public async Task<IActionResult> OnGetDestinationAreas(double eastings, double northings)
+        public async Task<IActionResult> OnGetZonningAreas(double eastings, double northings)
         {
-            var destinationAreas = await GetDestinationAreas(eastings, northings);
+            var zonningAreas = await GetZonningAreas(eastings, northings);
 
-            return new JsonResult(destinationAreas);
+            return new JsonResult(zonningAreas);
         }
 
-        public async Task<List<Area>> GetDestinationAreas(double eastings, double northings)
+        public async Task<List<Area>> GetZonningAreas(double eastings, double northings)
         {
             long owlModel = engine.CreateModel();
 
@@ -167,7 +167,7 @@ namespace VNGService.Pages
             {
                 SettingsManager settingsManager = new SettingsManager(_configuration, _logger);
                 var apiSettings = settingsManager.LoadAPISettings();
-                var APIKey = apiSettings.ContainsKey("planning") ? apiSettings["planning"] : throw new InvalidOperationException("Spatial Planning API key is not configured.");
+                var APIKey = apiSettings.ContainsKey("sp") ? apiSettings["sp"] : throw new InvalidOperationException("Spatial Planning API key is not configured.");
 
                 using var httpClient = new HttpClient
                 {
@@ -238,7 +238,7 @@ namespace VNGService.Pages
                     _logger.LogInformation("No plans found for the given coordinates.");
                 }
 
-                return await CreateDestinationAreas(owlModel, plans);
+                return await CreateZonningAreas(owlModel, plans);
             }
             catch (Exception ex)
             {
@@ -312,7 +312,7 @@ namespace VNGService.Pages
             }
         }
 
-        private async Task<List<Area>> CreateDestinationAreas(long owlModel, List<Plan> plans)
+        private async Task<List<Area>> CreateZonningAreas(long owlModel, List<Plan> plans)
         {
             if (plans.Count == 0)
             {
@@ -321,7 +321,7 @@ namespace VNGService.Pages
 
             SettingsManager settingsManager = new SettingsManager(_configuration, _logger);
             var apiSettings = settingsManager.LoadAPISettings();
-            var APIKey = apiSettings.ContainsKey("planning") ? apiSettings["planning"] : throw new InvalidOperationException("Spatial Planning API key is not configured.");
+            var APIKey = apiSettings.ContainsKey("sp") ? apiSettings["sp"] : throw new InvalidOperationException("Spatial Planning API key is not configured.");
 
             using var httpClient = new HttpClient
             {
@@ -338,25 +338,25 @@ namespace VNGService.Pages
                 new("expand", "geometrie")
             };
 
-            List<Area> destinationAreas = new();
+            List<Area> zonningAreas = new();
             for (int i = 0; i < plans.Count; i++)
             {
                 var plan = plans[i];
 
-                var planDestinationAreas = await CreatePlanDestinationAreas(
+                var planZonningAreas = await CreatePlanZonningAreas(
                     httpClient, queryParams, owlModel, plan,
                     groupFilter: "wonen", //#test
                     typeFilter: null);
-                if (planDestinationAreas.Count > 0)
+                if (planZonningAreas.Count > 0)
                 {
-                    destinationAreas.AddRange(planDestinationAreas);
+                    zonningAreas.AddRange(planZonningAreas);
                 }
             }
 
-            return destinationAreas;
+            return zonningAreas;
         }
 
-        private async Task<List<Area>> CreatePlanDestinationAreas(
+        private async Task<List<Area>> CreatePlanZonningAreas(
             HttpClient httpClient,
             List<KeyValuePair<string, string>> queryParams,
             long owlModel,
@@ -364,7 +364,7 @@ namespace VNGService.Pages
             string? groupFilter,
             string? typeFilter)
         {
-            List<Area> destinationAreas = new();
+            List<Area> zonningAreas = new();
 
             var isLinuxPlatform = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             var FileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
@@ -373,10 +373,10 @@ namespace VNGService.Pages
             if (string.IsNullOrEmpty(modelsDir))
             {
                 _logger.LogError("Models path is not configured.");
-                return destinationAreas;
+                return zonningAreas;
             }
 
-            var planDetails = await FetchDestinationAreas(httpClient, queryParams, plan.Id);
+            var planDetails = await FetchZonningAreas(httpClient, queryParams, plan.Id);
             if (planDetails?.Embedded.Bestemmingsvlakken.Count > 0)
             {
                 long verwijzingNaarTekstProperty = engine.CreateProperty(
@@ -426,7 +426,7 @@ namespace VNGService.Pages
                             var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                             System.IO.File.Delete(modelPath);
 
-                            destinationAreas.Add(new Area
+                            zonningAreas.Add(new Area
                             {
                                 Id = planDetails.Embedded.Bestemmingsvlakken[j].Id,
                                 Name = planDetails.Embedded.Bestemmingsvlakken[j].Naam,
@@ -441,7 +441,7 @@ namespace VNGService.Pages
                 var nextPage = planDetails.Links.Next;
                 while (nextPage != null)
                 {
-                    var nextPlanDetails = await FetchNextDestinationAreas(httpClient, nextPage.Href);
+                    var nextPlanDetails = await FetchNextZonningAreas(httpClient, nextPage.Href);
                     if (nextPlanDetails?.Embedded.Bestemmingsvlakken.Count > 0)
                     {
                         for (int j = 0; j < nextPlanDetails.Embedded.Bestemmingsvlakken.Count; j++)
@@ -483,7 +483,7 @@ namespace VNGService.Pages
                                     var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                                     System.IO.File.Delete(modelPath);
 
-                                    destinationAreas.Add(new Area
+                                    zonningAreas.Add(new Area
                                     {
                                         Id = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Id,
                                         Name = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
@@ -500,10 +500,10 @@ namespace VNGService.Pages
                 }
             }
 
-            return destinationAreas;
+            return zonningAreas;
         }
 
-        private async Task<BestemmingsvlakkenResponse?> FetchDestinationAreas(
+        private async Task<BestemmingsvlakkenResponse?> FetchZonningAreas(
             HttpClient httpClient,
             List<KeyValuePair<string, string>> queryParams,
             string planId)
@@ -529,7 +529,7 @@ namespace VNGService.Pages
             }
         }
 
-        private async Task<BestemmingsvlakkenResponse?> FetchNextDestinationAreas(
+        private async Task<BestemmingsvlakkenResponse?> FetchNextZonningAreas(
             HttpClient httpClient,
             string requestUrl)
         {

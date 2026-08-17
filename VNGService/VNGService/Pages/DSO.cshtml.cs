@@ -167,7 +167,7 @@ namespace VNGService.Pages
             {
                 SettingsManager settingsManager = new SettingsManager(_configuration, _logger);
                 var apiSettings = settingsManager.LoadAPISettings();
-                var APIKey = apiSettings.ContainsKey("dso") ? apiSettings["dso"] : throw new InvalidOperationException("DSO API key is not configured.");
+                var APIKey = apiSettings.ContainsKey("planning") ? apiSettings["planning"] : throw new InvalidOperationException("Spatial Planning API key is not configured.");
 
                 using var httpClient = new HttpClient
                 {
@@ -321,7 +321,7 @@ namespace VNGService.Pages
 
             SettingsManager settingsManager = new SettingsManager(_configuration, _logger);
             var apiSettings = settingsManager.LoadAPISettings();
-            var APIKey = apiSettings.ContainsKey("dso") ? apiSettings["dso"] : throw new InvalidOperationException("DSO API key is not configured.");
+            var APIKey = apiSettings.ContainsKey("planning") ? apiSettings["planning"] : throw new InvalidOperationException("Spatial Planning API key is not configured.");
 
             using var httpClient = new HttpClient
             {

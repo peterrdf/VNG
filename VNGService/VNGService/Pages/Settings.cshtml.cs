@@ -37,9 +37,12 @@ namespace VNGService.Pages
                     case "dso":
                         UpdateAPIKey(service, key);
                         break;
+                    case "planning":
+                        UpdateAPIKey(service, key);
+                        break;
                     case "bag":
                         UpdateAPIKey(service, key);
-                        break;                    
+                        break;                 
                     default:
                         throw new ArgumentException($"Unknown service: {service}");
                 }
@@ -77,6 +80,18 @@ namespace VNGService.Pages
                         dicSettings.Add("dso", key);
                     }
                     break;
+
+                case "planning":
+                    if (dicSettings.ContainsKey("planning"))
+                    {
+                        dicSettings["planning"] = key;
+                    }
+                    else
+                    {
+                        dicSettings.Add("planning", key);
+                    }
+                    break;
+
                 case "bag":
                     if (dicSettings.ContainsKey("bag"))
                     {
@@ -86,7 +101,8 @@ namespace VNGService.Pages
                     {
                         dicSettings.Add("bag", key);
                     }
-                    break;                
+                    break;  
+                    
                 default:
                     throw new ArgumentException($"Unknown service: {service}");
             }

@@ -48,7 +48,7 @@ namespace VNGPortal.Workflows
                 }
             };
 
-            // IIS worker processes do not inherit the interactive user PATH
+            // IIS worker processes do not inherit the interactive user PATH - inject any extra path entries if provided
             if (extraPathEntries != null)
             {
                 var currentPath = process.StartInfo.EnvironmentVariables["PATH"] ?? string.Empty;

@@ -111,12 +111,12 @@ namespace VNGService.Services
             }
         }
 
-        public async Task<List<DsoGebiedsaanwijzing>> GetAreaInstructionsAsync(
+        public async Task<List<DsoGebiedsaanwijzing>> GetRuleTextAnnotationsAsync(
             string regelingId,
             string? groupFilter,
             string? typeFilter)
         {
-            var annotations = await FetchAnnotationsAsync(regelingId);
+            var annotations = await FetchRuleTextAnnotationsAsync(regelingId);
             if ((annotations == null) || (annotations.Gebiedsaanwijzingen == null))
             {
                 return new List<DsoGebiedsaanwijzing>();
@@ -158,7 +158,7 @@ namespace VNGService.Services
             return results;
         }
 
-        private async Task<DsoRegeltekstAnnotatiesResponse?> FetchAnnotationsAsync(string regelingId)
+        private async Task<DsoRegeltekstAnnotatiesResponse?> FetchRuleTextAnnotationsAsync(string regelingId)
         {
             var url = $"regelingen/{Uri.EscapeDataString(regelingId)}/regeltekstannotaties";
 

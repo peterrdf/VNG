@@ -28,7 +28,7 @@ namespace VNGPortal.SPARQL
                 // Attempt to delete the dataset if it exists
                 DeleteDataset(datasetName);
 
-                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
+                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
 
                 var requestUri = $"{_sparqlEndpoint}$/datasets";
                 var byteArray = System.Text.Encoding.ASCII.GetBytes($"{_user}:{_password}");
@@ -86,7 +86,7 @@ namespace VNGPortal.SPARQL
         {
             try
             {
-                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
+                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
                 var byteArray = System.Text.Encoding.ASCII.GetBytes($"{_user}:{_password}");
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
@@ -185,7 +185,7 @@ namespace VNGPortal.SPARQL
             {
                 var updateUri = $"{_sparqlEndpoint}{datasetName}";
 
-                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
+                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(60) };
 
                 // Add basic authentication
                 var byteArray = System.Text.Encoding.ASCII.GetBytes($"{_user}:{_password}");
@@ -220,7 +220,7 @@ namespace VNGPortal.SPARQL
             {
                 var shaclUri = $"{_sparqlEndpoint}{datasetName}/shacl?graph={Uri.EscapeDataString(graph)}";
 
-                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
+                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
 
                 // Add basic authentication
                 var byteArray = System.Text.Encoding.ASCII.GetBytes($"{_user}:{_password}");

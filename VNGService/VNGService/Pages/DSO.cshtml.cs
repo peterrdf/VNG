@@ -42,12 +42,12 @@ namespace VNGService.Pages
                 return new JsonResult(areas);
             }
 
-            areas = await GetAreaInstructions(eastings, northings);
+            areas = await GetRuleTextAnnotations(eastings, northings);
 
             return new JsonResult(areas);
         }
 
-        public async Task<List<Area>> GetAreaInstructions(double eastings, double northings)
+        public async Task<List<Area>> GetRuleTextAnnotations(double eastings, double northings)
         {
             List<Area> areas = new();
 
@@ -86,12 +86,12 @@ namespace VNGService.Pages
 
                 foreach (var regelingId in regelingIds)
                 {
-                    var areaInstructions = await dsoService.GetAreaInstructionsAsync(
+                    var ruleTextAnnotations = await dsoService.GetRuleTextAnnotationsAsync(
                         regelingId,
                         groupFilter: "wonen", //#test
                         typeFilter: null);
 
-                    foreach (var item in areaInstructions)
+                    foreach (var item in ruleTextAnnotations)
                     {
                         if (item.Geometrie == null)
                         {

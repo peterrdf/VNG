@@ -36,7 +36,7 @@ namespace VNGService.Pages
 
         public async Task<IActionResult> OnGetAreas(double eastings, double northings)
         {
-            var areas = await GetZonningAreas(eastings, northings);
+            var areas = await GetZoningAreas(eastings, northings);
             if (areas?.Count > 0)
             {
                 return new JsonResult(areas);
@@ -143,14 +143,14 @@ namespace VNGService.Pages
             }
         }
 
-        public async Task<IActionResult> OnGetZonningAreas(double eastings, double northings)
+        public async Task<IActionResult> OnGetZoningAreas(double eastings, double northings)
         {
-            var zonningAreas = await GetZonningAreas(eastings, northings);
+            var zoningAreas = await GetZoningAreas(eastings, northings);
 
-            return new JsonResult(zonningAreas);
+            return new JsonResult(zoningAreas);
         }
 
-        public async Task<List<Area>> GetZonningAreas(double eastings, double northings)
+        public async Task<List<Area>> GetZoningAreas(double eastings, double northings)
         {
             long owlModel = engine.CreateModel();
 
@@ -240,7 +240,7 @@ namespace VNGService.Pages
                     _logger.LogInformation("No plans found for the given coordinates.");
                 }
 
-                return await CreateZonningAreas(owlModel, plans);
+                return await CreateZoningAreas(owlModel, plans);
             }
             catch (Exception ex)
             {
@@ -314,7 +314,7 @@ namespace VNGService.Pages
             }
         }
 
-        private async Task<List<Area>> CreateZonningAreas(long owlModel, List<Plan> plans)
+        private async Task<List<Area>> CreateZoningAreas(long owlModel, List<Plan> plans)
         {
             if (plans.Count == 0)
             {
@@ -340,25 +340,25 @@ namespace VNGService.Pages
                 new("expand", "geometrie")
             };
 
-            List<Area> zonningAreas = new();
+            List<Area> zoningAreas = new();
             for (int i = 0; i < plans.Count; i++)
             {
                 var plan = plans[i];
 
-                var planZonningAreas = await CreatePlanZonningAreas(
+                var planZoningAreas = await CreatePlanZoningAreas(
                     httpClient, queryParams, owlModel, plan,
                     groupFilter: "wonen", //#test
                     typeFilter: null);
-                if (planZonningAreas.Count > 0)
+                if (planZoningAreas.Count > 0)
                 {
-                    zonningAreas.AddRange(planZonningAreas);
+                    zoningAreas.AddRange(planZoningAreas);
                 }
             }
 
-            return zonningAreas;
+            return zoningAreas;
         }
 
-        private async Task<List<Area>> CreatePlanZonningAreas(
+        private async Task<List<Area>> CreatePlanZoningAreas(
             HttpClient httpClient,
             List<KeyValuePair<string, string>> queryParams,
             long owlModel,
@@ -366,7 +366,7 @@ namespace VNGService.Pages
             string? groupFilter,
             string? typeFilter)
         {
-            List<Area> zonningAreas = new();
+            List<Area> zoningAreas = new();
 
             var isLinuxPlatform = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             var FileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
@@ -375,10 +375,10 @@ namespace VNGService.Pages
             if (string.IsNullOrEmpty(modelsDir))
             {
                 _logger.LogError("Models path is not configured.");
-                return zonningAreas;
+                return zoningAreas;
             }
 
-            var planDetails = await FetchZonningAreas(httpClient, queryParams, plan.Id);
+            var planDetails = await FetchZoningAreas(httpClient, queryParams, plan.Id);
             if (planDetails?.Embedded.Bestemmingsvlakken.Count > 0)
             {
                 long verwijzingNaarTekstProperty = engine.CreateProperty(
@@ -428,7 +428,7 @@ namespace VNGService.Pages
                             var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                             System.IO.File.Delete(modelPath);
 
-                            zonningAreas.Add(new Area
+                            zoningAreas.Add(new Area
                             {
                                 Id = planDetails.Embedded.Bestemmingsvlakken[j].Id,
                                 Name = planDetails.Embedded.Bestemmingsvlakken[j].Naam,
@@ -443,7 +443,7 @@ namespace VNGService.Pages
                 var nextPage = planDetails.Links.Next;
                 while (nextPage != null)
                 {
-                    var nextPlanDetails = await FetchNextZonningAreas(httpClient, nextPage.Href);
+                    var nextPlanDetails = await FetchNextZoningAreas(httpClient, nextPage.Href);
                     if (nextPlanDetails?.Embedded.Bestemmingsvlakken.Count > 0)
                     {
                         for (int j = 0; j < nextPlanDetails.Embedded.Bestemmingsvlakken.Count; j++)
@@ -485,7 +485,7 @@ namespace VNGService.Pages
                                     var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                                     System.IO.File.Delete(modelPath);
 
-                                    zonningAreas.Add(new Area
+                                    zoningAreas.Add(new Area
                                     {
                                         Id = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Id,
                                         Name = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
@@ -502,10 +502,10 @@ namespace VNGService.Pages
                 }
             }
 
-            return zonningAreas;
+            return zoningAreas;
         }
 
-        private async Task<BestemmingsvlakkenResponse?> FetchZonningAreas(
+        private async Task<BestemmingsvlakkenResponse?> FetchZoningAreas(
             HttpClient httpClient,
             List<KeyValuePair<string, string>> queryParams,
             string planId)
@@ -531,7 +531,7 @@ namespace VNGService.Pages
             }
         }
 
-        private async Task<BestemmingsvlakkenResponse?> FetchNextZonningAreas(
+        private async Task<BestemmingsvlakkenResponse?> FetchNextZoningAreas(
             HttpClient httpClient,
             string requestUrl)
         {

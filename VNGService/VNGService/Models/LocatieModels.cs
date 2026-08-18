@@ -29,13 +29,13 @@ namespace VNGService.Models
     {
         // List containing all individual location records.
         [JsonPropertyName("locaties")]
-        public List<LocatieItem>? Locaties { get; set; }
+        public List<DsoLocatieItem>? Locaties { get; set; }
     }
 
     /// <summary>
     /// Represents a single found location item during the search process.
     /// </summary>
-    public class LocatieItem
+    public class DsoLocatieItem
     {
         // Unique identifier of the location record.
         [JsonPropertyName("identificatie")]

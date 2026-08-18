@@ -88,6 +88,8 @@ namespace VNGService.Pages
                 {
                     var ruleTextAnnotations = await dsoService.GetRuleTextAnnotationsAsync(
                         regelingId,
+                        eastings,
+                        northings,                        
                         groupFilter: "wonen", //#test
                         typeFilter: null);
 

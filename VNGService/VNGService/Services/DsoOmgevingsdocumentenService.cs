@@ -113,6 +113,8 @@ namespace VNGService.Services
 
         public async Task<List<DsoGebiedsaanwijzing>> GetRuleTextAnnotationsAsync(
             string regelingId,
+            double pointX,
+            double pointY,
             string? groupFilter,
             string? typeFilter)
         {
@@ -142,6 +144,12 @@ namespace VNGService.Services
 
                     foreach (var geometrie in geometries)
                     {
+                        // Check if the point is inside the polygon
+                        if (!GeometryHelper.GeometryContainsPoint(geometrie, pointX, pointY))
+                        {
+                            continue;
+                        }
+
                         var gebiedsaanwijzingItem = new DsoGebiedsaanwijzing
                         {
                             Identificatie = item.Identificatie,

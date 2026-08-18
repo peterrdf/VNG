@@ -40,7 +40,7 @@ namespace VNGService.Services
          * containing the coordinates that describe the geometry.
          * */
         private const string GeometrieUrl = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/geometrieopvragen/v1/";
-        
+
         private const string CrsParam = "crs=http%3A%2F%2Fwww.opengis.net%2Fdef%2Fcrs%2FEPSG%2F0%2F28992";
         private const string ContentCrs = "http://www.opengis.net/def/crs/EPSG/0/28992";
 
@@ -145,20 +145,23 @@ namespace VNGService.Services
                     foreach (var geometrie in geometries)
                     {
                         // Check if the point is inside the polygon
-                        if (!GeometryHelper.GeometryContainsPoint(geometrie, pointX, pointY))
+                        if (GeometryHelper.GeometryContainsPoint(geometrie, pointX, pointY) ||
+                                GeometryHelper.GeometryContainsPoint(geometrie, pointX - 200, pointY - 200) ||
+                                GeometryHelper.GeometryContainsPoint(geometrie, pointX + 200, pointY - 200) ||
+                                GeometryHelper.GeometryContainsPoint(geometrie, pointX + 200, pointY + 200) ||
+                                GeometryHelper.GeometryContainsPoint(geometrie, pointX - 200, pointY + 200))
                         {
-                            continue;
-                        }
 
-                        var gebiedsaanwijzingItem = new DsoGebiedsaanwijzing
-                        {
-                            Identificatie = item.Identificatie,
-                            Naam = item.Naam ?? item.Identificatie,
-                            Groep = item.Groep,
-                            Type = item.Type,
-                            Geometrie = geometrie
-                        };
-                        results.Add(gebiedsaanwijzingItem);
+                            var gebiedsaanwijzingItem = new DsoGebiedsaanwijzing
+                            {
+                                Identificatie = item.Identificatie,
+                                Naam = item.Naam ?? item.Identificatie,
+                                Groep = item.Groep,
+                                Type = item.Type,
+                                Geometrie = geometrie
+                            };
+                            results.Add(gebiedsaanwijzingItem);
+                        }
                     }
                 }
             }

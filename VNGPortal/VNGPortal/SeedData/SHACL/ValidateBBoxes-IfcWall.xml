@@ -12,7 +12,6 @@
 geom:GeometryShape
     a sh:NodeShape ;
 	sh:targetClass ifc:IfcWall ;
-	sh:targetClass ifc:IfcRoof ;
 
     sh:sparql [
         sh:prefixes [

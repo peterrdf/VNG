@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sparql>
-	<id><![CDATA[InsertTopologicalRelations]]></id>
+	<id><![CDATA[InsertTopologicalRelations-IfcWall-IfcRoof]]></id>
 	<query>
 		<![CDATA[
 PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -22,6 +22,8 @@ INSERT {
     }
 }
 WHERE {
+    VALUES ?ifcType { ifc:IfcWall ifc:IfcRoof }
+
     ?ifcElement     rdf:type                    ?ifcType ;
                     ifc:globalId_IfcRoot        ?globalIdNode .
     ?globalIdNode   rdf:type                    ifc:IfcGloballyUniqueId ;

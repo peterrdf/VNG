@@ -42,12 +42,12 @@ namespace VNGService.Pages
                 return new JsonResult(areas);
             }
 
-            areas = await GetRuleTextAnnotations(eastings, northings);
+            areas = await GetRegulationTextAnnotations(eastings, northings);
 
             return new JsonResult(areas);
         }
 
-        public async Task<List<Area>> GetRuleTextAnnotations(double eastings, double northings)
+        public async Task<List<Area>> GetRegulationTextAnnotations(double eastings, double northings)
         {
             List<Area> areas = new();
 
@@ -78,22 +78,22 @@ namespace VNGService.Pages
 
             try
             {
-                var regelingIds = await dsoService.FindRegulationsIdByPointAsync(eastings, northings);
-                if ((regelingIds == null) || (regelingIds.Count == 0))
+                var regulationIds = await dsoService.FindRegulationsIdByPointAsync(eastings, northings);
+                if ((regulationIds == null) || (regulationIds.Count == 0))
                 {
                     return new List<Area>();
                 }
 
-                foreach (var regelingId in regelingIds)
+                foreach (var regulationId in regulationIds)
                 {
-                    var ruleTextAnnotations = await dsoService.GetRuleTextAnnotationsAsync(
-                        regelingId,
+                    var regulationTextAnnotations = await dsoService.GetRegulationTextAnnotationsAsync(
+                        regulationId,
                         eastings,
                         northings,                        
                         groupFilter: "wonen", //#test
                         typeFilter: null);
 
-                    foreach (var item in ruleTextAnnotations)
+                    foreach (var item in regulationTextAnnotations)
                     {
                         if (item.Geometrie == null)
                         {

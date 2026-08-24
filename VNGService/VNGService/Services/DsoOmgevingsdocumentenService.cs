@@ -96,6 +96,7 @@ namespace VNGService.Services
             {
                 //#test
                 //var responseText = await response.Content.ReadAsStringAsync();
+
                 var result = await response.Content.ReadFromJsonAsync<DsoRegelingenZoekResponse>();
                 if ((result == null) || (result.AllRegelingen == null) || !result.AllRegelingen.Any())
                 {
@@ -107,69 +108,122 @@ namespace VNGService.Services
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Error: {response.StatusCode}\n{errorContent}");
+                _logger.LogError($"Error fetching regulations by point ({pointX}, {pointY}). StatusCode: {response.StatusCode}, Content: {errorContent}");
             }
+
+            return null;
         }
 
-        public async Task<List<DsoGebiedsaanwijzing>> GetRuleTextAnnotationsAsync(
+        public async Task<List<DsoGebiedsaanwijzing>> GetRegulationTextAnnotationsAsync(
             string regelingId,
             double pointX,
             double pointY,
             string? groupFilter,
             string? typeFilter)
         {
-            var annotations = await FetchRuleTextAnnotationsAsync(regelingId);
-            if ((annotations == null) || (annotations.Gebiedsaanwijzingen == null))
+            var regulationTextAnnotations = await FetchRegulationTextAnnotationsAsync(regelingId);
+            if ((regulationTextAnnotations == null) || (regulationTextAnnotations.Gebiedsaanwijzingen == null))
             {
                 return new List<DsoGebiedsaanwijzing>();
             }
 
             var results = new List<DsoGebiedsaanwijzing>();
-            foreach (var item in annotations.Gebiedsaanwijzingen)
+            foreach (var itemGebiedsaanwijzingen in regulationTextAnnotations.Gebiedsaanwijzingen)
             {
-                if ((item.LocatieRefs == null) ||
-                    !MatchesGroup(item, groupFilter) ||
-                    !MatchesType(item, typeFilter))
+                if ((itemGebiedsaanwijzingen.LocatieRefs == null) ||
+                    !MatchesGroup(itemGebiedsaanwijzingen, groupFilter) ||
+                    !MatchesType(itemGebiedsaanwijzingen, typeFilter))
                 {
                     continue;
                 }
 
-                foreach (var locRef in item.LocatieRefs)
+                foreach (var locationRef in itemGebiedsaanwijzingen.LocatieRefs)
                 {
-                    var geometries = await FetchGeometryByLocationIdAsync(locRef);
-                    if (geometries == null || !geometries.Any())
+                    var locationDetails = await FetchLocationDetailsAsync(locationRef);
+                    if (locationDetails == null)
                     {
                         continue;
                     }
 
-                    foreach (var geometrie in geometries)
+                    // Single Geometry
+                    if ((locationDetails.GeometrieIdentificatie != null) &&
+                        (locationDetails.BoundingBox != null))
                     {
-                        // Check if the point is inside the polygon
-                        if (GeometryHelper.GeometryContainsPoint(geometrie, pointX, pointY) ||
-                                GeometryHelper.GeometryContainsPoint(geometrie, pointX - 200, pointY - 200) ||
-                                GeometryHelper.GeometryContainsPoint(geometrie, pointX + 200, pointY - 200) ||
-                                GeometryHelper.GeometryContainsPoint(geometrie, pointX + 200, pointY + 200) ||
-                                GeometryHelper.GeometryContainsPoint(geometrie, pointX - 200, pointY + 200))
+                        if (!GeometryHelper.BoundingBoxesIntersect(
+                            locationDetails.BoundingBox.MinX, locationDetails.BoundingBox.MinY,
+                            locationDetails.BoundingBox.MaxX, locationDetails.BoundingBox.MaxY,
+                            pointX - 200, pointY - 200, pointX + 200, pointY + 200))
                         {
+                            continue;
+                        }
 
+                        var geometry = await FetchGeometryAsync(locationDetails.GeometrieIdentificatie);
+                        if (geometry != null)
+                        {
                             var gebiedsaanwijzingItem = new DsoGebiedsaanwijzing
                             {
-                                Identificatie = item.Identificatie,
-                                Naam = item.Naam ?? item.Identificatie,
-                                Groep = item.Groep,
-                                Type = item.Type,
-                                Geometrie = geometrie
+                                Identificatie = itemGebiedsaanwijzingen.Identificatie,
+                                Naam = itemGebiedsaanwijzingen.Naam ?? itemGebiedsaanwijzingen.Identificatie,
+                                Groep = itemGebiedsaanwijzingen.Groep,
+                                Type = itemGebiedsaanwijzingen.Type,
+                                Geometrie = geometry
                             };
                             results.Add(gebiedsaanwijzingItem);
                         }
-                    }
-                }
-            }
+                    } // if ((locationDetails.GeometrieIdentificatie != null) && ...
+
+                    // Multiple Geometries
+                    if (locationDetails?.Embedded?.Omvat?.Count > 0)
+                    {
+                        foreach (var itemOmvat in locationDetails.Embedded.Omvat)
+                        {
+                            if ((itemOmvat.GeometrieIdentificatie == null) ||
+                                (itemOmvat.Identificatie == null))
+                            {
+                                continue;
+                            }
+
+                            locationDetails = await FetchLocationDetailsAsync(itemOmvat.Identificatie);
+                            if (locationDetails == null)
+                            {
+                                continue;
+                            }
+
+                            // Single Geometry
+                            if ((locationDetails.GeometrieIdentificatie != null) &&
+                                (locationDetails.BoundingBox != null))
+                            {
+                                if (!GeometryHelper.BoundingBoxesIntersect(
+                                        locationDetails.BoundingBox.MinX, locationDetails.BoundingBox.MinY,
+                                        locationDetails.BoundingBox.MaxX, locationDetails.BoundingBox.MaxY,
+                                        pointX - 200, pointY - 200, pointX + 200, pointY + 200))
+                                {
+                                    continue;
+                                }
+
+                                var geometry = await FetchGeometryAsync(locationDetails.GeometrieIdentificatie);
+                                if (geometry != null)
+                                {
+                                    var gebiedsaanwijzingItem = new DsoGebiedsaanwijzing
+                                    {
+                                        Identificatie = itemGebiedsaanwijzingen.Identificatie,
+                                        Naam = itemGebiedsaanwijzingen.Naam ?? itemGebiedsaanwijzingen.Identificatie,
+                                        Groep = itemGebiedsaanwijzingen.Groep,
+                                        Type = itemGebiedsaanwijzingen.Type,
+                                        Geometrie = geometry
+                                    };
+                                    results.Add(gebiedsaanwijzingItem);
+                                }
+                            } // if ((locationDetails.GeometrieIdentificatie != null) && ...
+                        } // foreach (var itemOmvat in locationDetails.Embedded.Omvat)
+                    } // if (locationDetails?.Embedded?.Omvat?.Count > 0)
+                } // foreach (var locationRef in item.LocatieRefs)                
+            } // foreach (var itemGebiedsaanwijzingen in annotations.Gebiedsaanwijzingen)
 
             return results;
         }
 
-        private async Task<DsoRegeltekstAnnotatiesResponse?> FetchRuleTextAnnotationsAsync(string regelingId)
+        private async Task<DsoRegeltekstAnnotatiesResponse?> FetchRegulationTextAnnotationsAsync(string regelingId)
         {
             var url = $"regelingen/{Uri.EscapeDataString(regelingId)}/regeltekstannotaties";
 
@@ -193,25 +247,27 @@ namespace VNGService.Services
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Error: {response.StatusCode}\n{errorContent}");
+                _logger.LogError($"Error fetching rule text annotations for regelingId: {regelingId}. StatusCode: {response.StatusCode}, Content: {errorContent}");
             }
+
+            return null;
         }
 
-        private async Task<List<GeoJsonGeometry>?> FetchGeometryByLocationIdAsync(string id)
+        private async Task<List<GeoJsonGeometry>?> FetchGeometryByLocationIdAsync(string locationId)
         {
-            var url = $"locaties/{id}";
+            var url = $"locaties/{locationId}";
 
             var response = await _toepasbaarClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 //#test
                 //var responseText = await response.Content.ReadAsStringAsync();
-                var detail = await response.Content.ReadFromJsonAsync<LocatieDetailResponse>();
+                var locationDetails = await response.Content.ReadFromJsonAsync<LocatieDetailResponse>();
 
                 // Single Geometry
-                if (detail?.GeometrieIdentificatie != null)
+                if (locationDetails?.GeometrieIdentificatie != null)
                 {
-                    var geometry = await FetchGeometryAsync(detail.GeometrieIdentificatie);
+                    var geometry = await FetchGeometryAsync(locationDetails.GeometrieIdentificatie);
                     if (geometry != null)
                     {
                         return new List<GeoJsonGeometry> { geometry };
@@ -219,10 +275,10 @@ namespace VNGService.Services
                 }
 
                 // Multiple Geometries
-                if (detail?.Embedded?.Omvat?.Count > 0)
+                if (locationDetails?.Embedded?.Omvat?.Count > 0)
                 {
                     var geometries = new List<GeoJsonGeometry>();
-                    foreach (var item in detail.Embedded.Omvat)
+                    foreach (var item in locationDetails.Embedded.Omvat)
                     {
                         if (item.GeometrieIdentificatie == null)
                         {
@@ -238,14 +294,42 @@ namespace VNGService.Services
 
                     return geometries;
                 }
-
-                return null;
             }
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Error: {response.StatusCode}\n{errorContent}");
+                _logger.LogError($"Error fetching location details for locationId: {locationId}. StatusCode: {response.StatusCode}, Content: {errorContent}");                
             }
+
+            return null;
+        }
+
+        private async Task<LocatieDetailResponse?> FetchLocationDetailsAsync(string locationId)
+        {
+            var url = $"locaties/{locationId}";
+            var response = await _toepasbaarClient.GetAsync(url);
+
+            /*
+            * https://developer.omgevingswet.overheid.nl/api-register/api/omgevingsdocument-presenteren/
+            * Throttling: This API has a query limit of 200 per second.
+            */
+            await Task.Delay(100);
+
+            if (response.IsSuccessStatusCode)
+            {
+                //#test
+                //var responseText = await response.Content.ReadAsStringAsync();
+                var locationDetails = await response.Content.ReadFromJsonAsync<LocatieDetailResponse>();
+
+                return locationDetails;
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError($"Error fetching location details for locationId: {locationId}. StatusCode: {response.StatusCode}, Content: {errorContent}");
+            }
+
+            return null;
         }
 
         private async Task<GeoJsonGeometry?> FetchGeometryAsync(string geometrieIdentificatie)
@@ -264,8 +348,10 @@ namespace VNGService.Services
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Error: {response.StatusCode}\n{errorContent}");
+                _logger.LogError($"Error fetching geometry for geometrieIdentificatie: {geometrieIdentificatie}. StatusCode: {response.StatusCode}, Content: {errorContent}");
             }
+
+            return null;
         }
 
         private static bool MatchesGroup(DsoGebiedsaanwijzing g, string? typeFilter)

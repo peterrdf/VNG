@@ -879,7 +879,7 @@ namespace VNGService.Models
         /// <summary>
         /// Group the area designation belongs to.
         /// </summary>
-        public DsoRegelingGroep Groep { get; set; }
+        public DsoRegelingGroep? Groep { get; set; }
 
         /// <summary>
         /// Type/category of the area designation.
@@ -1109,10 +1109,31 @@ namespace VNGService.Models
         public string? GeometrieIdentificatie { get; set; }
 
         /// <summary>
+        /// Bounding box surrounding the location's geometry, if available.
+        /// </summary>
+        public LocatieDetailBoundingBox? BoundingBox { get; set; }
+
+        /// <summary>
         /// HAL "_embedded" section containing the sub-locations this location contains.
         /// </summary>
         [JsonPropertyName("_embedded")]
         public LocatieDetailEmbedded? Embedded { get; set; }
+
+        [JsonPropertyName("_links")]
+        public LocatieDetailLinks? Links { get; set; }
+    }
+
+    public class LocatieDetailBoundingBox
+    {
+        public double MinX { get; set; }
+        public double MaxX { get; set; }
+        public double MinY { get; set; }
+        public double MaxY { get; set; }
+    }
+
+    public class LocatieDetailLinks
+    {
+        public DsoHalLink? Self { get; set; }
     }
 
     /// <summary>

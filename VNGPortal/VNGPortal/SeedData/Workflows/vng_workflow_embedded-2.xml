@@ -10,7 +10,97 @@
 			<type><![CDATA[IDS]]></type>
 			<parameters>
 				<ids_file>
-					<![CDATA[IDS Ruimten voor Kievietsweg v001.ids]]>
+					<![CDATA[01-9-ILS-voor-Ruimten-in-de-omgevingswet.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[02-9.01a-Georeferentie.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[03-9.01b-Coordinatenstelsel.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[04-9.01c-Projectadres-IFC4X3-ADD2.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[05-9.01d-Perceeladres-IFC4.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[06-9.01e-Gebouwadres-IFC4.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[07-9.02-Project.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[09-9.03b-Bouwwerkperceel.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[10-9.04-Kadastraal-Perceel.ids]]>
+				</ids_file>
+			</parameters>
+		</step>		
+		<step>
+			<name><![CDATA[IDS Validation]]></name>
+			<description><![CDATA[]]></description>
+			<type><![CDATA[IDS]]></type>
+			<parameters>
+				<ids_file>
+					<![CDATA[13-9.06a-Bouwlaag-voorheen-verdieping.ids]]>
 				</ids_file>
 			</parameters>
 		</step>

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 using VNGPortal.Services;
 
@@ -198,6 +200,31 @@ namespace VNGPortal
             {
                 app.UseHttpsRedirection();
             }
+
+            app.UseStaticFiles();
+
+            // Custom MIME types and other configuration
+            var extensionProvider = new FileExtensionContentTypeProvider();            
+            extensionProvider.Mappings.Add(".bin", "application/octet-stream");
+            extensionProvider.Mappings.Add(".binz", "application/octet-stream");
+            extensionProvider.Mappings.Add(".ifc", "text/plain");
+            extensionProvider.Mappings.Add(".step", "text/plain");
+            extensionProvider.Mappings.Add(".stp", "text/plain");
+
+            // Then protected viewer content only
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.WebRootPath, "viewer")),
+                RequestPath = "/viewer",
+                ContentTypeProvider = extensionProvider,
+                ServeUnknownFileTypes = true,
+                OnPrepareResponse = ctx =>
+                {
+                    ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+                    ctx.Context.Response.Headers["Pragma"] = "no-cache";
+                    ctx.Context.Response.Headers["Expires"] = "0";
+                }
+            });
 
             app.UseRouting();
 

@@ -226,7 +226,6 @@ namespace VNGPortal.Workflows
                                 else
                                 {
                                     await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "IDS Validation Report", "", output, true);
-                                    throw new Exception($"Workflow step: '{step.Name}' failed for model {taskDescriptor.TaskId} with exit code {exitCode}");
                                 }
                             }
                             break;

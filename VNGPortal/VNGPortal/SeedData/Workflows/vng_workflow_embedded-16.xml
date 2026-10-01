@@ -123,6 +123,21 @@
 					<![CDATA[41-9.18h-Fysieke-elementen-IfcWall.ids]]>
 				</ids_file>
 			</parameters>
-		</step>		
+		</step>
+		<step>
+			<name><![CDATA[IFC to RDF conversion]]></name>
+			<description />
+			<type><![CDATA[IFC2RDF]]></type>
+		</step>
+		<step>
+			<name><![CDATA[IFC Geometry to RDF conversion]]></name>
+			<description />
+			<type><![CDATA[IFCGEOMETRY2RDF]]></type>
+		</step>
+		<step>
+			<name><![CDATA[Create SPARQL dataset]]></name>
+			<description />
+			<type><![CDATA[CREATE-SPARQL-DATASET]]></type>
+		</step>
 	</steps>
 </workflow>

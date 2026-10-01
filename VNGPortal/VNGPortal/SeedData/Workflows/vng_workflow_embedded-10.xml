@@ -153,6 +153,21 @@
 					<![CDATA[40-9.18g-Fysieke-elementen-IfcSlab.ids]]>
 				</ids_file>
 			</parameters>
-		</step>		
+		</step>
+		<step>
+			<name><![CDATA[IFC to RDF conversion]]></name>
+			<description />
+			<type><![CDATA[IFC2RDF]]></type>
+		</step>
+		<step>
+			<name><![CDATA[IFC Geometry to RDF conversion]]></name>
+			<description />
+			<type><![CDATA[IFCGEOMETRY2RDF]]></type>
+		</step>
+		<step>
+			<name><![CDATA[Create SPARQL dataset]]></name>
+			<description />
+			<type><![CDATA[CREATE-SPARQL-DATASET]]></type>
+		</step>
 	</steps>
 </workflow>

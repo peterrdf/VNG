@@ -34,7 +34,7 @@
 				</ids_file>
 			</parameters>
 		</step>		
-		<!--<step>
+		<step>
 			<name><![CDATA[IDS Validation]]></name>
 			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
@@ -153,7 +153,7 @@
 					<![CDATA[26-9.12b-Verblijfsruimte.ids]]>
 				</ids_file>
 			</parameters>
-		</step>-->
+		</step>
 		<step>
 			<name><![CDATA[IFC to RDF conversion]]></name>
 			<description />

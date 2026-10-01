@@ -93,6 +93,21 @@
 					<![CDATA[17-9.09-Nevengebruiksfunctie.ids]]>
 				</ids_file>
 			</parameters>
-		</step>		
+		</step>
+		<step>
+			<name><![CDATA[IFC to RDF conversion]]></name>
+			<description />
+			<type><![CDATA[IFC2RDF]]></type>
+		</step>
+		<step>
+			<name><![CDATA[IFC Geometry to RDF conversion]]></name>
+			<description />
+			<type><![CDATA[IFCGEOMETRY2RDF]]></type>
+		</step>
+		<step>
+			<name><![CDATA[Create SPARQL dataset]]></name>
+			<description />
+			<type><![CDATA[CREATE-SPARQL-DATASET]]></type>
+		</step>
 	</steps>
 </workflow>

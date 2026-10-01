@@ -21,11 +21,11 @@ namespace VNGPortal.Pages
         {
         }
 
-        public IActionResult OnGetModel(string id)
+        public IActionResult OnGetModel(string workflowId, string model)
         {
             try
             {
-                _logger.LogInformation($"OnGetModel called with id: {id}");
+                _logger.LogInformation($"OnGetModel called with: workflowId={workflowId}, model={model}");
 
                 var isLinuxPlatform = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
                 var FileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
@@ -39,21 +39,29 @@ namespace VNGPortal.Pages
 
                 _logger.LogInformation($"Using viewer path: {modelsDir}");
 
-                if (string.IsNullOrEmpty(id))
+                if (string.IsNullOrEmpty(workflowId))
                 {
                     _logger.LogError("id is required");
                     return Content(HTTPResponse.BadRequestXML.Replace("%MESSAGE%", "id is required."), "application/xml");
                 }
 
-                var provider = new PhysicalFileProvider(modelsDir);
-                var fileInfo = provider.GetFileInfo(id);
+                if (string.IsNullOrEmpty(model))
+                {
+                    _logger.LogError("model is required");
+                    return Content(HTTPResponse.BadRequestXML.Replace("%MESSAGE%", "model is required."), "application/xml");
+                }
 
-                _logger.LogInformation($"Looking for file: {id}, exists: {fileInfo.Exists}, physical path: {fileInfo.PhysicalPath}");
+                var modelDir = Path.Combine(modelsDir, workflowId);
+
+                var provider = new PhysicalFileProvider(modelDir);
+                var fileInfo = provider.GetFileInfo(model);
+
+                _logger.LogInformation($"Looking for file: {model}, exists: {fileInfo.Exists}, physical path: {fileInfo.PhysicalPath}");
 
                 if (!fileInfo.Exists || string.IsNullOrEmpty(fileInfo.PhysicalPath))
                 {
-                    _logger.LogError($"File '{id}' not found at '{fileInfo.PhysicalPath}'");
-                    return Content(HTTPResponse.NotFoundXML.Replace("%MESSAGE%", $"File '{id}' not found."), "application/xml");
+                    _logger.LogError($"File '{model}' not found at '{fileInfo.PhysicalPath}'");
+                    return Content(HTTPResponse.NotFoundXML.Replace("%MESSAGE%", $"File '{model}' not found."), "application/xml");
                 }
 
                 _logger.LogInformation($"Returning file: {fileInfo.PhysicalPath}, size: {fileInfo.Length} bytes");
@@ -61,7 +69,7 @@ namespace VNGPortal.Pages
                 Response.Headers["Pragma"] = "no-cache";
                 Response.Headers["Expires"] = "0";
 
-                return File(System.IO.File.ReadAllBytes(fileInfo.PhysicalPath), "application/octet-stream", Path.GetFileName(id));
+                return File(System.IO.File.ReadAllBytes(fileInfo.PhysicalPath), "application/octet-stream", Path.GetFileName(model));
             }
             catch (Exception ex)
             {

@@ -7,50 +7,50 @@ namespace VNGPortal.Workflows;
 public class Workflow
 {
     [XmlElement("id")]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     [XmlElement("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [XmlElement("description")]
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     [XmlArray("steps")]
     [XmlArrayItem("step")]
-    public List<Step> Steps { get; set; }
+    public List<Step> Steps { get; set; } = new List<Step>();
 }
 
 public class Step
 {
     [XmlElement("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [XmlElement("description")]
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     [XmlElement("type")]
-    public string Type { get; set; }
+    public string Type { get; set; } = string.Empty;
 
     [XmlElement("parameters")]
-    public ParameterDictionary Parameters { get; set; }
+    public ParameterDictionary Parameters { get; set; } = new ParameterDictionary();
 }
 
 [XmlRoot("sparql")]
 public class SPARQLQuery
 {
     [XmlElement("id")]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     [XmlElement("query")]
-    public string Query { get; set; }
+    public string Query { get; set; } = string.Empty;
 }
 
 [XmlRoot("shacl")]
 public class SHACLShape
 {
     [XmlElement("id")]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     [XmlElement("shape")]
-    public string Shape { get; set; }
+    public string Shape { get; set; } = string.Empty;
 }

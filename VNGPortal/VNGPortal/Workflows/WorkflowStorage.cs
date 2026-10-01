@@ -44,7 +44,7 @@ namespace VNGPortal.Workflows
                     {
                         try
                         {
-                            Workflow workflow = WorkflowDeserializer.Deserialize(workflowXML.PhysicalPath);
+                            Workflow? workflow = WorkflowDeserializer.Deserialize(workflowXML.PhysicalPath);
                             if (workflow != null)
                             {
                                 if (string.IsNullOrWhiteSpace(workflow.Id))
@@ -110,7 +110,7 @@ namespace VNGPortal.Workflows
                     {
                         try
                         {
-                            SPARQLQuery sparqlQuery = SPARQLQueryDeserializer.Deserialize(sparqlXML.PhysicalPath);
+                            SPARQLQuery? sparqlQuery = SPARQLQueryDeserializer.Deserialize(sparqlXML.PhysicalPath);
                             if (sparqlQuery != null)
                             {
                                 if (string.IsNullOrWhiteSpace(sparqlQuery.Id))
@@ -171,7 +171,7 @@ namespace VNGPortal.Workflows
                     {
                         try
                         {
-                            SHACLShape shaclShape = SHACLShapeDeserializer.Deserialize(shaclXML.PhysicalPath);
+                            SHACLShape? shaclShape = SHACLShapeDeserializer.Deserialize(shaclXML.PhysicalPath);
                             if (shaclShape != null)
                             {
                                 if (string.IsNullOrWhiteSpace(shaclShape.Id))

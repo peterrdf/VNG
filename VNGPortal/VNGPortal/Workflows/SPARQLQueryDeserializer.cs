@@ -4,18 +4,18 @@ using VNGPortal.Workflows;
 
 public static class SPARQLQueryDeserializer
 {
-    public static SPARQLQuery Deserialize(string xmlFilePath)
+    public static SPARQLQuery? Deserialize(string xmlFilePath)
     {
         var serializer = new XmlSerializer(typeof(SPARQLQuery));
         using var reader = new StreamReader(xmlFilePath);
-        return (SPARQLQuery)serializer.Deserialize(reader);
+        return (SPARQLQuery?)serializer.Deserialize(reader);
     }
 
-    public static SPARQLQuery DeserializeFromString(string xmlContent)
+    public static SPARQLQuery? DeserializeFromString(string xmlContent)
     {
         var serializer = new XmlSerializer(typeof(SPARQLQuery));
 
         using var reader = new StringReader(xmlContent);
-        return (SPARQLQuery)serializer.Deserialize(reader);
+        return (SPARQLQuery?)serializer.Deserialize(reader);
     }
 }

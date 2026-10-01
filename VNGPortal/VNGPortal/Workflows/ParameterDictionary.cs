@@ -7,7 +7,7 @@ namespace VNGPortal.Workflows;
 
 public class ParameterDictionary : Dictionary<string, string>, IXmlSerializable
 {
-    public XmlSchema GetSchema() => null;
+    public XmlSchema? GetSchema() => null;
 
     public void ReadXml(XmlReader reader)
     {

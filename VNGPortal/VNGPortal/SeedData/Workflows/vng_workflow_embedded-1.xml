@@ -34,7 +34,7 @@
 				</ids_file>
 			</parameters>
 		</step>		
-		<step>
+		<!--<step>
 			<name><![CDATA[IDS Validation]]></name>
 			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
@@ -153,6 +153,21 @@
 					<![CDATA[26-9.12b-Verblijfsruimte.ids]]>
 				</ids_file>
 			</parameters>
+		</step>-->
+		<step>
+			<name><![CDATA[IFC to RDF conversion]]></name>
+			<description />
+			<type><![CDATA[IFC2RDF]]></type>
+		</step>
+		<step>
+			<name><![CDATA[IFC Geometry to RDF conversion]]></name>
+			<description />
+			<type><![CDATA[IFCGEOMETRY2RDF]]></type>
+		</step>
+		<step>
+			<name><![CDATA[Create SPARQL dataset]]></name>
+			<description />
+			<type><![CDATA[CREATE-SPARQL-DATASET]]></type>
 		</step>
 		<!--<step>
 			<name><![CDATA[Insert Buildings]]></name>

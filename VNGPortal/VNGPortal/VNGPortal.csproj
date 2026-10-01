@@ -31,7 +31,133 @@
 		<None Update="libifcengine.so">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\IDS\01-9-ILS-voor-Ruimten-in-de-omgevingswet.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\02-9.01a-Georeferentie.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\03-9.01b-Coordinatenstelsel.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\04-9.01c-Projectadres-IFC4X3-ADD2.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\05-9.01d-Perceeladres-IFC4.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\06-9.01e-Gebouwadres-IFC4.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\07-9.02-Project.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\08-9.03a-Perceel.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\09-9.03b-Bouwwerkperceel.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\10-9.04-Kadastraal-Perceel.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\11-9.05a-Gebouw.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\12-9.05b-Gebouwinhoud.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\13-9.06a-Bouwlaag-voorheen-verdieping.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\14-9.06b-Bouwlaaginhoud-voorheen-bouwlaagobject.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\15-9.07-Gebruikseenheid-voorheen-eigendom-en-gebruikseenheid.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\16-9.08-Gebruiksfunctie.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\17-9.09-Nevengebruiksfunctie.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\18-9.10a-Functiegebied.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\19-9.10b-Verblijfsgebied.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\20-9.10c-Verblijfsgebied-met-bezettingsgraad.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\IDS\20251009025325_Requirements-openBIM-building-permit-City-of-Vienna-entity-based-Specifications-v1-3.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\21-9.10d-Gebruiksgebied.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\22-9.10e-Bedgebied.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\23-9.10f-Restgebied.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\24-9.11-Buitengebied.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\25-9.12a-Functieruimte.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\26-9.12b-Verblijfsruimte.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\27-9.12c-Bedruimte.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\28-9.12d-Restruimte.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\29-9.13-Buitenruimte.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\30-9.16a-Brandcompartiment.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\31-9.16b-Subbrandcompartiment.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\32-9.16c-Vluchtroute.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\33-9.17-Tarra-Ruimte.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\34-9.18a-Fysieke-elementen-IfcBeam.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\35-9.18b-Fysieke-elementen-IfcColumn.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\36-9.18c-Fysieke-elementen-IfcCovering.INSULATION.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\37-9.18d-Fysieke-elementen-IfcCurtainWall.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\38-9.18e-Fysieke-elementen-IfcDoor.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\39-9.18f-Fysieke-elementen-IfcSensor.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\40-9.18g-Fysieke-elementen-IfcSlab.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\41-9.18h-Fysieke-elementen-IfcWall.ids">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\IDS\42-9.18i-Fysieke-elementen-Ifcwindow.ids">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\IDS\IDS Ruimten voor Kievietsweg v001.ids">

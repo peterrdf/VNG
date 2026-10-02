@@ -7,7 +7,6 @@ using System.Xml;
 
 namespace VNGPortal.Pages
 {
-    [Authorize]
     [IgnoreAntiforgeryToken]
     public class ViewerModel : PageModel
     {

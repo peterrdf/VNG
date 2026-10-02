@@ -128,6 +128,25 @@
         messageContainer.appendChild(messageDiv);
     });
 
+    connection.on("Receive3DViewUpdate", function (view) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "alert alert-info";
+
+        const title = document.createElement("label");
+        title.className = "form-label mt-2 fw-bold";
+        title.textContent = `${view.error ? "❌" : "✅"} ${view.title}`;
+        messageDiv.appendChild(title);
+
+        const iframe = document.createElement("iframe");
+        iframe.src = `/viewer/viewer.html?workflowId=${encodeURIComponent(view.workflowId)}&model=${encodeURIComponent(view.model)}`;
+        iframe.className = "w-100 border rounded";
+        iframe.style.height = "600px";
+        iframe.style.display = "block";
+        messageDiv.appendChild(iframe);
+
+        document.getElementById('messageContainer').appendChild(messageDiv);
+    });
+
     connection.onreconnecting((error) => {
         console.warn('SignalR reconnecting...', error);
     });

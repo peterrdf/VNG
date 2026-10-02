@@ -190,7 +190,17 @@ namespace VNGPortal.Workflows
                                 var result = await sparqlServer.ExecuteSHACLAsync(datasetName, "https://vng.nl/geometries/", shape);
                                 if (!string.IsNullOrEmpty(result))
                                 {
-                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Validation Report", "", result, result.IndexOf("sh:Violation") != -1);
+                                    bool hasViolation = result.IndexOf("sh:Violation") != -1;
+                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Validation Report", "", result, hasViolation);
+                                    if (hasViolation)
+                                    {
+                                        await _signalRStatus.Send3DViewUpdate(
+                                            taskDescriptor.GroupName, 
+                                            "SHACL Violations View", 
+                                            taskDescriptor.TaskId, 
+                                            taskDescriptor.Model,
+                                            true);
+                                    }
                                 }
 
                                 _logger.LogInformation("Workflow step: {StepName} executed successfully.", step.Name);

@@ -36,6 +36,7 @@ namespace VNGPortal.Services
         Task SendStatusUpdate(string groupName, string message, object data);
         Task SendProgressUpdate(string groupName, float progress, string message, bool error);
         Task SendQueryUpdate(string groupName, string type, string query, string result, bool error);
+        Task Send3DViewUpdate(string groupName, string title, string workflowId, string model, bool error);
     }
 
     public class SignalRStatusService : ISignalRStatusService
@@ -290,6 +291,15 @@ namespace VNGPortal.Services
             if (connections.Any())
             {
                 await _hubContext.Clients.Group(groupName).SendAsync("ReceiveQueryUpdate", new { type, query, result, error });
+            }
+        }
+
+        public async Task Send3DViewUpdate(string groupName, string title, string workflowId, string model, bool error)
+        {
+            var connections = _connectionState.GetConnectionsInGroup(groupName).Result;
+            if (connections.Any())
+            {
+                await _hubContext.Clients.Group(groupName).SendAsync("Receive3DViewUpdate", new { title, workflowId, model, error });
             }
         }
 

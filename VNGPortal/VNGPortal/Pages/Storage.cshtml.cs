@@ -5,7 +5,6 @@ using Microsoft.Extensions.FileProviders;
 
 namespace VNGPortal.Pages
 {
-    [Authorize]
     [IgnoreAntiforgeryToken]
     public class StorageModel : PageModel
     {

@@ -725,14 +725,14 @@
             try {
                 setTimeout(() => {
                     const urlParams = new URLSearchParams(window.location.search);
-                    const modelId = urlParams.get('model');
-                    const thumbnailMode = urlParams.get('thumbnail') === '1';
-                    if (modelId) {
+                    const workflowId = urlParams.get('workflowId');
+                    const model = urlParams.get('model');                    
+                    if (workflowId && model) {
                         try {
-                            window.logInfo(`Fetching modelId: ${modelId}`);
+                            window.logInfo(`Fetching model: ${model}`);
 
                             // Use fetch API to get the binary data
-                            fetch('/Storage?handler=Model&id=' + encodeURIComponent(modelId), {
+                            fetch('/Storage?handler=Model&workflowId=' + encodeURIComponent(workflowId) + '&model=' + encodeURIComponent(model), {
                                 method: 'GET',
                                 headers: {
                                     'Accept': 'application/octet-stream',
@@ -757,28 +757,16 @@
                                 if (!Module.FS.analyzePath('/data').exists) {
                                     Module.FS.mkdir('/data');
                                 }
-                                const wasmFSModel = '/data/' + getFileNameWithExtension(modelId);
+                                const wasmFSModel = '/data/' + getFileNameWithExtension(model);
                                 Module.FS.writeFile(wasmFSModel, new Uint8Array(data));
 
                                 await loadModelWASM(wasmFSModel);
                                 await loadDecorationModelsWASM();
-
-                                if (thumbnailMode) {
-                                    setTimeout(() => {
-                                        window.parent.postMessage({ type: 'thumbnail-done', modelId: modelId }, '*');
-                                    }, 500);                                    
-                                }
                             }).catch(e => {
-                                if (thumbnailMode) {
-                                    window.parent.postMessage({ type: 'thumbnail-error', modelId: modelId }, '*');
-                                }
                                 window.logErr(e);
                             });
                         }
                         catch (e) {
-                            if (thumbnailMode) {
-                                window.parent.postMessage({ type: 'thumbnail-error', modelId: modelId }, '*');
-                            }
                             window.logErr(e);
                         }
                     }

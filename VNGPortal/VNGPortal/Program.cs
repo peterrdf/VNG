@@ -204,8 +204,8 @@ namespace VNGPortal
             app.UseStaticFiles();
 
             // Custom MIME types and other configuration
-            var extensionProvider = new FileExtensionContentTypeProvider();            
-            extensionProvider.Mappings.Add(".bin", "application/octet-stream");
+            var extensionProvider = new FileExtensionContentTypeProvider();
+            extensionProvider.Mappings.Add(".data", "application/octet-stream");
             extensionProvider.Mappings.Add(".binz", "application/octet-stream");
             extensionProvider.Mappings.Add(".ifc", "text/plain");
             extensionProvider.Mappings.Add(".step", "text/plain");

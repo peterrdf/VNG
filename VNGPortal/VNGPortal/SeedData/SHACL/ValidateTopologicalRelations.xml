@@ -72,6 +72,27 @@ ORDER BY ?ifcElement
 					</query>
 					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
 				</sparql>
+				<sparql>
+					<id><![CDATA[RetriveLivingAreas]]></id>
+					<query>
+						<![CDATA[
+PREFIX dso:    <http://vng.nl/areas/>
+
+SELECT ?id ?group ?geometry
+WHERE {
+  GRAPH <areas.ttl> {
+    ?area	a       dso:area ;
+                  	dso:id    		?id ;
+                  	dso:group  	    ?group ;
+                  	dso:geometry  	?geometry .
+    FILTER(?group = "wonen")
+  }
+}
+ORDER BY ?id
+			]]>
+					</query>
+					<geometryVariable><![CDATA[geometry]]></geometryVariable>
+				</sparql>
 			</queries>
 		</view>
 	</views>

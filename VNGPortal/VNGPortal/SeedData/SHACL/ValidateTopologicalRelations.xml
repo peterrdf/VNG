@@ -41,8 +41,10 @@ geom:GeometryShape
 			<type>violation</type>
 			<visualization>3dview</visualization>
 			<queries>
-				<query>
-					<![CDATA[
+				<sparql>
+					<id><![CDATA[RetriveTopologicalRelationVialolations]]></id>
+					<query>
+						<![CDATA[
 PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
 PREFIX express: <https://w3id.org/express#>
@@ -67,7 +69,9 @@ WHERE {
 }
 ORDER BY ?ifcElement
 			]]>
-				</query>
+					</query>
+					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
+				</sparql>
 			</queries>
 		</view>
 	</views>

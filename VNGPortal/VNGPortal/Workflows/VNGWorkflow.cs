@@ -208,10 +208,10 @@ namespace VNGPortal.Workflows
                                                     long owlModel = engine.CreateModel();
                                                     try
                                                     {
-                                                        foreach (var query in shaclViolationView.Queries)
+                                                        foreach (var geometryQuery in shaclViolationView.Queries)
                                                         {
-                                                            var queryResult = await sparqlServer.ExecuteQueryAsync(datasetName, query);
-                                                            await sparqlServer.RetrieveGeometry(queryResult, "base64Data", owlModel); //#todo: make "base64Data" configurable in the future
+                                                            var queryResult = await sparqlServer.ExecuteQueryAsync(datasetName, geometryQuery.Query);
+                                                            await sparqlServer.RetrieveGeometry(queryResult, geometryQuery.GeometryVariable, owlModel);
                                                         }
 
                                                         var shaclErrorsModel = $"shacl_errors_{Guid.NewGuid().ToString()}.bin";

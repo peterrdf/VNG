@@ -59,6 +59,13 @@ public class SHACLShape
     public List<SHACLView> Views { get; set; } = new();
 }
 
+[XmlRoot("sparql")]
+public class SPARQLGeometryQuery : SPARQLQuery
+{
+    [XmlElement("geometryVariable")]
+    public string GeometryVariable { get; set; } = string.Empty;
+}
+
 public class SHACLView
 {
     [XmlElement("type")]
@@ -68,6 +75,6 @@ public class SHACLView
     public string Visualization { get; set; } = string.Empty;
 
     [XmlArray("queries")]
-    [XmlArrayItem("query")]
-    public List<string> Queries { get; set; } = new();
+    [XmlArrayItem("sparql")]
+    public List<SPARQLGeometryQuery> Queries { get; set; } = new();
 }

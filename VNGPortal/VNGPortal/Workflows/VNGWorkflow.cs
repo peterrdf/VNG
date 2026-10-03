@@ -1,4 +1,5 @@
-﻿using VNGPortal.IFC2RDF;
+﻿using RDF;
+using VNGPortal.IFC2RDF;
 using VNGPortal.Services;
 
 namespace VNGPortal.Workflows
@@ -172,11 +173,12 @@ namespace VNGPortal.Workflows
                                     shape = step.Parameters["shape"];
                                 }
 
+                                SHACLShape? shaclShape = null;
                                 if (string.IsNullOrEmpty(shape) && step.Parameters.ContainsKey("shapeRef"))
                                 {
                                     var shapeRef = step.Parameters["shapeRef"];
                                     if (!string.IsNullOrEmpty(shapeRef) &&
-                                        shaclShapes.TryGetValue(shapeRef, out var shaclShape))
+                                        shaclShapes.TryGetValue(shapeRef, out shaclShape))
                                     {
                                         shape = shaclShape.Shape;
                                     }
@@ -194,12 +196,51 @@ namespace VNGPortal.Workflows
                                     await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Validation Report", "", result, hasViolation);
                                     if (hasViolation)
                                     {
-                                        await _signalRStatus.Send3DViewUpdate(
-                                            taskDescriptor.GroupName, 
-                                            "SHACL Violations View", 
-                                            taskDescriptor.TaskId, 
-                                            taskDescriptor.Model,
-                                            true);
+                                        if (shaclShape != null)
+                                        {
+                                            var shaclViolationViews = shaclShape.Views.FindAll(v => v.Type == "violation").ToList();
+                                            if ((shaclViolationViews != null) && (shaclViolationViews.Count > 0))
+                                            {
+                                                // Use the first view for now, but we could potentially handle multiple views in the future
+                                                var shaclViolationView = shaclViolationViews?.First();
+                                                if (shaclViolationView != null)
+                                                {
+                                                    long owlModel = engine.CreateModel();
+                                                    try
+                                                    {
+                                                        foreach (var query in shaclViolationView.Queries)
+                                                        {
+                                                            var queryResult = await sparqlServer.ExecuteQueryAsync(datasetName, query);
+                                                            await sparqlServer.RetrieveGeometry(queryResult, "base64Data", owlModel); //#todo: make "base64Data" configurable in the future
+                                                        }
+
+                                                        var shaclErrorsModel = $"shacl_errors_{Guid.NewGuid().ToString()}.bin";
+                                                        var shaclErrorsModelPath = Path.Combine(modelDir, shaclErrorsModel);
+                                                        engine.SaveModel(owlModel, shaclErrorsModelPath);
+
+                                                        await _signalRStatus.Send3DViewUpdate(
+                                                            taskDescriptor.GroupName,
+                                                            "SHACL Violations View",
+                                                            taskDescriptor.TaskId,
+                                                            shaclErrorsModel,
+                                                            true);
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        _logger.LogError(ex, "Error executing SHACL error view queries for workflow step: '{StepName}'", step.Name);
+                                                        await _signalRStatus.SendProgressUpdate(
+                                                            taskDescriptor.GroupName,
+                                                            0,
+                                                            $"Error executing SHACL error view queries for workflow step: '{step.Name}'.",
+                                                            true);
+                                                    }
+                                                    finally
+                                                    {
+                                                        engine.CloseModel(owlModel);
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
 

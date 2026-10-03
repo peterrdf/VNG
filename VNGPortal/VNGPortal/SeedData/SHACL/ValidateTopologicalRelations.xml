@@ -50,19 +50,19 @@ PREFIX geom:    <https://vng.nl/geometry/>
 
 SELECT ?ifcElement ?globalIdValue ?base64Data ?topologicalRelation
 WHERE {
-    VALUES ?ifcType { ifc:IfcWall }
+        VALUES ?ifcType { ifc:IfcWall }
 
-    ?ifcElement      rdf:type               		?ifcType ;
-                    ifc:globalId_IfcRoot   		?globalIdNode .
-    ?globalIdNode    rdf:type               		ifc:IfcGloballyUniqueId ;
-                    express:hasString      		?globalIdValue .
+        ?ifcElement     rdf:type               		?ifcType ;
+                        ifc:globalId_IfcRoot   		?globalIdNode .
+        ?globalIdNode   rdf:type               		ifc:IfcGloballyUniqueId ;
+                        express:hasString      		?globalIdValue .
 
-    GRAPH <https://vng.nl/geometries/> {
-    ?geometry      rdf:type               		geom:Geometry ;
-                    geom:globalId          		?globalIdValue ;
-            		geom:base64Data				?base64Data ;
-                    geom:topologicalRelation     ?topologicalRelation .
-    FILTER(?topologicalRelation != "CONTAINED BY")
+        GRAPH <https://vng.nl/geometries/> {
+        ?geometry       rdf:type               		?ifcType ;
+                        geom:globalId          		?globalIdValue ;
+            		    geom:base64Data				?base64Data ;
+                        geom:topologicalRelation    ?topologicalRelation .
+        FILTER(?topologicalRelation != "CONTAINED BY")
     }
 }
 ORDER BY ?ifcElement

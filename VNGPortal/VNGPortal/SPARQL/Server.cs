@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using RDF;
+using System.Net;
+using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 
 namespace VNGPortal.SPARQL
@@ -245,6 +247,79 @@ namespace VNGPortal.SPARQL
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Exception occurred while validating dataset '{DatasetName}'", datasetName);
+                throw;
+            }
+        }
+
+        public async Task<SparqlResultSet> ExecuteQueryAsync(string datasetName, string query)
+        {
+            try
+            {
+                var queryUri = $"{_sparqlEndpoint}{datasetName}?query={Uri.EscapeDataString(query)}";
+                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
+
+                // Add basic authentication
+                var byteArray = System.Text.Encoding.ASCII.GetBytes($"{_user}:{_password}");
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/sparql-results+json"));
+
+                var response = await client.GetAsync(queryUri);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    var parser = new SparqlJsonParser();
+                    using var reader = new StringReader(responseBody);
+                    var results = new SparqlResultSet();
+                    parser.Load(results, reader);
+                    return results;
+                }
+                else
+                {
+                    throw new Exception($"Query failed. Status code: {response.StatusCode}, Response: {responseBody}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred while querying dataset '{DatasetName}'", datasetName);
+                throw;
+            }
+        }
+
+        public async Task<int> RetrieveGeometry(SparqlResultSet resultSet, string geometryField, long owlModel)
+        {
+            if (resultSet.Count == 0)
+            {
+                return await Task.FromResult(0);
+            }
+
+            try
+            {
+                var resultId = Guid.NewGuid().ToString();
+                foreach (SparqlResult result in resultSet)
+                {
+                    var base64Data = result[geometryField]?.ToString();
+                    if (string.IsNullOrEmpty(base64Data))
+                    {
+                        continue;
+                    }
+
+                    var typeIndex = base64Data.LastIndexOf("^^");
+                    if (typeIndex > 0)
+                    {
+                        base64Data = base64Data.Substring(0, typeIndex);
+                    }
+
+                    var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{resultId}.bin");
+                    File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Data));
+                    engine.ImportModel(owlModel, modelPath);
+                    File.Delete(modelPath);
+                }
+
+                return await Task.FromResult(resultSet.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing results from SPARQL query.");
                 throw;
             }
         }

@@ -7,13 +7,13 @@
     <script src="scripts/gl-matrix-min.js"></script>
     <!--MAUI WebView2 integration-->
     <!--<script src="scripts/HybridWebView.js"></script>-->
-    <script async src="emifcengine.js"></script>
     <script src="scripts/log.js"></script>
     <script src="scripts/webgl.js"></script>
     <script src="scripts/load.js"></script>
     <script src="scripts/selectionbuffer.js"></script>
     <script src="scripts/viewer.js"></script>
     <script src="scripts/interaction.js"></script>
+    <script src="emifcengine.js"></script>
     <style>
         body {
             margin: 0;
@@ -726,7 +726,7 @@
                 setTimeout(() => {
                     const urlParams = new URLSearchParams(window.location.search);
                     const workflowId = urlParams.get('workflowId');
-                    const model = urlParams.get('model');                    
+                    const model = urlParams.get('model');
                     if (workflowId && model) {
                         try {
                             window.logInfo(`Fetching model: ${model}`);

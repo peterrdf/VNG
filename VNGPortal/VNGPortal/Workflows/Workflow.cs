@@ -53,4 +53,21 @@ public class SHACLShape
 
     [XmlElement("shape")]
     public string Shape { get; set; } = string.Empty;
+
+    [XmlArray("views")]
+    [XmlArrayItem("view")]
+    public List<SHACLView> Views { get; set; } = new();
+}
+
+public class SHACLView
+{
+    [XmlElement("type")]
+    public string Type { get; set; } = string.Empty;
+
+    [XmlElement("visualization")]
+    public string Visualization { get; set; } = string.Empty;
+
+    [XmlArray("queries")]
+    [XmlArrayItem("query")]
+    public List<string> Queries { get; set; } = new();
 }

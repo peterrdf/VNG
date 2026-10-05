@@ -194,54 +194,13 @@ namespace VNGPortal.Workflows
                                 {
                                     bool hasViolation = result.IndexOf("sh:Violation") != -1;
                                     await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Validation Report", "", result, hasViolation);
-                                    if (hasViolation)
-                                    {
-                                        if (shaclShape != null)
-                                        {
-                                            var shaclViolationViews = shaclShape.Views.FindAll(v => v.Type == "violation").ToList();
-                                            if ((shaclViolationViews != null) && (shaclViolationViews.Count > 0))
-                                            {
-                                                // Use the first view for now, but we could potentially handle multiple views in the future
-                                                var shaclViolationView = shaclViolationViews?.First();
-                                                if (shaclViolationView != null)
-                                                {
-                                                    long owlModel = engine.CreateModel();
-                                                    try
-                                                    {
-                                                        foreach (var geometryQuery in shaclViolationView.Queries)
-                                                        {
-                                                            var queryResult = await sparqlServer.ExecuteQueryAsync(datasetName, geometryQuery.Query);
-                                                            await sparqlServer.RetrieveGeometry(queryResult, geometryQuery.GeometryVariable, owlModel);
-                                                        }
-
-                                                        var shaclErrorsModel = $"shacl_errors_{Guid.NewGuid().ToString()}.bin";
-                                                        var shaclErrorsModelPath = Path.Combine(modelDir, shaclErrorsModel);
-                                                        engine.SaveModel(owlModel, shaclErrorsModelPath);
-
-                                                        await _signalRStatus.Send3DViewUpdate(
-                                                            taskDescriptor.GroupName,
-                                                            "SHACL Violations View",
-                                                            taskDescriptor.TaskId,
-                                                            shaclErrorsModel,
-                                                            true);
-                                                    }
-                                                    catch (Exception ex)
-                                                    {
-                                                        _logger.LogError(ex, "Error executing SHACL error view queries for workflow step: '{StepName}'", step.Name);
-                                                        await _signalRStatus.SendProgressUpdate(
-                                                            taskDescriptor.GroupName,
-                                                            0,
-                                                            $"Error executing SHACL error view queries for workflow step: '{step.Name}'.",
-                                                            true);
-                                                    }
-                                                    finally
-                                                    {
-                                                        engine.CloseModel(owlModel);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    await CreateSHACLViews(
+                                        sparqlServer, 
+                                        datasetName,
+                                        shaclShape, 
+                                        hasViolation,
+                                        modelDir,
+                                        taskDescriptor);
                                 }
 
                                 _logger.LogInformation("Workflow step: {StepName} executed successfully.", step.Name);
@@ -305,6 +264,93 @@ namespace VNGPortal.Workflows
                 false);
 
             return true;
+        }
+
+        private async Task CreateSHACLViews(
+            SPARQL.Server sparqlServer,
+            string datasetName,
+            SHACLShape? shaclShape, 
+            bool hasViolations, 
+            string modelDir,
+            TaskDescriptor taskDescriptor)
+        {
+            if (sparqlServer == null)
+            {
+                throw new ArgumentNullException(nameof(sparqlServer));
+            }
+
+            if (string.IsNullOrEmpty(datasetName))
+            {
+                throw new ArgumentException("Dataset name cannot be null or empty.", nameof(datasetName));
+            }
+
+            if (shaclShape == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(modelDir))
+            {
+                throw new ArgumentNullException(nameof(modelDir));
+            }
+
+            if (taskDescriptor == null)
+            {
+                throw new ArgumentNullException(nameof(taskDescriptor));
+            }
+
+            //
+            // Violation Views
+            //
+            if (hasViolations)
+            {
+                var shaclViolationViews = shaclShape.Views.FindAll(v => v.Type == "violation").ToList();
+                if ((shaclViolationViews != null) && (shaclViolationViews.Count > 0))
+                {
+
+                    foreach (var shaclViolationView in shaclViolationViews)
+                    {
+                        if (shaclViolationView == null)
+                        {
+                            continue;
+                        }
+
+                        long owlModel = engine.CreateModel();
+                        try
+                        {
+                            foreach (var geometryQuery in shaclViolationView.Queries)
+                            {
+                                var queryResult = await sparqlServer.ExecuteQueryAsync(datasetName, geometryQuery.Query);
+                                await sparqlServer.RetrieveGeometry(queryResult, geometryQuery.GeometryVariable, owlModel);
+                            }
+
+                            var shaclErrorsModel = $"shacl_errors_{Guid.NewGuid().ToString()}.bin";
+                            var shaclErrorsModelPath = Path.Combine(modelDir, shaclErrorsModel);
+                            engine.SaveModel(owlModel, shaclErrorsModelPath);
+
+                            await _signalRStatus.Send3DViewUpdate(
+                                taskDescriptor.GroupName,
+                                "SHACL Violations View",
+                                taskDescriptor.TaskId,
+                                shaclErrorsModel,
+                                true);
+                        }
+                        finally
+                        {
+                            engine.CloseModel(owlModel);
+                        }
+                    }
+                } // foreach (var shaclViolationView in shaclViolationViews)
+            } // if (hasViolations)
+
+            //
+            // Success Views
+            //
+            var shaclSuccessViews = shaclShape.Views.FindAll(v => v.Type == "success").ToList();
+            if ((shaclSuccessViews != null) && (shaclSuccessViews.Count > 0))
+            {
+                throw new NotImplementedException("Success Views");
+            }
         }
 
         private string FormatXML(string xml)

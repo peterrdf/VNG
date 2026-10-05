@@ -196,6 +196,9 @@
 		<None Update="SeedData\SHACL\ValidateTopologicalRelations.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SPARQL\RetrieveGeometryByGlobalIdTemplate.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\SPARQL\InsertTopologicalRelations-IfcWall-IfcRoof.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

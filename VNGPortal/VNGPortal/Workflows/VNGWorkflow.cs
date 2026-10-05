@@ -1,4 +1,6 @@
-﻿using RDF;
+﻿using Microsoft.Extensions.Logging;
+using RDF;
+using System.Text.RegularExpressions;
 using VNGPortal.IFC2RDF;
 using VNGPortal.Services;
 
@@ -14,6 +16,8 @@ namespace VNGPortal.Workflows
 
         public override async Task<bool> ExecuteAsync(TaskDescriptor taskDescriptor)
         {
+            TaskDescriptor = taskDescriptor;
+
             await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, 0, "Workflow started...", false);
 
             var currentStep = 0;
@@ -25,19 +29,18 @@ namespace VNGPortal.Workflows
             var modelsDir = _configuration[$"{fileStorage}:ModelsDir"]!;
             var idsDir = _configuration[$"{fileStorage}:IDSDir"]!;
 
-            var modelDir = Path.Combine(modelsDir, taskDescriptor.TaskId);
-            var modelPath = Path.Combine(modelDir, taskDescriptor.Model);
+            ModelDir = Path.Combine(modelsDir, taskDescriptor.TaskId);
+            var modelPath = Path.Combine(ModelDir, taskDescriptor.Model);            
 
-            var datasetName = "test1"; //#todo modelId or taskId instead of hardcoded "test1"
-
-            var sparqlServer = new SPARQL.Server(_logger);
+            SPARQLServer = new SPARQL.Server(_logger);
+            DatasetName = "test1"; //#todo modelId or taskId instead of hardcoded "test1"
 
             //
             // Execute workflow steps
             //
 
             WorkflowStorage workflowStorage = new WorkflowStorage(_configuration, _logger);
-            var sparqlQueries = workflowStorage.LoadSPARQLQueries();
+            SPARQLQueries = workflowStorage.LoadSPARQLQueries();
             var shaclShapes = workflowStorage.LoadSHACLShapes();
 
             for (int i = 0; _workflow.Steps != null && i < _workflow.Steps.Count; i++)
@@ -69,7 +72,7 @@ namespace VNGPortal.Workflows
                                     : string.Empty;
                                 var (output, error, exitCode) = await ExecuteProcess(
                                     exePath: javaPath,
-                                    args: $"{jvmArgs}-jar \"{jarPath}\" --baseURI http://vng.nl/geometry/ --dir \"{modelDir}\""
+                                    args: $"{jvmArgs}-jar \"{jarPath}\" --baseURI http://vng.nl/geometry/ --dir \"{ModelDir}\""
                                 );
                                 if (exitCode == 0)
                                 {
@@ -104,11 +107,11 @@ namespace VNGPortal.Workflows
                         case "CREATE-SPARQL-DATASET":
                             {
                                 // Add data to the Jena-Fuseki database
-                                sparqlServer.CreateDataset(datasetName);
-                                if (sparqlServer.AddData(datasetName, new List<string>
+                                SPARQLServer.CreateDataset(DatasetName);
+                                if (SPARQLServer.AddData(DatasetName, new List<string>
                                     {
-                                        Path.Combine(modelDir, Path.GetFileNameWithoutExtension(modelPath) + ".ttl"),
-                                        Path.Combine(modelDir, Path.GetFileNameWithoutExtension(modelPath) + "_geometry.trig")
+                                        Path.Combine(ModelDir, Path.GetFileNameWithoutExtension(modelPath) + ".ttl"),
+                                        Path.Combine(ModelDir, Path.GetFileNameWithoutExtension(modelPath) + "_geometry.trig")
                                     }))
                                 {
                                     _logger.LogInformation("Workflow step: '{StepName}' executed successfully.", step.Name);
@@ -137,7 +140,7 @@ namespace VNGPortal.Workflows
                                 {
                                     string queryRef = step.Parameters["queryRef"];
                                     if (!string.IsNullOrEmpty(queryRef) &&
-                                        sparqlQueries.TryGetValue(queryRef, out var sparqlQuery))
+                                        SPARQLQueries.TryGetValue(queryRef, out var sparqlQuery))
                                     {
                                         query = sparqlQuery.Query;
                                     }
@@ -149,7 +152,7 @@ namespace VNGPortal.Workflows
                                 }
 
                                 await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SPARQL Query", query, "", false);
-                                if (await sparqlServer.ExecuteInsertAsync(datasetName, query))
+                                if (await SPARQLServer.ExecuteInsertAsync(DatasetName, query))
                                 {
                                     _logger.LogInformation("Workflow step {StepName} executed successfully.", step.Name);
                                     await _signalRStatus.SendProgressUpdate(
@@ -189,18 +192,14 @@ namespace VNGPortal.Workflows
                                     throw new Exception($"SHACL shape is empty for workflow step: '{step.Name}'");
                                 }
 
-                                var result = await sparqlServer.ExecuteSHACLAsync(datasetName, "https://vng.nl/geometries/", shape);
+                                var result = await SPARQLServer.ExecuteSHACLAsync(DatasetName, "https://vng.nl/geometries/", shape);
                                 if (!string.IsNullOrEmpty(result))
                                 {
-                                    bool hasViolation = result.IndexOf("sh:Violation") != -1;
-                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Validation Report", "", result, hasViolation);
+                                    bool hasViolations = result.IndexOf("sh:Violation") != -1;
+                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Validation Report", "", result, hasViolations);
                                     await CreateSHACLViews(
-                                        sparqlServer, 
-                                        datasetName,
-                                        shaclShape, 
-                                        hasViolation,
-                                        modelDir,
-                                        taskDescriptor);
+                                        shaclShape,
+                                        result);
                                 }
 
                                 _logger.LogInformation("Workflow step: {StepName} executed successfully.", step.Name);
@@ -267,21 +266,27 @@ namespace VNGPortal.Workflows
         }
 
         private async Task CreateSHACLViews(
-            SPARQL.Server sparqlServer,
-            string datasetName,
-            SHACLShape? shaclShape, 
-            bool hasViolations, 
-            string modelDir,
-            TaskDescriptor taskDescriptor)
+            SHACLShape? shaclShape,
+            string shaclResult)
         {
-            if (sparqlServer == null)
+            if (TaskDescriptor == null)
             {
-                throw new ArgumentNullException(nameof(sparqlServer));
+                throw new InvalidOperationException("Task Descriptor is not initialized.");
             }
 
-            if (string.IsNullOrEmpty(datasetName))
+            if (SPARQLServer == null)
             {
-                throw new ArgumentException("Dataset name cannot be null or empty.", nameof(datasetName));
+                throw new InvalidOperationException("SPARQL Server is not initialized.");
+            }
+
+            if (string.IsNullOrEmpty(DatasetName))
+            {
+                throw new InvalidOperationException("Dataset name is not initialized.");
+            }
+
+            if (string.IsNullOrEmpty(ModelDir))
+            {
+                throw new InvalidOperationException("Mode Directory is not initialized.");
             }
 
             if (shaclShape == null)
@@ -289,25 +294,15 @@ namespace VNGPortal.Workflows
                 return;
             }
 
-            if (string.IsNullOrEmpty(modelDir))
-            {
-                throw new ArgumentNullException(nameof(modelDir));
-            }
-
-            if (taskDescriptor == null)
-            {
-                throw new ArgumentNullException(nameof(taskDescriptor));
-            }
-
             //
             // Violation Views
             //
+            bool hasViolations = shaclResult.IndexOf("sh:Violation") != -1;
             if (hasViolations)
             {
                 var shaclViolationViews = shaclShape.Views.FindAll(v => v.Type == "violation").ToList();
                 if ((shaclViolationViews != null) && (shaclViolationViews.Count > 0))
                 {
-
                     foreach (var shaclViolationView in shaclViolationViews)
                     {
                         if (shaclViolationView == null)
@@ -320,18 +315,57 @@ namespace VNGPortal.Workflows
                         {
                             foreach (var geometryQuery in shaclViolationView.Queries)
                             {
-                                var queryResult = await sparqlServer.ExecuteQueryAsync(datasetName, geometryQuery.Query);
-                                await sparqlServer.RetrieveGeometry(queryResult, geometryQuery.GeometryVariable, owlModel);
+                                string query = geometryQuery.Query;
+                                if (string.IsNullOrEmpty(query))
+                                {
+                                    throw new Exception($"SPARQL query is empty for SHACL Validation - SPARQL Query: '{shaclShape.Id} - {geometryQuery.Id}'");
+                                }
+
+                                string templateArgRegExpr = string.Empty;
+                                if (geometryQuery.Parameters.ContainsKey("templateArgRegExpr"))
+                                {
+                                    templateArgRegExpr = geometryQuery.Parameters["templateArgRegExpr"];
+                                }
+
+                                string templateArgRegExprMatch = string.Empty;
+                                if (geometryQuery.Parameters.ContainsKey("templateArgRegExprMatch"))
+                                {
+                                    templateArgRegExprMatch = geometryQuery.Parameters["templateArgRegExprMatch"];
+                                }
+
+                                //
+                                // Template Arguments
+                                //
+                                string templateArgName = string.Empty;
+                                if (geometryQuery.Parameters.ContainsKey("templateArgName"))
+                                {
+                                    templateArgName = geometryQuery.Parameters["templateArgName"];
+                                }
+
+                                if (!string.IsNullOrEmpty(templateArgRegExpr) && 
+                                    !string.IsNullOrEmpty(templateArgRegExprMatch) && 
+                                    !string.IsNullOrEmpty(templateArgName))
+                                {
+                                    var templateArgValue = string.Join(" ",
+                                    Regex.Matches(shaclResult, templateArgRegExpr)
+                                        .Select(m => $"'{m.Groups[templateArgRegExprMatch].Value}'"));
+                                    query = query.Replace(templateArgName, templateArgValue);
+                                    _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Template Argument: '{TemplateArgName}' = '{TemplateArgValue}'", shaclShape.Id, geometryQuery.Id, templateArgName, templateArgValue);
+                                    _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclShape.Id, geometryQuery.Id, query);
+                                }
+
+                                var queryResult = await SPARQLServer.ExecuteQueryAsync(DatasetName, query);
+                                await SPARQLServer.RetrieveGeometry(queryResult, geometryQuery.GeometryVariable, owlModel);
                             }
 
                             var shaclErrorsModel = $"shacl_errors_{Guid.NewGuid().ToString()}.bin";
-                            var shaclErrorsModelPath = Path.Combine(modelDir, shaclErrorsModel);
+                            var shaclErrorsModelPath = Path.Combine(ModelDir, shaclErrorsModel);
                             engine.SaveModel(owlModel, shaclErrorsModelPath);
 
                             await _signalRStatus.Send3DViewUpdate(
-                                taskDescriptor.GroupName,
+                                TaskDescriptor.GroupName,
                                 "SHACL Violations View",
-                                taskDescriptor.TaskId,
+                                TaskDescriptor.TaskId,
                                 shaclErrorsModel,
                                 true);
                         }
@@ -387,6 +421,12 @@ namespace VNGPortal.Workflows
         #region Properties
         public override string Name => "VNG";
         public override string Description => "VNG Workflow";
+
+        private TaskDescriptor? TaskDescriptor { get; set; } = null;
+        private SPARQL.Server? SPARQLServer { get; set; } = null;
+        private string DatasetName { get; set; } = string.Empty;
+        private IDictionary<string, SPARQLQuery> SPARQLQueries { get; set; } = new Dictionary<string, SPARQLQuery>();
+        private string ModelDir { get; set; } = string.Empty;
         #endregion
 
     }

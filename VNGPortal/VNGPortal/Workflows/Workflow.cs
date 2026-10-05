@@ -43,6 +43,9 @@ public class SPARQLQuery
 
     [XmlElement("query")]
     public string Query { get; set; } = string.Empty;
+
+    [XmlElement("parameters")]
+    public ParameterDictionary Parameters { get; set; } = new ParameterDictionary();
 }
 
 [XmlRoot("shacl")]
@@ -63,7 +66,7 @@ public class SHACLShape
 public class SPARQLGeometryQuery : SPARQLQuery
 {
     [XmlElement("geometryVariable")]
-    public string GeometryVariable { get; set; } = string.Empty;
+    public string GeometryVariable { get; set; } = string.Empty;    
 }
 
 public class SHACLView

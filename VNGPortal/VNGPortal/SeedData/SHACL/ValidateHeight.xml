@@ -39,7 +39,7 @@ geom:IfcElementHeightShape
                 FILTER(?bboxMaxZ - ?globalMaxZ > 1)
             }
         """ ;
-        sh:message "Height violation for GlobalId {?globalId}: bboxMaxZ={?bboxMaxZ} minus globalMaxZ={?globalMaxZ} exceeds 1." ;
+        sh:message "Height violation for GlobalId=[{?globalId}]: bboxMaxZ={?bboxMaxZ} minus globalMaxZ={?globalMaxZ} exceeds 1." ;
     ] ;
 
     sh:severity sh:Violation .

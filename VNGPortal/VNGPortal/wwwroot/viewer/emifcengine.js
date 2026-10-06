@@ -76,7 +76,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: C:\Users\svile\AppData\Local\Temp\tmpb776npmo.js
+// include: C:\Users\svile\AppData\Local\Temp\tmpzkym_xge.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -204,21 +204,21 @@ Module['FS_createPath']("/", "data", true, true);
 
   })();
 
-// end include: C:\Users\svile\AppData\Local\Temp\tmpb776npmo.js
-// include: C:\Users\svile\AppData\Local\Temp\tmp4nlx7g1x.js
+// end include: C:\Users\svile\AppData\Local\Temp\tmpzkym_xge.js
+// include: C:\Users\svile\AppData\Local\Temp\tmp0jnq_2ln.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: C:\Users\svile\AppData\Local\Temp\tmp4nlx7g1x.js
-// include: C:\Users\svile\AppData\Local\Temp\tmpwp9z0edv.js
+  // end include: C:\Users\svile\AppData\Local\Temp\tmp0jnq_2ln.js
+// include: C:\Users\svile\AppData\Local\Temp\tmp3a6948k9.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: C:\Users\svile\AppData\Local\Temp\tmpwp9z0edv.js
+  // end include: C:\Users\svile\AppData\Local\Temp\tmp3a6948k9.js
 
 
 var programArgs = [];
@@ -6248,7 +6248,6 @@ ${functionBody}
       return emval_addMethodCaller(createNamedFunction(functionName, invokerFunction));
     };
 
-
   
   
   var __emval_invoke = (caller, handle, methodName, destructorsRef, args) => {
@@ -8369,7 +8368,6 @@ var _internalGetBoundingBox = Module['_internalGetBoundingBox'] = makeInvalidEar
 var _internalGetCenter = Module['_internalGetCenter'] = makeInvalidEarlyAccess('_internalGetCenter');
 var _getRootAxis2Placement = Module['_getRootAxis2Placement'] = makeInvalidEarlyAccess('_getRootAxis2Placement');
 var _getGlobalPlacement = Module['_getGlobalPlacement'] = makeInvalidEarlyAccess('_getGlobalPlacement');
-var _engiGetAggrElement = Module['_engiGetAggrElement'] = makeInvalidEarlyAccess('_engiGetAggrElement');
 var _setGlobalPlacement = Module['_setGlobalPlacement'] = makeInvalidEarlyAccess('_setGlobalPlacement');
 var _getTimeStamp = Module['_getTimeStamp'] = makeInvalidEarlyAccess('_getTimeStamp');
 var _setInstanceReference = Module['_setInstanceReference'] = makeInvalidEarlyAccess('_setInstanceReference');
@@ -8381,8 +8379,8 @@ var _engiGetEntityAttributeByIndex = Module['_engiGetEntityAttributeByIndex'] = 
 var _iterateOverProperties = Module['_iterateOverProperties'] = makeInvalidEarlyAccess('_iterateOverProperties');
 var _engiGetEntityAttributeIndex = Module['_engiGetEntityAttributeIndex'] = makeInvalidEarlyAccess('_engiGetEntityAttributeIndex');
 var _engiGetAttrIndexBN = Module['_engiGetAttrIndexBN'] = makeInvalidEarlyAccess('_engiGetAttrIndexBN');
-var _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = makeInvalidEarlyAccess('_engiGetAttrIndexExBN');
 var _engiGetEntityAttributeIndexEx = Module['_engiGetEntityAttributeIndexEx'] = makeInvalidEarlyAccess('_engiGetEntityAttributeIndexEx');
+var _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = makeInvalidEarlyAccess('_engiGetAttrIndexExBN');
 var _engiGetEntityArgumentName = Module['_engiGetEntityArgumentName'] = makeInvalidEarlyAccess('_engiGetEntityArgumentName');
 var _engiGetAttrNameByIndex = Module['_engiGetAttrNameByIndex'] = makeInvalidEarlyAccess('_engiGetAttrNameByIndex');
 var _engiGetEntityArgumentType = Module['_engiGetEntityArgumentType'] = makeInvalidEarlyAccess('_engiGetEntityArgumentType');
@@ -8399,6 +8397,7 @@ var _engiGetEntityNoArguments = Module['_engiGetEntityNoArguments'] = makeInvali
 var _engiGetArgumentType = Module['_engiGetArgumentType'] = makeInvalidEarlyAccess('_engiGetArgumentType');
 var _engiGetAttributeType = Module['_engiGetAttributeType'] = makeInvalidEarlyAccess('_engiGetAttributeType');
 var _engiGetEntityArgumentIndex = Module['_engiGetEntityArgumentIndex'] = makeInvalidEarlyAccess('_engiGetEntityArgumentIndex');
+var _engiGetAggrElement = Module['_engiGetAggrElement'] = makeInvalidEarlyAccess('_engiGetAggrElement');
 var _engiGetEntityArgument = Module['_engiGetEntityArgument'] = makeInvalidEarlyAccess('_engiGetEntityArgument');
 var _sdaiGetADBTypePathx = Module['_sdaiGetADBTypePathx'] = makeInvalidEarlyAccess('_sdaiGetADBTypePathx');
 var _xxxxOpenModelByStream = Module['_xxxxOpenModelByStream'] = makeInvalidEarlyAccess('_xxxxOpenModelByStream');
@@ -8941,7 +8940,6 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['internalGetCenter'] != 'undefined', 'missing Wasm export: internalGetCenter');
   assert(typeof wasmExports['getRootAxis2Placement'] != 'undefined', 'missing Wasm export: getRootAxis2Placement');
   assert(typeof wasmExports['getGlobalPlacement'] != 'undefined', 'missing Wasm export: getGlobalPlacement');
-  assert(typeof wasmExports['engiGetAggrElement'] != 'undefined', 'missing Wasm export: engiGetAggrElement');
   assert(typeof wasmExports['setGlobalPlacement'] != 'undefined', 'missing Wasm export: setGlobalPlacement');
   assert(typeof wasmExports['getTimeStamp'] != 'undefined', 'missing Wasm export: getTimeStamp');
   assert(typeof wasmExports['setInstanceReference'] != 'undefined', 'missing Wasm export: setInstanceReference');
@@ -8953,8 +8951,8 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['iterateOverProperties'] != 'undefined', 'missing Wasm export: iterateOverProperties');
   assert(typeof wasmExports['engiGetEntityAttributeIndex'] != 'undefined', 'missing Wasm export: engiGetEntityAttributeIndex');
   assert(typeof wasmExports['engiGetAttrIndexBN'] != 'undefined', 'missing Wasm export: engiGetAttrIndexBN');
-  assert(typeof wasmExports['engiGetAttrIndexExBN'] != 'undefined', 'missing Wasm export: engiGetAttrIndexExBN');
   assert(typeof wasmExports['engiGetEntityAttributeIndexEx'] != 'undefined', 'missing Wasm export: engiGetEntityAttributeIndexEx');
+  assert(typeof wasmExports['engiGetAttrIndexExBN'] != 'undefined', 'missing Wasm export: engiGetAttrIndexExBN');
   assert(typeof wasmExports['engiGetEntityArgumentName'] != 'undefined', 'missing Wasm export: engiGetEntityArgumentName');
   assert(typeof wasmExports['engiGetAttrNameByIndex'] != 'undefined', 'missing Wasm export: engiGetAttrNameByIndex');
   assert(typeof wasmExports['engiGetEntityArgumentType'] != 'undefined', 'missing Wasm export: engiGetEntityArgumentType');
@@ -8971,6 +8969,7 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['engiGetArgumentType'] != 'undefined', 'missing Wasm export: engiGetArgumentType');
   assert(typeof wasmExports['engiGetAttributeType'] != 'undefined', 'missing Wasm export: engiGetAttributeType');
   assert(typeof wasmExports['engiGetEntityArgumentIndex'] != 'undefined', 'missing Wasm export: engiGetEntityArgumentIndex');
+  assert(typeof wasmExports['engiGetAggrElement'] != 'undefined', 'missing Wasm export: engiGetAggrElement');
   assert(typeof wasmExports['engiGetEntityArgument'] != 'undefined', 'missing Wasm export: engiGetEntityArgument');
   assert(typeof wasmExports['sdaiGetADBTypePathx'] != 'undefined', 'missing Wasm export: sdaiGetADBTypePathx');
   assert(typeof wasmExports['xxxxOpenModelByStream'] != 'undefined', 'missing Wasm export: xxxxOpenModelByStream');
@@ -9509,7 +9508,6 @@ function assignWasmExports(wasmExports) {
   _internalGetCenter = Module['_internalGetCenter'] = createExportWrapper('internalGetCenter', wasmExports['internalGetCenter'], 2);
   _getRootAxis2Placement = Module['_getRootAxis2Placement'] = createExportWrapper('getRootAxis2Placement', wasmExports['getRootAxis2Placement'], 2);
   _getGlobalPlacement = Module['_getGlobalPlacement'] = createExportWrapper('getGlobalPlacement', wasmExports['getGlobalPlacement'], 2);
-  _engiGetAggrElement = Module['_engiGetAggrElement'] = createExportWrapper('engiGetAggrElement', wasmExports['engiGetAggrElement'], 4);
   _setGlobalPlacement = Module['_setGlobalPlacement'] = createExportWrapper('setGlobalPlacement', wasmExports['setGlobalPlacement'], 3);
   _getTimeStamp = Module['_getTimeStamp'] = createExportWrapper('getTimeStamp', wasmExports['getTimeStamp'], 1);
   _setInstanceReference = Module['_setInstanceReference'] = createExportWrapper('setInstanceReference', wasmExports['setInstanceReference'], 2);
@@ -9521,8 +9519,8 @@ function assignWasmExports(wasmExports) {
   _iterateOverProperties = Module['_iterateOverProperties'] = createExportWrapper('iterateOverProperties', wasmExports['iterateOverProperties'], 2);
   _engiGetEntityAttributeIndex = Module['_engiGetEntityAttributeIndex'] = createExportWrapper('engiGetEntityAttributeIndex', wasmExports['engiGetEntityAttributeIndex'], 2);
   _engiGetAttrIndexBN = Module['_engiGetAttrIndexBN'] = createExportWrapper('engiGetAttrIndexBN', wasmExports['engiGetAttrIndexBN'], 2);
-  _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = createExportWrapper('engiGetAttrIndexExBN', wasmExports['engiGetAttrIndexExBN'], 4);
   _engiGetEntityAttributeIndexEx = Module['_engiGetEntityAttributeIndexEx'] = createExportWrapper('engiGetEntityAttributeIndexEx', wasmExports['engiGetEntityAttributeIndexEx'], 4);
+  _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = createExportWrapper('engiGetAttrIndexExBN', wasmExports['engiGetAttrIndexExBN'], 4);
   _engiGetEntityArgumentName = Module['_engiGetEntityArgumentName'] = createExportWrapper('engiGetEntityArgumentName', wasmExports['engiGetEntityArgumentName'], 4);
   _engiGetAttrNameByIndex = Module['_engiGetAttrNameByIndex'] = createExportWrapper('engiGetAttrNameByIndex', wasmExports['engiGetAttrNameByIndex'], 4);
   _engiGetEntityArgumentType = Module['_engiGetEntityArgumentType'] = createExportWrapper('engiGetEntityArgumentType', wasmExports['engiGetEntityArgumentType'], 3);
@@ -9539,6 +9537,7 @@ function assignWasmExports(wasmExports) {
   _engiGetArgumentType = Module['_engiGetArgumentType'] = createExportWrapper('engiGetArgumentType', wasmExports['engiGetArgumentType'], 1);
   _engiGetAttributeType = Module['_engiGetAttributeType'] = createExportWrapper('engiGetAttributeType', wasmExports['engiGetAttributeType'], 1);
   _engiGetEntityArgumentIndex = Module['_engiGetEntityArgumentIndex'] = createExportWrapper('engiGetEntityArgumentIndex', wasmExports['engiGetEntityArgumentIndex'], 2);
+  _engiGetAggrElement = Module['_engiGetAggrElement'] = createExportWrapper('engiGetAggrElement', wasmExports['engiGetAggrElement'], 4);
   _engiGetEntityArgument = Module['_engiGetEntityArgument'] = createExportWrapper('engiGetEntityArgument', wasmExports['engiGetEntityArgument'], 2);
   _sdaiGetADBTypePathx = Module['_sdaiGetADBTypePathx'] = createExportWrapper('sdaiGetADBTypePathx', wasmExports['sdaiGetADBTypePathx'], 3);
   _xxxxOpenModelByStream = Module['_xxxxOpenModelByStream'] = createExportWrapper('xxxxOpenModelByStream', wasmExports['xxxxOpenModelByStream'], 3);
@@ -9666,8 +9665,6 @@ var wasmImports = {
   _embind_register_void: __embind_register_void,
   /** @export */
   _emval_create_invoker: __emval_create_invoker,
-  /** @export */
-  _emval_decref: __emval_decref,
   /** @export */
   _emval_invoke: __emval_invoke,
   /** @export */

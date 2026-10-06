@@ -162,7 +162,7 @@ function _zoom(zoomIn, factor, redraw) {
 
         // Ensure we don't zoom too close or too far
         //const MIN_DISTANCE = 0.15;
-        const MIN_DISTANCE = g_viewer._worldDimensions.MaxDistance * 0.015;
+        const MIN_DISTANCE = g_viewer._worldDimensions.MaxDistance * 0.00015;
         const MAX_DISTANCE = g_viewer._worldDimensions.MaxDistance * 5;
 
         // Normalize the direction vector

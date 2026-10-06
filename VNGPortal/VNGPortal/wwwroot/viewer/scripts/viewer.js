@@ -1263,7 +1263,7 @@ var Viewer = function () {
     }
 
     /**
-     * Zoom
+     * Zoom (X/Z orbit convention: camera is fixed on -Z, the view is defined by _rotateQuat)
      */
     Viewer.prototype.zoomToXZ = function (Xmin, Ymin, Zmin, Xmax, Ymax, Zmax) {
         try {
@@ -1273,104 +1273,115 @@ var Viewer = function () {
                 return;
             }
 
-            // Model center
-            const modelCenterX = (this._worldDimensions.Xmin + this._worldDimensions.Xmax) / 2;
-            const modelCenterY = (this._worldDimensions.Ymin + this._worldDimensions.Ymax) / 2;
-            const modelCenterZ = (this._worldDimensions.Zmin + this._worldDimensions.Zmax) / 2;
-            window.logInfo(`[Viewer.zoomToXZ] Model center: (${modelCenterX.toFixed(4)}, ${modelCenterY.toFixed(4)}, ${modelCenterZ.toFixed(4)})`);
-
-            // Object center
-            const objectCenterX = (Xmin + Xmax) / 2;
-            const objectCenterY = (Ymin + Ymax) / 2;
-            const objectCenterZ = (Zmin + Zmax) / 2;
-            const objectCenter = [objectCenterX, objectCenterY, objectCenterZ];
-            window.logInfo(`[Viewer.zoomToXZ] Object center: (${objectCenterX.toFixed(4)}, ${objectCenterY.toFixed(4)}, ${objectCenterZ.toFixed(4)})`);
-
-            // Set rotation center to object center
-            this._rotationCenter = vec3.fromValues(objectCenterX, objectCenterY, objectCenterZ);
-
-            // Calculate object dimensions
             const EPSILON = 0.0001;
-            const width = Math.max(Xmax - Xmin, EPSILON);
-            const height = Math.max(Ymax - Ymin, EPSILON);
-            const depth = Math.max(Zmax - Zmin, EPSILON);
-            window.logInfo(`[Viewer.zoomToXZ] Object dimensions: width=${width.toFixed(4)}, height=${height.toFixed(4)}, depth=${depth.toFixed(4)}`);
 
-            // Calculate viewing distance based on object size
-            const fov = 45 * (Math.PI / 180);
-            const aspectRatio = gl.canvas.width / gl.canvas.height;
-            let distance = Math.max(
-                width / (2 * Math.tan(fov / 2)),
-                height / (2 * Math.tan(fov / 2)) * aspectRatio,
-                depth * 1.5
-            );
-            window.logInfo(`[Viewer.zoomToXZ] Calculated viewing distance: ${distance.toFixed(4)}`);
+            // Center of the target object
+            const centerX = (Xmin + Xmax) / 2;
+            const centerY = (Ymin + Ymax) / 2;
+            const centerZ = (Zmin + Zmax) / 2;
+            const objectCenter = [centerX, centerY, centerZ];
+            window.logInfo(`[Viewer.zoomToXZ] Object center: (${centerX.toFixed(4)}, ${centerY.toFixed(4)}, ${centerZ.toFixed(4)})`);
 
-            // Define all faces with their directions and areas
-            let faces = [
-                // Ignoring front/back faces for XZ view
-                //{ name: 'front', normal: [0, 0, -1], area: width * height, eulerXZ: [-180, 0] },
-                //{ name: 'back', normal: [0, 0, 1], area: width * height, eulerXZ: [0, 0] },
-                { name: 'left', normal: [-1, 0, 0], area: depth * height, eulerXZ: [270, 90] },
-                { name: 'right', normal: [1, 0, 0], area: depth * height, eulerXZ: [270, -90] },
-                { name: 'bottom', normal: [0, -1, 0], area: width * depth, eulerXZ: [270, 0] },
-                { name: 'top', normal: [0, 1, 0], area: width * depth, eulerXZ: [270, 180] }
+            // Rotate around the object center
+            this._rotationCenter = vec3.fromValues(centerX, centerY, centerZ);
+
+            // Extents (model is Z-up)
+            const sizeX = Math.max(Xmax - Xmin, EPSILON);
+            const sizeY = Math.max(Ymax - Ymin, EPSILON);
+            const sizeZ = Math.max(Zmax - Zmin, EPSILON);
+
+            // Faces: outward normal (camera side), X/Z rotation angles, visible width/height
+            const faces = [
+                { name: '+Y', normal: [0, 1, 0], x: -90, z: 0, w: sizeX, h: sizeZ, d: sizeY },
+                { name: '+X', normal: [1, 0, 0], x: -90, z: 90, w: sizeY, h: sizeZ, d: sizeX },
+                { name: '-Y', normal: [0, -1, 0], x: -90, z: 180, w: sizeX, h: sizeZ, d: sizeY },
+                { name: '-X', normal: [-1, 0, 0], x: -90, z: 270, w: sizeY, h: sizeZ, d: sizeX },
+                { name: 'bottom', normal: [0, 0, -1], x: 0, z: 0, w: sizeX, h: sizeY, d: sizeZ },
+                { name: 'top', normal: [0, 0, 1], x: -180, z: 0, w: sizeX, h: sizeY, d: sizeZ }
             ];
+            faces.forEach(f => f.area = f.w * f.h);
 
-            // Calculate vector from origin to object center
-            const vectorToObject = [objectCenterX, objectCenterY, objectCenterZ];
-            let distanceToObject = Math.sqrt(
-                vectorToObject[0] * vectorToObject[0] +
-                vectorToObject[1] * vectorToObject[1] +
-                vectorToObject[2] * vectorToObject[2]
-            );
-
-            // Normal vector
-            const normalizedVector = [
-                vectorToObject[0] / distanceToObject,
-                vectorToObject[1] / distanceToObject,
-                vectorToObject[2] / distanceToObject
-            ];
-
-            faces.forEach(face => {
-                // Calculate alignment (dot product of normal with vector to object)
-                face.alignment = -(
-                    normalizedVector[0] * face.normal[0] +
-                    normalizedVector[1] * face.normal[1] +
-                    normalizedVector[2] * face.normal[2]
+            // Alignment of every face with the direction from the origin to the object
+            const length = Math.sqrt(centerX * centerX + centerY * centerY + centerZ * centerZ);
+            faces.forEach(f => {
+                f.alignment = (length < EPSILON) ? 0 : -(
+                    (centerX / length) * f.normal[0] +
+                    (centerY / length) * f.normal[1] +
+                    (centerZ / length) * f.normal[2]
                 );
             });
 
-            // Sort by area
-            faces.sort((a, b) => b.area - a.area);
-            window.logInfo(`[Viewer.zoomToXZ] Faces sorted by area:\n${faces.map(f => `  ${f.name}: alignment=${f.alignment.toFixed(4)}, area=${f.area.toFixed(4)}`).join('\n')}`);
+            // Flat objects (parcels, walls, slabs): the view is dictated by the thin axis
+            const FLAT_RATIO = 0.1;
+            const sizes = [sizeX, sizeY, sizeZ];
+            const maxSize = Math.max(...sizes);
+            const thinAxis = sizes.indexOf(Math.min(...sizes));
+            const isFlat = (sizes[thinAxis] / maxSize) < FLAT_RATIO;
 
-            // Keep first 2 largest faces
-            faces = faces.slice(0, 2);
+            let candidates = faces;
+            if (isFlat) {
+                if (thinAxis === 2) {
+                    // Horizontal object (parcel) => always look from above
+                    candidates = faces.filter(f => f.name === 'top');
+                } else {
+                    // Vertical object (wall) => look from the side facing the origin
+                    candidates = faces.filter(f => f.normal[thinAxis] !== 0);
+                }
+            }
 
-            // Sort by alignment
-            faces.sort((a, b) => b.alignment - a.alignment);
-            window.logInfo(`[Viewer.zoomToXZ] Faces sorted by score:\n${faces.map(f => `  ${f.name}: alignment=${f.alignment.toFixed(4)}, area=${f.area.toFixed(4)}`).join('\n')}`);
+            if (length < EPSILON && !isFlat) {
+                candidates.sort((a, b) => b.area - a.area);
+            } else {
+                candidates.sort((a, b) => b.alignment - a.alignment);
+            }
+            const selectedFace = candidates[0];
+            window.logInfo(`[Viewer.zoomToXZ] Selected face: ${selectedFace.name}${isFlat ? ' (flat object)' : ''}`);
 
-            const selectedFace = faces[0];
-            window.logInfo(`[Viewer.zoomToXZ] Selected face: ${selectedFace.name} (alignment=${selectedFace.alignment.toFixed(4)}, area=${selectedFace.area.toFixed(4)})`);
+            // View = rotation only; the camera stays on the default -Z axis
+            this._rotateQuat = fromEulerXZ(selectedFace.x, selectedFace.z);
 
-            // Set target to object center
-            this._targetVector = vec3.fromValues(objectCenter[0], objectCenter[1], objectCenter[2]);
+            // Viewing distance: fit the rotated bounding box into the frustum
+            const fovY = 45 * (Math.PI / 180); // keep in sync with setProjectionMatrix
+            const tanV = Math.tan(fovY / 2);
+            const tanH = tanV * (gl.canvas.width / gl.canvas.height);
+            const PADDING = 1.15; // 15% margin around the object
+            const Z_NEAR = 0.001; // keep in sync with setProjectionMatrix
 
-            // Position camera at standard location (along negative Z from actual object center)
-            this._eyeVector = vec3.fromValues(
-                objectCenter[0],
-                objectCenter[1],
-                objectCenter[2] - distance
-            );
+            const half = [sizeX / 2 * PADDING, sizeY / 2 * PADDING, sizeZ / 2 * PADDING];
+            const corner = vec3.create();
+            let distance = 0;
+            let maxDepth = 0;
+            for (const sx of [-1, 1]) {
+                for (const sy of [-1, 1]) {
+                    for (const sz of [-1, 1]) {
+                        vec3.set(corner, sx * half[0], sy * half[1], sz * half[2]);
+                        vec3.transformQuat(corner, corner, this._rotateQuat);
 
-            // Set the quaternion to rotate the view to show the selected face
-            this._rotateQuat = fromEulerXZ(selectedFace.eulerXZ[0], selectedFace.eulerXZ[1]);
+                        // depth from the eye = distance + corner[2]
+                        distance = Math.max(
+                            distance,
+                            Math.abs(corner[0]) / tanH - corner[2],
+                            Math.abs(corner[1]) / tanV - corner[2]
+                        );
+                        maxDepth = Math.max(maxDepth, corner[2]);
+                    }
+                }
+            }
 
-            // Always use world up vector
+            // The nearest corner must stay in front of the near plane
+            distance = Math.max(distance, maxDepth + Z_NEAR * 2);
+
+            // Same limits as _zoom(), so the first mouse wheel step doesn't jump
+            const MIN_DISTANCE = this._worldDimensions.MaxDistance * 0.015;
+            const MAX_DISTANCE = this._worldDimensions.MaxDistance * 5;
+            distance = Math.max(MIN_DISTANCE, Math.min(distance, MAX_DISTANCE));
+
+            window.logInfo(`[Viewer.zoomToXZ] Calculated viewing distance: ${distance.toFixed(4)}`);
+
+            this._targetVector = vec3.fromValues(centerX, centerY, centerZ);
+            this._eyeVector = vec3.fromValues(centerX, centerY, centerZ - distance);
             this._upVector = vec3.fromValues(0, 1, 0);
-
+            
             window.logInfo(`[Viewer.zoomToXZ] Camera positioned at (${this._eyeVector[0].toFixed(4)}, ${this._eyeVector[1].toFixed(4)}, ${this._eyeVector[2].toFixed(4)})`);
             window.logInfo(`[Viewer.zoomToXZ] Looking at (${this._targetVector[0].toFixed(4)}, ${this._targetVector[1].toFixed(4)}, ${this._targetVector[2].toFixed(4)})`);
             window.logInfo(`[Viewer.zoomToXZ] Rotation center: (${this._rotationCenter[0].toFixed(4)}, ${this._rotationCenter[1].toFixed(4)}, ${this._rotationCenter[2].toFixed(4)})`);

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Xml;
+﻿using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
@@ -23,9 +23,12 @@ public class ParameterDictionary : Dictionary<string, string>, IXmlSerializable
         {
             if (reader.NodeType == XmlNodeType.Element)
             {
-                string key = reader.LocalName;
-                string value = reader.ReadElementContentAsString().Trim();
-                this[key] = value;
+                // ReadFrom consumes the whole element, including nested children
+                var element = (XElement)XNode.ReadFrom(reader);
+
+                this[element.Name.LocalName] = element.HasElements
+                    ? string.Concat(element.Nodes().Select(n => n.ToString()))   // keep nested XML (CDATA preserved)
+                    : element.Value.Trim();
             }
             else
             {
@@ -44,5 +47,21 @@ public class ParameterDictionary : Dictionary<string, string>, IXmlSerializable
             writer.WriteCData(kvp.Value);
             writer.WriteEndElement();
         }
+    }
+
+    /// <summary>
+    /// Parses a nested &lt;queries&gt; parameter into SPARQLGeometryQuery items.
+    /// </summary>
+    public List<SPARQLGeometryQuery> GetGeometryQueries(string key = "queries")
+    {
+        if (!TryGetValue(key, out var xml) || string.IsNullOrWhiteSpace(xml))
+        {
+            return new List<SPARQLGeometryQuery>();
+        }
+
+        return XElement.Parse($"<{key}>{xml}</{key}>")
+            .Elements("sparql")
+            .Select(SPARQLGeometryQuery.FromXml)
+            .ToList();
     }
 }

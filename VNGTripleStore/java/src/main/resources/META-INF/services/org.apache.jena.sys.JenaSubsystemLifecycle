@@ -7,3 +7,4 @@ org.vng.GetSpatialPlansDestinationAreasInit
 org.vng.BBoxInit
 org.vng.GetAreasInit
 org.vng.GetPDOKFeatureInit
+org.vng.CylinderInit

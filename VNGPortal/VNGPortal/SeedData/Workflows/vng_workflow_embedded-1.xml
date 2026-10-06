@@ -155,6 +155,43 @@
 			</parameters>
 		</step>
 		<step>
+			<name><![CDATA[Constructive solid geometry]]></name>
+			<description>
+				<![CDATA[
+				    TEST: Constructive solid geometry example.
+			    ]]>
+			</description>
+			<type><![CDATA[3DVIEW]]></type>
+			<parameters>
+				<queries>
+					<sparql>
+						<id><![CDATA[Cylinder1]]></id>
+						<query>
+							<![CDATA[
+SELECT ?base64Data
+WHERE {
+  BIND(<http://vng.nl/geometry-ext.ttl#csgCylinder>(10.0, 2.5, 36) AS ?base64Data)
+}
+							]]>
+						</query>
+						<geometryVariable><![CDATA[base64Data]]></geometryVariable>
+					</sparql>
+					<sparql>
+						<id><![CDATA[Cylinder2]]></id>
+						<query>
+							<![CDATA[
+SELECT ?base64Data
+WHERE {
+  BIND(<http://vng.nl/geometry-ext.ttl#csgCylinder>(20.0, 4.5, 36) AS ?base64Data)
+}
+							]]>
+						</query>
+						<geometryVariable><![CDATA[base64Data]]></geometryVariable>
+					</sparql>
+				</queries>
+			</parameters>
+		</step>		
+		<step>
 			<name><![CDATA[IFC to RDF conversion]]></name>
 			<description />
 			<type><![CDATA[IFC2RDF]]></type>

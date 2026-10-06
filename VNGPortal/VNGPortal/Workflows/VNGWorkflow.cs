@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RDF;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using VNGPortal.IFC2RDF;
 using VNGPortal.Services;
 
@@ -30,7 +31,7 @@ namespace VNGPortal.Workflows
             var idsDir = _configuration[$"{fileStorage}:IDSDir"]!;
 
             ModelDir = Path.Combine(modelsDir, taskDescriptor.TaskId);
-            var modelPath = Path.Combine(ModelDir, taskDescriptor.Model);            
+            var modelPath = Path.Combine(ModelDir, taskDescriptor.Model);
 
             SPARQLServer = new SPARQL.Server(_logger);
             DatasetName = "test1"; //#todo modelId or taskId instead of hardcoded "test1"
@@ -86,7 +87,7 @@ namespace VNGPortal.Workflows
                                 else
                                 {
                                     throw new Exception($"Workflow step: '{step.Name}' failed for model {taskDescriptor.TaskId} with exit code {exitCode}");
-                                }                                
+                                }
                             }
                             break;
 
@@ -164,6 +165,54 @@ namespace VNGPortal.Workflows
                                 else
                                 {
                                     throw new Exception($"Workflow step: '{step.Name}' failed for model {taskDescriptor.TaskId}");
+                                }
+                            }
+                            break;
+
+                        case "3DVIEW":
+                            {
+                                if (!step.Parameters.ContainsKey("queries"))
+                                {
+                                    throw new Exception($"3DVIEW workflow step: '{step.Name}' is missing 'queries' parameter.");
+                                }
+
+                                var geometryQueries = step.Parameters.GetGeometryQueries();
+                                if (geometryQueries == null || geometryQueries.Count == 0)
+                                {
+                                    throw new Exception($"3DVIEW workflow step: '{step.Name}' has no valid geometry queries.");
+                                }
+
+                                long owlModel = engine.CreateModel();
+                                try
+                                {
+                                    foreach (var geometryQuery in geometryQueries)
+                                    {
+                                        await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SPARQL Query", geometryQuery.Query, "", false);
+
+                                        var queryResult = await SPARQLServer.ExecuteQueryAsync(DatasetName, geometryQuery.Query);
+                                        await SPARQLServer.RetrieveGeometry(queryResult, geometryQuery.GeometryVariable, owlModel);
+                                    }
+
+                                    var viewModel = $"3dview_{Guid.NewGuid().ToString()}.bin";
+                                    var viewModelPath = Path.Combine(ModelDir, viewModel);
+                                    engine.SaveModel(owlModel, viewModelPath);
+
+                                    await _signalRStatus.Send3DViewUpdate(
+                                        taskDescriptor.GroupName,
+                                        "3D View",
+                                        taskDescriptor.TaskId,
+                                        viewModel,
+                                        false);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, "Error executing 3DVIEW workflow step: '{StepName}'", step.Name);
+                                    await _signalRStatus.SendProgressUpdate(
+                                        taskDescriptor.GroupName,
+                                        0,
+                                        $"Error executing 3DVIEW workflow step: '{step.Name}'.",
+                                        true);
+                                    throw;
                                 }
                             }
                             break;
@@ -343,8 +392,8 @@ namespace VNGPortal.Workflows
                                     templateArgName = geometryQuery.Parameters["templateArgName"];
                                 }
 
-                                if (!string.IsNullOrEmpty(templateArgRegExpr) && 
-                                    !string.IsNullOrEmpty(templateArgRegExprMatch) && 
+                                if (!string.IsNullOrEmpty(templateArgRegExpr) &&
+                                    !string.IsNullOrEmpty(templateArgRegExprMatch) &&
                                     !string.IsNullOrEmpty(templateArgName))
                                 {
                                     var templateArgValue = string.Join(" ",

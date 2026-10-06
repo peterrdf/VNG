@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace VNGPortal.Workflows;
@@ -66,7 +67,28 @@ public class SHACLShape
 public class SPARQLGeometryQuery : SPARQLQuery
 {
     [XmlElement("geometryVariable")]
-    public string GeometryVariable { get; set; } = string.Empty;    
+    public string GeometryVariable { get; set; } = string.Empty;
+
+    public static SPARQLGeometryQuery FromXml(XElement e)
+    {
+        var parameters = new ParameterDictionary();
+        var parametersElement = e.Element("parameters");
+        if (parametersElement != null)
+        {
+            foreach (var p in parametersElement.Elements())
+            {
+                parameters[p.Name.LocalName] = p.Value.Trim();
+            }
+        }
+
+        return new SPARQLGeometryQuery
+        {
+            Id = e.Element("id")?.Value.Trim() ?? "",
+            Query = e.Element("query")?.Value.Trim() ?? "",
+            GeometryVariable = e.Element("geometryVariable")?.Value.Trim() ?? "",
+            Parameters = parameters
+        };
+    }
 }
 
 public class SHACLView

@@ -82,6 +82,7 @@ namespace VNGPortal.IFC2RDF
                 sb.AppendLine($"GRAPH <{GraphIRI}> {{");
                 sb.AppendLine();
 
+                var resultId = Guid.NewGuid().ToString();
                 foreach (var prGeometry in model.Geometries)
                 {
                     long expressID = ifcengine.internalGetP21Line(prGeometry.Value.Instance);
@@ -95,7 +96,7 @@ namespace VNGPortal.IFC2RDF
 
                     if (prGeometry.Value.OwlInstance != 0 && !string.IsNullOrEmpty(globalId))
                     {
-                        var modelPath = Path.Combine(Path.GetTempPath(), "temp.bin");
+                        var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{resultId}.bin");
 
                         long owlTransformationInstance = CreateMapConversionTransformation(sdaiModel, dScale, out double dEastings, out double dNorthings);
                         if (owlTransformationInstance != 0)

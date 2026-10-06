@@ -1,4 +1,4 @@
-package org.example;
+package org.vng;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonArray;
@@ -27,9 +27,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetBuildingsPropFunction extends PropertyFunctionBase {
+public class GetSpatialPlansDestinationAreasPropFunction extends PropertyFunctionBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GetBuildingsPropFunction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GetSpatialPlansDestinationAreasPropFunction.class);
     private static final HttpClient HTTP_CLIENT;
     private static final String SERVICE_BASE_URL = "http://vngservice:8080";
 
@@ -37,7 +37,7 @@ public class GetBuildingsPropFunction extends PropertyFunctionBase {
         HTTP_CLIENT = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofMinutes(5))
                 .build();
-        LOG.info("GetBuildingsPropFunction: initialized OK");
+        LOG.info("GetSpatialPlansDestinationAreasPropFunction: initialized OK");
     }
 
     @Override
@@ -49,20 +49,20 @@ public class GetBuildingsPropFunction extends PropertyFunctionBase {
         List<Node> subjArgs = argSubject.getArgList();
         if (subjArgs.size() != 2)
             throw new ExprEvalException(
-                    "eachBuilding: subject must be (?eastings ?northings), got " + subjArgs.size());
+                    "eachSpatialPlansDestinationArea: subject must be (?eastings ?northings), got " + subjArgs.size());
 
         // Object: (?id ?name ?geometry)
         List<Node> objArgs = argObject.getArgList();
         if (objArgs.size() != 3)
             throw new ExprEvalException(
-                    "eachBuilding: object must be (?id ?name ?geometry), got " + objArgs.size());
+                    "eachSpatialPlansDestinationArea: object must be (?id ?name ?geometry), got " + objArgs.size());
 
         // Resolve any variables in the subject from the current binding
         Node eastNode  = resolve(subjArgs.get(0), binding);
         Node northNode = resolve(subjArgs.get(1), binding);
 
         if (eastNode == null || northNode == null)
-            throw new ExprEvalException("eachBuilding: unbound eastings or northings");
+            throw new ExprEvalException("eachSpatialPlansDestinationArea: unbound eastings or northings");
 
         double eastings  = NodeValue.makeNode(eastNode).getDouble();
         double northings = NodeValue.makeNode(northNode).getDouble();
@@ -73,10 +73,10 @@ public class GetBuildingsPropFunction extends PropertyFunctionBase {
 
         try {
             // Use %.2f to avoid scientific notation (e.g. 5.3E5) confusing the ASP.NET handler
-            URI uri = URI.create(SERVICE_BASE_URL + "/LandRegistry?handler=Buildings"
+            URI uri = URI.create(SERVICE_BASE_URL + "/SpatialPlans?handler=DestinationAreas"
                     + "&eastings="  + String.format("%.2f", eastings)
                     + "&northings=" + String.format("%.2f", northings));
-            LOG.debug("eachBuilding: GET {}", uri);
+            LOG.debug("eachSpatialPlansDestinationArea: GET {}", uri);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
@@ -87,14 +87,14 @@ public class GetBuildingsPropFunction extends PropertyFunctionBase {
             HttpResponse<String> response = HTTP_CLIENT.send(
                     request, HttpResponse.BodyHandlers.ofString());
 
-            LOG.debug("eachBuilding: status={} Content-Type={}",
+            LOG.debug("eachSpatialPlansDestinationArea: status={} Content-Type={}",
                     response.statusCode(),
                     response.headers().firstValue("Content-Type").orElse("(none)"));
-            LOG.debug("eachBuilding: body (first 500): {}",
+            LOG.debug("eachSpatialPlansDestinationArea: body (first 500): {}",
                     response.body().substring(0, Math.min(500, response.body().length())));
 
             if (response.statusCode() != 200)
-                throw new ExprEvalException("eachBuilding: HTTP error " + response.statusCode()
+                throw new ExprEvalException("eachSpatialPlansDestinationArea: HTTP error " + response.statusCode()
                         + " body: " + response.body());
 
             // Guard: ASP.NET Core returns 200 HTML on misconfigured routes
@@ -104,21 +104,21 @@ public class GetBuildingsPropFunction extends PropertyFunctionBase {
                 String preview = response.body()
                         .substring(0, Math.min(300, response.body().length()))
                         .replaceAll("\\s+", " ");
-                LOG.error("eachBuilding: expected JSON but got Content-Type='{}', body: {}",
+                LOG.error("eachSpatialPlansDestinationArea: expected JSON but got Content-Type='{}', body: {}",
                         contentType, preview);
                 throw new ExprEvalException(
-                        "eachBuilding: service returned Content-Type='" + contentType
+                        "eachSpatialPlansDestinationArea: service returned Content-Type='" + contentType
                         + "' (expected application/json). "
-                        + "Check handler=Buildings exists. Body starts: " + preview);
+                        + "Check handler=DestinationAreas exists. Body starts: " + preview);
             }
 
-            JsonArray buildings = JSON.parseAny(response.body()).getAsArray();
-            LOG.info("eachBuilding: eastings={} northings={} => {} building(s) returned",
-                    eastings, northings, buildings.size());
+            JsonArray destinationAreas = JSON.parseAny(response.body()).getAsArray();
+            LOG.info("eachSpatialPlansDestinationArea: eastings={} northings={} => {} destination area(s) returned",
+                    eastings, northings, destinationAreas.size());
 
-            // One Binding per building → one row per building in SPARQL results
+            // One Binding per destination area → one row per destination area in SPARQL results
             List<Binding> bindings = new ArrayList<>();
-            for (JsonValue bindingValue : buildings) {
+            for (JsonValue bindingValue : destinationAreas) {
                 JsonObject bindingObject = bindingValue.getAsObject();
                 BindingBuilder bindingBuilder = BindingBuilder.create(binding);
                 bindingBuilder.add(idVar,   NodeFactory.createLiteralString(field(bindingObject, "id",   "Id")));
@@ -132,8 +132,8 @@ public class GetBuildingsPropFunction extends PropertyFunctionBase {
         } catch (ExprEvalException e) {
             throw e;
         } catch (Exception e) {
-            LOG.error("eachBuilding: HTTP call failed", e);
-            throw new ExprEvalException("eachBuilding: HTTP call failed: " + e.getMessage(), e);
+            LOG.error("eachSpatialPlansDestinationArea: HTTP call failed", e);
+            throw new ExprEvalException("eachSpatialPlansDestinationArea: HTTP call failed: " + e.getMessage(), e);
         }
     }
 
@@ -148,7 +148,7 @@ public class GetBuildingsPropFunction extends PropertyFunctionBase {
                     : null;
         if (v == null)
             throw new ExprEvalException(
-                    "eachBuilding: missing field '" + camel + "' in building object");
+                    "eachSpatialPlansDestinationArea: missing field '" + camel + "' in destinationAreas object");
         return v.getAsString().value();
     }
 }

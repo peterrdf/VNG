@@ -1,4 +1,4 @@
-package org.example;
+package org.vng;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonArray;
@@ -27,9 +27,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetParcelsPropFunction extends PropertyFunctionBase {
+public class GetAreasPropFunction extends PropertyFunctionBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GetParcelsPropFunction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GetAreasPropFunction.class);
     private static final HttpClient HTTP_CLIENT;
     private static final String SERVICE_BASE_URL = "http://vngservice:8080";
 
@@ -37,7 +37,7 @@ public class GetParcelsPropFunction extends PropertyFunctionBase {
         HTTP_CLIENT = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofMinutes(5))
                 .build();
-        LOG.info("GetParcelsPropFunction: initialized OK");
+        LOG.info("GetAreasPropFunction: initialized OK");
     }
 
     @Override
@@ -49,52 +49,54 @@ public class GetParcelsPropFunction extends PropertyFunctionBase {
         List<Node> subjArgs = argSubject.getArgList();
         if (subjArgs.size() != 2)
             throw new ExprEvalException(
-                    "eachParcel: subject must be (?eastings ?northings), got " + subjArgs.size());
+                    "dsoArea: subject must be (?eastings ?northings), got " + subjArgs.size());
 
-        // Object: (?id ?name ?geometry)
+        // Object: (?id ?name ?group ?type ?geometry)
         List<Node> objArgs = argObject.getArgList();
-        if (objArgs.size() != 3)
+        if (objArgs.size() != 5)
             throw new ExprEvalException(
-                    "eachParcel: object must be (?id ?name ?geometry), got " + objArgs.size());
+                    "dsoArea: object must be (?id ?name ?group ?type ?geometry), got " + objArgs.size());
 
         // Resolve any variables in the subject from the current binding
         Node eastNode  = resolve(subjArgs.get(0), binding);
         Node northNode = resolve(subjArgs.get(1), binding);
 
         if (eastNode == null || northNode == null)
-            throw new ExprEvalException("eachParcel: unbound eastings or northings");
+            throw new ExprEvalException("dsoArea: unbound eastings or northings");
 
         double eastings  = NodeValue.makeNode(eastNode).getDouble();
         double northings = NodeValue.makeNode(northNode).getDouble();
 
         Var idVar   = (Var) objArgs.get(0);
         Var nameVar = (Var) objArgs.get(1);
-        Var geometryVar = (Var) objArgs.get(2);
+        Var groupVar = (Var) objArgs.get(2);
+        Var typeVar = (Var) objArgs.get(3);
+        Var geometryVar = (Var) objArgs.get(4);
 
         try {
             // Use %.2f to avoid scientific notation (e.g. 5.3E5) confusing the ASP.NET handler
-            URI uri = URI.create(SERVICE_BASE_URL + "/LandRegistry?handler=Parcels"
+            URI uri = URI.create(SERVICE_BASE_URL + "/DSO?handler=Areas"
                     + "&eastings="  + String.format("%.2f", eastings)
                     + "&northings=" + String.format("%.2f", northings));
-            LOG.debug("eachParcel: GET {}", uri);
+            LOG.debug("dsoArea: GET {}", uri);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
-                    .timeout(Duration.ofMinutes(5))
+                    .timeout(Duration.ofMinutes(30))
                     .GET()
                     .build();
 
             HttpResponse<String> response = HTTP_CLIENT.send(
                     request, HttpResponse.BodyHandlers.ofString());
 
-            LOG.debug("eachParcel: status={} Content-Type={}",
+            LOG.debug("dsoArea: status={} Content-Type={}",
                     response.statusCode(),
                     response.headers().firstValue("Content-Type").orElse("(none)"));
-            LOG.debug("eachParcel: body (first 500): {}",
+            LOG.debug("dsoArea: body (first 500): {}",
                     response.body().substring(0, Math.min(500, response.body().length())));
 
             if (response.statusCode() != 200)
-                throw new ExprEvalException("eachParcel: HTTP error " + response.statusCode()
+                throw new ExprEvalException("dsoArea: HTTP error " + response.statusCode()
                         + " body: " + response.body());
 
             // Guard: ASP.NET Core returns 200 HTML on misconfigured routes
@@ -104,25 +106,27 @@ public class GetParcelsPropFunction extends PropertyFunctionBase {
                 String preview = response.body()
                         .substring(0, Math.min(300, response.body().length()))
                         .replaceAll("\\s+", " ");
-                LOG.error("eachParcel: expected JSON but got Content-Type='{}', body: {}",
+                LOG.error("dsoArea: expected JSON but got Content-Type='{}', body: {}",
                         contentType, preview);
                 throw new ExprEvalException(
-                        "eachParcel: service returned Content-Type='" + contentType
+                        "dsoArea: service returned Content-Type='" + contentType
                         + "' (expected application/json). "
-                        + "Check handler=Parcels exists. Body starts: " + preview);
+                        + "Check handler=Areas exists. Body starts: " + preview);
             }
 
-            JsonArray parcels = JSON.parseAny(response.body()).getAsArray();
-            LOG.info("eachParcel: eastings={} northings={} => {} parcel(s) returned",
-                    eastings, northings, parcels.size());
+            JsonArray areas = JSON.parseAny(response.body()).getAsArray();
+            LOG.info("dsoArea: eastings={} northings={} => {} area(s) returned",
+                    eastings, northings, areas.size());
 
-            // One Binding per parcel → one row per parcel in SPARQL results
+            // One Binding per area → one row per area in SPARQL results
             List<Binding> bindings = new ArrayList<>();
-            for (JsonValue bindingValue : parcels) {
+            for (JsonValue bindingValue : areas) {
                 JsonObject bindingObject = bindingValue.getAsObject();
                 BindingBuilder bindingBuilder = BindingBuilder.create(binding);
                 bindingBuilder.add(idVar,   NodeFactory.createLiteralString(field(bindingObject, "id",   "Id")));
                 bindingBuilder.add(nameVar, NodeFactory.createLiteralString(field(bindingObject, "name", "Name")));
+                bindingBuilder.add(groupVar, NodeFactory.createLiteralString(field(bindingObject, "group", "Group")));
+                bindingBuilder.add(typeVar, NodeFactory.createLiteralString(field(bindingObject, "type", "Type")));
                 bindingBuilder.add(geometryVar, NodeFactory.createLiteralString(field(bindingObject, "geometry", "Geometry")));
                 bindings.add(bindingBuilder.build());
             }
@@ -132,8 +136,8 @@ public class GetParcelsPropFunction extends PropertyFunctionBase {
         } catch (ExprEvalException e) {
             throw e;
         } catch (Exception e) {
-            LOG.error("eachParcel: HTTP call failed", e);
-            throw new ExprEvalException("eachParcel: HTTP call failed: " + e.getMessage(), e);
+            LOG.error("dsoArea: HTTP call failed", e);
+            throw new ExprEvalException("dsoArea: HTTP call failed: " + e.getMessage(), e);
         }
     }
 
@@ -148,7 +152,7 @@ public class GetParcelsPropFunction extends PropertyFunctionBase {
                     : null;
         if (v == null)
             throw new ExprEvalException(
-                    "eachParcel: missing field '" + camel + "' in parcel object");
+                    "dsoArea: missing field '" + camel + "' in areas object");
         return v.getAsString().value();
     }
 }

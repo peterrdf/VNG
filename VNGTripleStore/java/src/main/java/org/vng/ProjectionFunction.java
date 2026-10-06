@@ -1,4 +1,4 @@
-package org.example;
+package org.vng;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;

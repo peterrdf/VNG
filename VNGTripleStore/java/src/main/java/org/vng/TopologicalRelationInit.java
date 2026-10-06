@@ -1,4 +1,4 @@
-package org.example;
+package org.vng;
 
 import org.apache.jena.sparql.function.FunctionRegistry;
 import org.apache.jena.sys.JenaSubsystemLifecycle;

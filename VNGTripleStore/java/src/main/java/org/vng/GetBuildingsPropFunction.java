@@ -1,4 +1,4 @@
-package org.example;
+package org.vng;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonArray;
@@ -27,9 +27,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetPDOKFeaturePropFunction extends PropertyFunctionBase {
+public class GetBuildingsPropFunction extends PropertyFunctionBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GetPDOKFeaturePropFunction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GetBuildingsPropFunction.class);
     private static final HttpClient HTTP_CLIENT;
     private static final String SERVICE_BASE_URL = "http://vngservice:8080";
 
@@ -37,7 +37,7 @@ public class GetPDOKFeaturePropFunction extends PropertyFunctionBase {
         HTTP_CLIENT = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofMinutes(5))
                 .build();
-        LOG.info("GetPDOKFeaturePropFunction: initialized OK");
+        LOG.info("GetBuildingsPropFunction: initialized OK");
     }
 
     @Override
@@ -45,27 +45,25 @@ public class GetPDOKFeaturePropFunction extends PropertyFunctionBase {
                                Node predicate, PropFuncArg argObject,
                                ExecutionContext execCxt) {
 
-        // Subject: (?feature ?eastings ?northings)
+        // Subject: (?eastings ?northings)
         List<Node> subjArgs = argSubject.getArgList();
-        if (subjArgs.size() != 3)
+        if (subjArgs.size() != 2)
             throw new ExprEvalException(
-                    "pdokFeature: subject must be (?eastings ?northings), got " + subjArgs.size());
+                    "eachBuilding: subject must be (?eastings ?northings), got " + subjArgs.size());
 
         // Object: (?id ?name ?geometry)
         List<Node> objArgs = argObject.getArgList();
         if (objArgs.size() != 3)
             throw new ExprEvalException(
-                    "pdokFeature: object must be (?id ?name ?geometry), got " + objArgs.size());
+                    "eachBuilding: object must be (?id ?name ?geometry), got " + objArgs.size());
 
         // Resolve any variables in the subject from the current binding
-        Node featureNode = resolve(subjArgs.get(0), binding);
-        Node eastNode  = resolve(subjArgs.get(1), binding);
-        Node northNode = resolve(subjArgs.get(2), binding);
+        Node eastNode  = resolve(subjArgs.get(0), binding);
+        Node northNode = resolve(subjArgs.get(1), binding);
 
-        if (featureNode == null || eastNode == null || northNode == null)
-            throw new ExprEvalException("pdokFeature: unbound feature, eastings or northings");
+        if (eastNode == null || northNode == null)
+            throw new ExprEvalException("eachBuilding: unbound eastings or northings");
 
-        String feature = NodeValue.makeNode(featureNode).getString();
         double eastings  = NodeValue.makeNode(eastNode).getDouble();
         double northings = NodeValue.makeNode(northNode).getDouble();
 
@@ -75,10 +73,10 @@ public class GetPDOKFeaturePropFunction extends PropertyFunctionBase {
 
         try {
             // Use %.2f to avoid scientific notation (e.g. 5.3E5) confusing the ASP.NET handler
-            URI uri = URI.create(SERVICE_BASE_URL + "/LandRegistry?handler=" + feature
+            URI uri = URI.create(SERVICE_BASE_URL + "/LandRegistry?handler=Buildings"
                     + "&eastings="  + String.format("%.2f", eastings)
                     + "&northings=" + String.format("%.2f", northings));
-            LOG.debug("pdokFeature: GET {}", uri);
+            LOG.debug("eachBuilding: GET {}", uri);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
@@ -89,14 +87,14 @@ public class GetPDOKFeaturePropFunction extends PropertyFunctionBase {
             HttpResponse<String> response = HTTP_CLIENT.send(
                     request, HttpResponse.BodyHandlers.ofString());
 
-            LOG.debug("pdokFeature: status={} Content-Type={}",
+            LOG.debug("eachBuilding: status={} Content-Type={}",
                     response.statusCode(),
                     response.headers().firstValue("Content-Type").orElse("(none)"));
-            LOG.debug("pdokFeature: body (first 500): {}",
+            LOG.debug("eachBuilding: body (first 500): {}",
                     response.body().substring(0, Math.min(500, response.body().length())));
 
             if (response.statusCode() != 200)
-                throw new ExprEvalException("pdokFeature: HTTP error " + response.statusCode()
+                throw new ExprEvalException("eachBuilding: HTTP error " + response.statusCode()
                         + " body: " + response.body());
 
             // Guard: ASP.NET Core returns 200 HTML on misconfigured routes
@@ -106,21 +104,21 @@ public class GetPDOKFeaturePropFunction extends PropertyFunctionBase {
                 String preview = response.body()
                         .substring(0, Math.min(300, response.body().length()))
                         .replaceAll("\\s+", " ");
-                LOG.error("pdokFeature: expected JSON but got Content-Type='{}', body: {}",
+                LOG.error("eachBuilding: expected JSON but got Content-Type='{}', body: {}",
                         contentType, preview);
                 throw new ExprEvalException(
-                        "pdokFeature: service returned Content-Type='" + contentType
+                        "eachBuilding: service returned Content-Type='" + contentType
                         + "' (expected application/json). "
-                        + "Check handler=PDOKFeature exists. Body starts: " + preview);
+                        + "Check handler=Buildings exists. Body starts: " + preview);
             }
 
-            JsonArray features = JSON.parseAny(response.body()).getAsArray();
-            LOG.info("pdokFeature: features={} eastings={} northings={} => {} feature(s) returned",
-                    feature, eastings, northings, features.size());
+            JsonArray buildings = JSON.parseAny(response.body()).getAsArray();
+            LOG.info("eachBuilding: eastings={} northings={} => {} building(s) returned",
+                    eastings, northings, buildings.size());
 
-            // One Binding per feature → one row per feature in SPARQL results
+            // One Binding per building → one row per building in SPARQL results
             List<Binding> bindings = new ArrayList<>();
-            for (JsonValue bindingValue : features) {
+            for (JsonValue bindingValue : buildings) {
                 JsonObject bindingObject = bindingValue.getAsObject();
                 BindingBuilder bindingBuilder = BindingBuilder.create(binding);
                 bindingBuilder.add(idVar,   NodeFactory.createLiteralString(field(bindingObject, "id",   "Id")));
@@ -134,8 +132,8 @@ public class GetPDOKFeaturePropFunction extends PropertyFunctionBase {
         } catch (ExprEvalException e) {
             throw e;
         } catch (Exception e) {
-            LOG.error("pdokFeature: HTTP call failed", e);
-            throw new ExprEvalException("pdokFeature: HTTP call failed: " + e.getMessage(), e);
+            LOG.error("eachBuilding: HTTP call failed", e);
+            throw new ExprEvalException("eachBuilding: HTTP call failed: " + e.getMessage(), e);
         }
     }
 
@@ -150,7 +148,7 @@ public class GetPDOKFeaturePropFunction extends PropertyFunctionBase {
                     : null;
         if (v == null)
             throw new ExprEvalException(
-                    "pdokFeature: missing field '" + camel + "' in feature object");
+                    "eachBuilding: missing field '" + camel + "' in building object");
         return v.getAsString().value();
     }
 }

@@ -1,4 +1,4 @@
-package org.example;
+package org.vng;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonArray;
@@ -27,9 +27,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetSpatialPlansDestinationAreasPropFunction extends PropertyFunctionBase {
+public class GetParcelsPropFunction extends PropertyFunctionBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GetSpatialPlansDestinationAreasPropFunction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GetParcelsPropFunction.class);
     private static final HttpClient HTTP_CLIENT;
     private static final String SERVICE_BASE_URL = "http://vngservice:8080";
 
@@ -37,7 +37,7 @@ public class GetSpatialPlansDestinationAreasPropFunction extends PropertyFunctio
         HTTP_CLIENT = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofMinutes(5))
                 .build();
-        LOG.info("GetSpatialPlansDestinationAreasPropFunction: initialized OK");
+        LOG.info("GetParcelsPropFunction: initialized OK");
     }
 
     @Override
@@ -49,20 +49,20 @@ public class GetSpatialPlansDestinationAreasPropFunction extends PropertyFunctio
         List<Node> subjArgs = argSubject.getArgList();
         if (subjArgs.size() != 2)
             throw new ExprEvalException(
-                    "eachSpatialPlansDestinationArea: subject must be (?eastings ?northings), got " + subjArgs.size());
+                    "eachParcel: subject must be (?eastings ?northings), got " + subjArgs.size());
 
         // Object: (?id ?name ?geometry)
         List<Node> objArgs = argObject.getArgList();
         if (objArgs.size() != 3)
             throw new ExprEvalException(
-                    "eachSpatialPlansDestinationArea: object must be (?id ?name ?geometry), got " + objArgs.size());
+                    "eachParcel: object must be (?id ?name ?geometry), got " + objArgs.size());
 
         // Resolve any variables in the subject from the current binding
         Node eastNode  = resolve(subjArgs.get(0), binding);
         Node northNode = resolve(subjArgs.get(1), binding);
 
         if (eastNode == null || northNode == null)
-            throw new ExprEvalException("eachSpatialPlansDestinationArea: unbound eastings or northings");
+            throw new ExprEvalException("eachParcel: unbound eastings or northings");
 
         double eastings  = NodeValue.makeNode(eastNode).getDouble();
         double northings = NodeValue.makeNode(northNode).getDouble();
@@ -73,10 +73,10 @@ public class GetSpatialPlansDestinationAreasPropFunction extends PropertyFunctio
 
         try {
             // Use %.2f to avoid scientific notation (e.g. 5.3E5) confusing the ASP.NET handler
-            URI uri = URI.create(SERVICE_BASE_URL + "/SpatialPlans?handler=DestinationAreas"
+            URI uri = URI.create(SERVICE_BASE_URL + "/LandRegistry?handler=Parcels"
                     + "&eastings="  + String.format("%.2f", eastings)
                     + "&northings=" + String.format("%.2f", northings));
-            LOG.debug("eachSpatialPlansDestinationArea: GET {}", uri);
+            LOG.debug("eachParcel: GET {}", uri);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
@@ -87,14 +87,14 @@ public class GetSpatialPlansDestinationAreasPropFunction extends PropertyFunctio
             HttpResponse<String> response = HTTP_CLIENT.send(
                     request, HttpResponse.BodyHandlers.ofString());
 
-            LOG.debug("eachSpatialPlansDestinationArea: status={} Content-Type={}",
+            LOG.debug("eachParcel: status={} Content-Type={}",
                     response.statusCode(),
                     response.headers().firstValue("Content-Type").orElse("(none)"));
-            LOG.debug("eachSpatialPlansDestinationArea: body (first 500): {}",
+            LOG.debug("eachParcel: body (first 500): {}",
                     response.body().substring(0, Math.min(500, response.body().length())));
 
             if (response.statusCode() != 200)
-                throw new ExprEvalException("eachSpatialPlansDestinationArea: HTTP error " + response.statusCode()
+                throw new ExprEvalException("eachParcel: HTTP error " + response.statusCode()
                         + " body: " + response.body());
 
             // Guard: ASP.NET Core returns 200 HTML on misconfigured routes
@@ -104,21 +104,21 @@ public class GetSpatialPlansDestinationAreasPropFunction extends PropertyFunctio
                 String preview = response.body()
                         .substring(0, Math.min(300, response.body().length()))
                         .replaceAll("\\s+", " ");
-                LOG.error("eachSpatialPlansDestinationArea: expected JSON but got Content-Type='{}', body: {}",
+                LOG.error("eachParcel: expected JSON but got Content-Type='{}', body: {}",
                         contentType, preview);
                 throw new ExprEvalException(
-                        "eachSpatialPlansDestinationArea: service returned Content-Type='" + contentType
+                        "eachParcel: service returned Content-Type='" + contentType
                         + "' (expected application/json). "
-                        + "Check handler=DestinationAreas exists. Body starts: " + preview);
+                        + "Check handler=Parcels exists. Body starts: " + preview);
             }
 
-            JsonArray destinationAreas = JSON.parseAny(response.body()).getAsArray();
-            LOG.info("eachSpatialPlansDestinationArea: eastings={} northings={} => {} destination area(s) returned",
-                    eastings, northings, destinationAreas.size());
+            JsonArray parcels = JSON.parseAny(response.body()).getAsArray();
+            LOG.info("eachParcel: eastings={} northings={} => {} parcel(s) returned",
+                    eastings, northings, parcels.size());
 
-            // One Binding per destination area → one row per destination area in SPARQL results
+            // One Binding per parcel → one row per parcel in SPARQL results
             List<Binding> bindings = new ArrayList<>();
-            for (JsonValue bindingValue : destinationAreas) {
+            for (JsonValue bindingValue : parcels) {
                 JsonObject bindingObject = bindingValue.getAsObject();
                 BindingBuilder bindingBuilder = BindingBuilder.create(binding);
                 bindingBuilder.add(idVar,   NodeFactory.createLiteralString(field(bindingObject, "id",   "Id")));
@@ -132,8 +132,8 @@ public class GetSpatialPlansDestinationAreasPropFunction extends PropertyFunctio
         } catch (ExprEvalException e) {
             throw e;
         } catch (Exception e) {
-            LOG.error("eachSpatialPlansDestinationArea: HTTP call failed", e);
-            throw new ExprEvalException("eachSpatialPlansDestinationArea: HTTP call failed: " + e.getMessage(), e);
+            LOG.error("eachParcel: HTTP call failed", e);
+            throw new ExprEvalException("eachParcel: HTTP call failed: " + e.getMessage(), e);
         }
     }
 
@@ -148,7 +148,7 @@ public class GetSpatialPlansDestinationAreasPropFunction extends PropertyFunctio
                     : null;
         if (v == null)
             throw new ExprEvalException(
-                    "eachSpatialPlansDestinationArea: missing field '" + camel + "' in destinationAreas object");
+                    "eachParcel: missing field '" + camel + "' in parcel object");
         return v.getAsString().value();
     }
 }

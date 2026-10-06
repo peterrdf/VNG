@@ -10,7 +10,7 @@
     return vers.join('');
   }
   // 300000 -> "30.0.0"
-  var packedVersionToHumanReadable = n => [n / 10000 | 0, (n / 100 | 0) % 100, n % 100].join('.');
+  var packedVersionToHumanReadable = n => [n / 10_000 | 0, (n / 100 | 0) % 100, n % 100].join('.');
 
   var TARGET_NOT_SUPPORTED = 2147483647;
 
@@ -76,7 +76,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: C:\Users\svile\AppData\Local\Temp\tmpzkym_xge.js
+// include: C:\Users\svile\AppData\Local\Temp\tmp2pls3i06.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -204,21 +204,21 @@ Module['FS_createPath']("/", "data", true, true);
 
   })();
 
-// end include: C:\Users\svile\AppData\Local\Temp\tmpzkym_xge.js
-// include: C:\Users\svile\AppData\Local\Temp\tmp0jnq_2ln.js
+// end include: C:\Users\svile\AppData\Local\Temp\tmp2pls3i06.js
+// include: C:\Users\svile\AppData\Local\Temp\tmp6e93oe5y.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: C:\Users\svile\AppData\Local\Temp\tmp0jnq_2ln.js
-// include: C:\Users\svile\AppData\Local\Temp\tmp3a6948k9.js
+  // end include: C:\Users\svile\AppData\Local\Temp\tmp6e93oe5y.js
+// include: C:\Users\svile\AppData\Local\Temp\tmpisruawly.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: C:\Users\svile\AppData\Local\Temp\tmp3a6948k9.js
+  // end include: C:\Users\svile\AppData\Local\Temp\tmpisruawly.js
 
 
 var programArgs = [];
@@ -1296,17 +1296,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           var buf = Buffer.alloc(BUFSIZE);
           var bytesRead = 0;
   
-          // For some reason we must suppress a closure warning here, even though
-          // fd definitely exists on process.stdin, and is even the proper way to
-          // get the fd of stdin,
-          // https://github.com/nodejs/help/issues/2136#issuecomment-523649904
-          // This started to happen after moving this logic out of library_tty.js,
-          // so it is related to the surrounding code in some unclear manner.
-          /** @suppress {missingProperties} */
-          var fd = process.stdin.fd;
-  
           try {
-            bytesRead = fs.readSync(fd, buf, 0, BUFSIZE);
+            bytesRead = fs.readSync(process.stdin.fd, buf, 0, BUFSIZE);
           } catch(e) {
             // Cross-platform differences: on Windows, reading EOF throws an
             // exception, but on other OSes, reading EOF returns 0. Uniformize
@@ -1316,7 +1307,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           }
   
           if (bytesRead > 0) {
-            result = buf.slice(0, bytesRead).toString('utf-8');
+            result = buf.toString('utf-8', 0, bytesRead);
           }
         } else
         if (globalThis.window?.prompt) {
@@ -1945,6 +1936,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       'ESTRPIPE': 135,
     };
   
+  
   var asyncLoad = async (url) => {
       var arrayBuffer = await readAsync(url);
       assert(arrayBuffer, `Loading data file "${url}" failed (no arrayBuffer).`);
@@ -2023,7 +2015,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           if (shown) {
             err('(end of list)');
           }
-        }, 10000);
+        }, 10_000);
         // Prevent this timer from keeping the runtime alive if nothing
         // else is.
         runDependencyWatcher.unref?.()
@@ -2723,9 +2715,9 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         var rtn = {
           bsize: 4096,
           frsize: 4096,
-          blocks: 1e6,
-          bfree: 5e5,
-          bavail: 5e5,
+          blocks: 1_000_000,
+          bfree: 500_000,
+          bavail: 500_000,
           files: FS.nextInode,
           ffree: FS.nextInode - 1,
           fsid: 42,
@@ -3289,8 +3281,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         return stream.stream_ops.ioctl(stream, cmd, arg);
       },
   readFile(path, opts = {}) {
-        opts.flags = opts.flags ?? 0;
-        opts.encoding = opts.encoding ?? 'binary';
+        opts.flags ??= 0;
+        opts.encoding ??= 'binary';
         if (opts.encoding !== 'utf8' && opts.encoding !== 'binary') {
           abort(`Invalid encoding type "${opts.encoding}"`);
         }
@@ -3306,7 +3298,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         return buf;
       },
   writeFile(path, data, opts = {}) {
-        opts.flags = opts.flags ?? 577;
+        opts.flags ??= 577;
         var stream = FS.open(path, opts.flags, opts.mode);
         data = FS_fileDataToTypedArray(data);
         FS.write(stream, data, 0, data.byteLength, undefined, opts.canOwn);
@@ -3469,14 +3461,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           }
         }
       },
-  findObject(path, dontResolveLastLink) {
-        var ret = FS.analyzePath(path, dontResolveLastLink);
-        if (!ret.exists) {
-          return null;
-        }
-        return ret.object;
-      },
   analyzePath(path, dontResolveLastLink) {
+        warnOnce('FS.analyzePath is deprecated; use FS.lookupPath or FS.stat instead');
         // operate from within the context of the symlink's target
         try {
           var lookup = FS.lookupPath(path, { follow: !dontResolveLastLink });
@@ -3809,15 +3795,17 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         HEAP64[(((buf)+(24))>>3)] = BigInt(stat.size);checkInt64(stat.size);
         HEAP32[(((buf)+(32))>>2)] = 4096;checkInt32(4096);
         HEAP32[(((buf)+(36))>>2)] = stat.blocks;checkInt32(stat.blocks);
-        var atime = stat.atime.getTime();
-        var mtime = stat.mtime.getTime();
-        var ctime = stat.ctime.getTime();
+        // Prefer `*Ms` properties if available (e.g. from NODEFS / host `fs.Stats`)
+        // for sub-millisecond precision; fall back to Date#getTime for other filesystems.
+        var atime = stat.atimeMs ?? stat.atime.getTime();
+        var mtime = stat.mtimeMs ?? stat.mtime.getTime();
+        var ctime = stat.ctimeMs ?? stat.ctime.getTime();
         HEAP64[(((buf)+(40))>>3)] = BigInt(Math.floor(atime / 1000));checkInt64(Math.floor(atime / 1000));
-        HEAPU32[(((buf)+(48))>>2)] = (atime % 1000) * 1000 * 1000;checkInt32((atime % 1000) * 1000 * 1000);
+        HEAPU32[(((buf)+(48))>>2)] = Math.floor((atime % 1000) * 1_000_000);checkInt32(Math.floor((atime % 1000) * 1_000_000));
         HEAP64[(((buf)+(56))>>3)] = BigInt(Math.floor(mtime / 1000));checkInt64(Math.floor(mtime / 1000));
-        HEAPU32[(((buf)+(64))>>2)] = (mtime % 1000) * 1000 * 1000;checkInt32((mtime % 1000) * 1000 * 1000);
+        HEAPU32[(((buf)+(64))>>2)] = Math.floor((mtime % 1000) * 1_000_000);checkInt32(Math.floor((mtime % 1000) * 1_000_000));
         HEAP64[(((buf)+(72))>>3)] = BigInt(Math.floor(ctime / 1000));checkInt64(Math.floor(ctime / 1000));
-        HEAPU32[(((buf)+(80))>>2)] = (ctime % 1000) * 1000 * 1000;checkInt32((ctime % 1000) * 1000 * 1000);
+        HEAPU32[(((buf)+(80))>>2)] = Math.floor((ctime % 1000) * 1_000_000);checkInt32(Math.floor((ctime % 1000) * 1_000_000));
         HEAP64[(((buf)+(88))>>3)] = BigInt(stat.ino);checkInt64(stat.ino);
         return 0;
       },
@@ -4143,25 +4131,22 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         atime = now;
         mtime = now;
       } else {
-        var seconds = readI53FromI64(times);
-        var nanoseconds = HEAP32[(((times)+(8))>>2)];
-        if (nanoseconds == 1073741823) {
-          atime = now;
-        } else if (nanoseconds == 1073741822) {
-          atime = null;
-        } else {
-          atime = (seconds*1000) + (nanoseconds/(1000*1000));
+        function readTimespec(ptr) {
+          var tv_nsec = HEAP32[(((ptr)+(8))>>2)];
+          if (tv_nsec == 1073741823) {
+            return now;
+          }
+          if (tv_nsec == 1073741822) {
+            return null;
+          }
+          var tv_sec = readI53FromI64(ptr);
+          // Round down tv_nsec to the nearest 10 microseconds (10,000 ns) to prevent
+          // floating-point rounding into the next whole second when converting to host/Windows timestamps.
+          tv_nsec = (tv_nsec / 10_000 | 0) * 10_000;
+          return (tv_sec + (tv_nsec / 1_000_000_000)) * 1000;
         }
-        times += 16;
-        seconds = readI53FromI64(times);
-        nanoseconds = HEAP32[(((times)+(8))>>2)];
-        if (nanoseconds == 1073741823) {
-          mtime = now;
-        } else if (nanoseconds == 1073741822) {
-          mtime = null;
-        } else {
-          mtime = (seconds*1000) + (nanoseconds/(1000*1000));
-        }
+        atime = readTimespec(times);
+        mtime = readTimespec(times + 16);
       }
       // null here means UTIME_OMIT was passed. If both were set to UTIME_OMIT then
       // we can skip the call completely.
@@ -4306,12 +4291,17 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         onComplete(typeConverters);
       }
     };
+  
+  
+  var zeroMemory = (ptr, size) => HEAPU8.fill(0, ptr, ptr + size);
   var __embind_finalize_value_object = (structType) => {
       var reg = structRegistrations[structType];
       delete structRegistrations[structType];
   
       var rawConstructor = reg.rawConstructor;
       var rawDestructor = reg.rawDestructor;
+      var valueSize = reg.valueSize;
+      var isTrivial = reg.isTrivial;
       var fieldRecords = reg.fields;
       var fieldTypes = fieldRecords.map((field) => field.getterReturnType).
                 concat(fieldRecords.map((field) => field.setterArgumentType));
@@ -4324,13 +4314,20 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           const setterArgumentType = fieldTypes[i + fieldRecords.length];
           const setter = field.setter;
           const setterContext = field.setterContext;
-          fields[field.fieldName] = {
-            read: (ptr) => getterReturnType.fromWireType(getter(getterContext, ptr)),
-            write: (ptr, o) => {
+          var write;
+          if (setterArgumentType.destructorFunction === null && !setterArgumentType.argStackAlloc) {
+            // See the matching element-write logic in _embind_finalize_value_array.
+            write = (ptr, o) => setter(setterContext, ptr, setterArgumentType.toWireType(null, o));
+          } else {
+            write = (ptr, o) => {
               var destructors = [];
               setter(setterContext, ptr, setterArgumentType.toWireType(destructors, o));
               runDestructors(destructors);
-            },
+            };
+          }
+          fields[field.fieldName] = {
+            read: (ptr) => getterReturnType.fromWireType(getter(getterContext, ptr)),
+            write,
             optional: getterReturnType.optional,
           };
         }
@@ -4353,17 +4350,28 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
                 throw new TypeError(`Missing field: "${fieldName}"`);
               }
             }
-            var ptr = rawConstructor();
+            var ptr;
+            if (isTrivial && !destructors) {
+              // See the matching branch in _embind_finalize_value_array: the
+              // invoker manages a stack frame, so the temporary lives on the
+              // wasm stack with no allocation and no destructor bookkeeping;
+              // zero-filled to match the heap path's value-initialization.
+              ptr = stackAlloc(valueSize);
+              zeroMemory(ptr, valueSize);
+            } else {
+              ptr = rawConstructor();
+              if (destructors) {
+                destructors.push(rawDestructor, ptr);
+              }
+            }
             for (fieldName in fields) {
               fields[fieldName].write(ptr, o[fieldName]);
-            }
-            if (destructors !== null) {
-              destructors.push(rawDestructor, ptr);
             }
             return ptr;
           },
           readValueFromPointer: readPointer,
-          destructorFunction: rawDestructor,
+          destructorFunction: isTrivial ? null : rawDestructor,
+          argStackAlloc: isTrivial,
         }];
       });
     };
@@ -5333,6 +5341,19 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       return false;
     }
   
+  function argsUseStackAlloc(argTypes) {
+      // Skip return value at index 0 - only arguments stack-allocate.
+      for (var i = 1; i < argTypes.length; ++i) {
+        if (argTypes[i] !== null && argTypes[i].argStackAlloc) {
+          return true;
+        }
+      }
+      return false;
+    }
+  
+  
+  
+  
   
   function checkArgCount(numArgs, minArgs, maxArgs, humanName, throwBindingError) {
       if (numArgs < minArgs || numArgs > maxArgs) {
@@ -5342,6 +5363,16 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
     }
   function createJsInvoker(argTypes, isClassMethodFunc, returns, isAsync) {
       var needsDestructorStack = usesDestructorStack(argTypes);
+      var argsNeedStack = argsUseStackAlloc(argTypes);
+      // JSPI-async invokers resume after the frame would be gone, so they
+      // defer through the destructors array instead.
+      var useStackFrame = argsNeedStack && !isAsync && !needsDestructorStack;
+      if (argsNeedStack && !useStackFrame) {
+        // A stack-allocating type must never see a null destructors argument
+        // without a bracketing frame; route it through the destructors array
+        // (it heap-allocates on that path).
+        needsDestructorStack = true;
+      }
       var argCount = argTypes.length - 2;
       var argsList = [];
       var argsListWired = ['fn'];
@@ -5362,9 +5393,18 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       if (needsDestructorStack) {
         invokerFnBody += 'var destructors = [];\n';
       }
+      if (useStackFrame) {
+        // The frame must be released on every completion, including a throwing
+        // argument conversion or callee: a skipped stackRestore permanently
+        // leaks wasm stack. `var` declarations hoist out of the try block.
+        invokerFnBody += 'var sp = stackSave();\ntry {\n';
+      }
   
       var dtorStack = needsDestructorStack ? 'destructors' : 'null';
       var args1 = ['humanName', 'throwBindingError', 'invoker', 'fn', 'runDestructors', 'fromRetWire', 'toClassParamWire'];
+      if (useStackFrame) {
+        args1.push('stackSave', 'stackRestore');
+      }
   
       if (isClassMethodFunc) {
         invokerFnBody += `var thisWired = toClassParamWire(${dtorStack}, this);\n`;
@@ -5377,6 +5417,11 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       }
   
       invokerFnBody += (returns || isAsync ? 'var rv = ' : '') + `invoker(${argsListWired});\n`;
+      if (useStackFrame) {
+        // The callee has consumed the stack-allocated argument temporaries;
+        // release the frame before any post-call work.
+        invokerFnBody += '} finally {\nstackRestore(sp);\n}\n';
+      }
   
       var returnVal = returns ? 'rv' : '';
   
@@ -5445,6 +5490,14 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       // TODO: Remove this completely once all function invokers are being dynamically generated.
       var needsDestructorStack = usesDestructorStack(argTypes);
   
+      // Stack-allocating trivial value types get a stackSave/stackRestore
+      // bracket around the call; see createJsInvoker for the async carve-outs.
+      var argsNeedStack = argsUseStackAlloc(argTypes);
+      var useStackFrame = argsNeedStack && !isAsync && !needsDestructorStack;
+      if (argsNeedStack && !useStackFrame) {
+        needsDestructorStack = true;
+      }
+  
       var returns = !argTypes[0].isVoid;
   
       var expectedArgCount = argCount - 2;
@@ -5454,6 +5507,10 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       var retType = argTypes[0];
       var instType = argTypes[1];
       var closureArgs = [humanName, throwBindingError, cppInvokerFunc, cppTargetFunc, runDestructors, retType.fromWireType.bind(retType), instType?.toWireType.bind(instType)];
+      if (useStackFrame) {
+        // Must mirror the `args1.push('stackSave', 'stackRestore')` in createJsInvoker.
+        closureArgs.push(stackSave, stackRestore);
+      }
       for (var i = 2; i < argCount; ++i) {
         var argType = argTypes[i];
         closureArgs.push(argType.toWireType.bind(argType));
@@ -6107,12 +6164,16 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       constructorSignature,
       rawConstructor,
       destructorSignature,
-      rawDestructor
+      rawDestructor,
+      valueSize,
+      isTrivial
     ) => {
       structRegistrations[rawType] = {
         name: AsciiToString(name),
         rawConstructor: embind__requireFunction(constructorSignature, rawConstructor),
         rawDestructor: embind__requireFunction(destructorSignature, rawDestructor),
+        valueSize,
+        isTrivial: !!isTrivial,
         fields: [],
       };
     };
@@ -6248,6 +6309,7 @@ ${functionBody}
       return emval_addMethodCaller(createNamedFunction(functionName, invokerFunction));
     };
 
+
   
   
   var __emval_invoke = (caller, handle, methodName, destructorsRef, args) => {
@@ -6365,7 +6427,7 @@ ${functionBody}
         var nonDstOffset = Math.max(winterOffset, summerOffset);
         var trueOffset = dst > 0 ? dstOffset : nonDstOffset;
         // Don't try setMinutes(date.getMinutes() + ...) -- it's messed up.
-        date.setTime(date.getTime() + (trueOffset - guessedOffset)*60000);
+        date.setTime(date.getTime() + (trueOffset - guessedOffset)*60_000);
         if (isNaN(date.getTime())) {
           return -1;
         }
@@ -6471,7 +6533,7 @@ ${functionBody}
         return 52;
       }
       // "now" is in ms, and wasi times are in ns.
-      var nsec = Math.round(now * 1000 * 1000);
+      var nsec = Math.round(now * 1_000_000);
       HEAP64[((ptime)>>3)] = BigInt(nsec);checkInt64(nsec);
       return 0;
     ;
@@ -6817,13 +6879,13 @@ ${functionBody}
         }
       }
     };
-  var callUserCallback = (func) => {
+  var callUserCallback = (func, ...args) => {
       if (ABORT) {
         err('user callback triggered after runtime exited or application aborted.  Ignoring.');
         return;
       }
       try {
-        return func();
+        return func(...args);
       } catch (e) {
         handleException(e);
       } finally {
@@ -6840,10 +6902,13 @@ ${functionBody}
   /** @param {number=} timeout */
   var safeSetTimeout = (func, timeout) => {
       
-      return setTimeout(() => {
+      var id = safeSetTimeout.nextId++;
+      safeSetTimeout.pending.set(id, setTimeout(() => {
+        safeSetTimeout.pending.delete(id);
         
         callUserCallback(func);
-      }, timeout);
+      }, timeout));
+      return id;
     };
   
   
@@ -6956,7 +7021,7 @@ ${functionBody}
             // workaround for chrome bug 124926 - we do not always get oncanplaythrough or onerror
             safeSetTimeout(() => {
               finish(audio); // try to use it even though it is not necessarily ready to play
-            }, 10000);
+            }, 10_000);
           });
         };
         preloadPlugins.push(audioPlugin);
@@ -7305,6 +7370,7 @@ ${functionBody}
 init_ClassHandle();
 init_RegisteredPointer();
 assert(emval_handles.length === 5 * 2);
+safeSetTimeout.pending = new Map(); safeSetTimeout.nextId = 1;;
 // End JS library code
 
 // include: postlibrary.js
@@ -7376,7 +7442,6 @@ if (Module['printErr']) err = Module['printErr'];
   'convertU32PairToI53',
   'getTempRet0',
   'setTempRet0',
-  'zeroMemory',
   'withStackSave',
   'inetPton4',
   'inetNtop4',
@@ -7462,6 +7527,7 @@ if (Module['printErr']) err = Module['printErr'];
   'convertPCtoSourceLocation',
   'wasiRightsToMuslOFlags',
   'wasiOFlagsToMuslOFlags',
+  'safeClearTimeout',
   'setImmediateWrapped',
   'safeRequestAnimationFrame',
   'clearImmediateWrapped',
@@ -7549,6 +7615,7 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'stackAlloc',
   'createNamedFunction',
   'ptrToString',
+  'zeroMemory',
   'exitJS',
   'getHeapMax',
   'growMemory',
@@ -7742,7 +7809,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'FS_staticInit',
   'FS_init',
   'FS_quit',
-  'FS_findObject',
   'FS_analyzePath',
   'FS_createFile',
   'FS_forceLoadFile',
@@ -7780,6 +7846,7 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'heap32VectorToArray',
   'requireRegisteredType',
   'usesDestructorStack',
+  'argsUseStackAlloc',
   'checkArgCount',
   'getRequiredArgCount',
   'createJsInvoker',
@@ -8368,6 +8435,7 @@ var _internalGetBoundingBox = Module['_internalGetBoundingBox'] = makeInvalidEar
 var _internalGetCenter = Module['_internalGetCenter'] = makeInvalidEarlyAccess('_internalGetCenter');
 var _getRootAxis2Placement = Module['_getRootAxis2Placement'] = makeInvalidEarlyAccess('_getRootAxis2Placement');
 var _getGlobalPlacement = Module['_getGlobalPlacement'] = makeInvalidEarlyAccess('_getGlobalPlacement');
+var _engiGetAggrElement = Module['_engiGetAggrElement'] = makeInvalidEarlyAccess('_engiGetAggrElement');
 var _setGlobalPlacement = Module['_setGlobalPlacement'] = makeInvalidEarlyAccess('_setGlobalPlacement');
 var _getTimeStamp = Module['_getTimeStamp'] = makeInvalidEarlyAccess('_getTimeStamp');
 var _setInstanceReference = Module['_setInstanceReference'] = makeInvalidEarlyAccess('_setInstanceReference');
@@ -8379,8 +8447,8 @@ var _engiGetEntityAttributeByIndex = Module['_engiGetEntityAttributeByIndex'] = 
 var _iterateOverProperties = Module['_iterateOverProperties'] = makeInvalidEarlyAccess('_iterateOverProperties');
 var _engiGetEntityAttributeIndex = Module['_engiGetEntityAttributeIndex'] = makeInvalidEarlyAccess('_engiGetEntityAttributeIndex');
 var _engiGetAttrIndexBN = Module['_engiGetAttrIndexBN'] = makeInvalidEarlyAccess('_engiGetAttrIndexBN');
-var _engiGetEntityAttributeIndexEx = Module['_engiGetEntityAttributeIndexEx'] = makeInvalidEarlyAccess('_engiGetEntityAttributeIndexEx');
 var _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = makeInvalidEarlyAccess('_engiGetAttrIndexExBN');
+var _engiGetEntityAttributeIndexEx = Module['_engiGetEntityAttributeIndexEx'] = makeInvalidEarlyAccess('_engiGetEntityAttributeIndexEx');
 var _engiGetEntityArgumentName = Module['_engiGetEntityArgumentName'] = makeInvalidEarlyAccess('_engiGetEntityArgumentName');
 var _engiGetAttrNameByIndex = Module['_engiGetAttrNameByIndex'] = makeInvalidEarlyAccess('_engiGetAttrNameByIndex');
 var _engiGetEntityArgumentType = Module['_engiGetEntityArgumentType'] = makeInvalidEarlyAccess('_engiGetEntityArgumentType');
@@ -8397,7 +8465,6 @@ var _engiGetEntityNoArguments = Module['_engiGetEntityNoArguments'] = makeInvali
 var _engiGetArgumentType = Module['_engiGetArgumentType'] = makeInvalidEarlyAccess('_engiGetArgumentType');
 var _engiGetAttributeType = Module['_engiGetAttributeType'] = makeInvalidEarlyAccess('_engiGetAttributeType');
 var _engiGetEntityArgumentIndex = Module['_engiGetEntityArgumentIndex'] = makeInvalidEarlyAccess('_engiGetEntityArgumentIndex');
-var _engiGetAggrElement = Module['_engiGetAggrElement'] = makeInvalidEarlyAccess('_engiGetAggrElement');
 var _engiGetEntityArgument = Module['_engiGetEntityArgument'] = makeInvalidEarlyAccess('_engiGetEntityArgument');
 var _sdaiGetADBTypePathx = Module['_sdaiGetADBTypePathx'] = makeInvalidEarlyAccess('_sdaiGetADBTypePathx');
 var _xxxxOpenModelByStream = Module['_xxxxOpenModelByStream'] = makeInvalidEarlyAccess('_xxxxOpenModelByStream');
@@ -8940,6 +9007,7 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['internalGetCenter'] != 'undefined', 'missing Wasm export: internalGetCenter');
   assert(typeof wasmExports['getRootAxis2Placement'] != 'undefined', 'missing Wasm export: getRootAxis2Placement');
   assert(typeof wasmExports['getGlobalPlacement'] != 'undefined', 'missing Wasm export: getGlobalPlacement');
+  assert(typeof wasmExports['engiGetAggrElement'] != 'undefined', 'missing Wasm export: engiGetAggrElement');
   assert(typeof wasmExports['setGlobalPlacement'] != 'undefined', 'missing Wasm export: setGlobalPlacement');
   assert(typeof wasmExports['getTimeStamp'] != 'undefined', 'missing Wasm export: getTimeStamp');
   assert(typeof wasmExports['setInstanceReference'] != 'undefined', 'missing Wasm export: setInstanceReference');
@@ -8951,8 +9019,8 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['iterateOverProperties'] != 'undefined', 'missing Wasm export: iterateOverProperties');
   assert(typeof wasmExports['engiGetEntityAttributeIndex'] != 'undefined', 'missing Wasm export: engiGetEntityAttributeIndex');
   assert(typeof wasmExports['engiGetAttrIndexBN'] != 'undefined', 'missing Wasm export: engiGetAttrIndexBN');
-  assert(typeof wasmExports['engiGetEntityAttributeIndexEx'] != 'undefined', 'missing Wasm export: engiGetEntityAttributeIndexEx');
   assert(typeof wasmExports['engiGetAttrIndexExBN'] != 'undefined', 'missing Wasm export: engiGetAttrIndexExBN');
+  assert(typeof wasmExports['engiGetEntityAttributeIndexEx'] != 'undefined', 'missing Wasm export: engiGetEntityAttributeIndexEx');
   assert(typeof wasmExports['engiGetEntityArgumentName'] != 'undefined', 'missing Wasm export: engiGetEntityArgumentName');
   assert(typeof wasmExports['engiGetAttrNameByIndex'] != 'undefined', 'missing Wasm export: engiGetAttrNameByIndex');
   assert(typeof wasmExports['engiGetEntityArgumentType'] != 'undefined', 'missing Wasm export: engiGetEntityArgumentType');
@@ -8969,7 +9037,6 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['engiGetArgumentType'] != 'undefined', 'missing Wasm export: engiGetArgumentType');
   assert(typeof wasmExports['engiGetAttributeType'] != 'undefined', 'missing Wasm export: engiGetAttributeType');
   assert(typeof wasmExports['engiGetEntityArgumentIndex'] != 'undefined', 'missing Wasm export: engiGetEntityArgumentIndex');
-  assert(typeof wasmExports['engiGetAggrElement'] != 'undefined', 'missing Wasm export: engiGetAggrElement');
   assert(typeof wasmExports['engiGetEntityArgument'] != 'undefined', 'missing Wasm export: engiGetEntityArgument');
   assert(typeof wasmExports['sdaiGetADBTypePathx'] != 'undefined', 'missing Wasm export: sdaiGetADBTypePathx');
   assert(typeof wasmExports['xxxxOpenModelByStream'] != 'undefined', 'missing Wasm export: xxxxOpenModelByStream');
@@ -9508,6 +9575,7 @@ function assignWasmExports(wasmExports) {
   _internalGetCenter = Module['_internalGetCenter'] = createExportWrapper('internalGetCenter', wasmExports['internalGetCenter'], 2);
   _getRootAxis2Placement = Module['_getRootAxis2Placement'] = createExportWrapper('getRootAxis2Placement', wasmExports['getRootAxis2Placement'], 2);
   _getGlobalPlacement = Module['_getGlobalPlacement'] = createExportWrapper('getGlobalPlacement', wasmExports['getGlobalPlacement'], 2);
+  _engiGetAggrElement = Module['_engiGetAggrElement'] = createExportWrapper('engiGetAggrElement', wasmExports['engiGetAggrElement'], 4);
   _setGlobalPlacement = Module['_setGlobalPlacement'] = createExportWrapper('setGlobalPlacement', wasmExports['setGlobalPlacement'], 3);
   _getTimeStamp = Module['_getTimeStamp'] = createExportWrapper('getTimeStamp', wasmExports['getTimeStamp'], 1);
   _setInstanceReference = Module['_setInstanceReference'] = createExportWrapper('setInstanceReference', wasmExports['setInstanceReference'], 2);
@@ -9519,8 +9587,8 @@ function assignWasmExports(wasmExports) {
   _iterateOverProperties = Module['_iterateOverProperties'] = createExportWrapper('iterateOverProperties', wasmExports['iterateOverProperties'], 2);
   _engiGetEntityAttributeIndex = Module['_engiGetEntityAttributeIndex'] = createExportWrapper('engiGetEntityAttributeIndex', wasmExports['engiGetEntityAttributeIndex'], 2);
   _engiGetAttrIndexBN = Module['_engiGetAttrIndexBN'] = createExportWrapper('engiGetAttrIndexBN', wasmExports['engiGetAttrIndexBN'], 2);
-  _engiGetEntityAttributeIndexEx = Module['_engiGetEntityAttributeIndexEx'] = createExportWrapper('engiGetEntityAttributeIndexEx', wasmExports['engiGetEntityAttributeIndexEx'], 4);
   _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = createExportWrapper('engiGetAttrIndexExBN', wasmExports['engiGetAttrIndexExBN'], 4);
+  _engiGetEntityAttributeIndexEx = Module['_engiGetEntityAttributeIndexEx'] = createExportWrapper('engiGetEntityAttributeIndexEx', wasmExports['engiGetEntityAttributeIndexEx'], 4);
   _engiGetEntityArgumentName = Module['_engiGetEntityArgumentName'] = createExportWrapper('engiGetEntityArgumentName', wasmExports['engiGetEntityArgumentName'], 4);
   _engiGetAttrNameByIndex = Module['_engiGetAttrNameByIndex'] = createExportWrapper('engiGetAttrNameByIndex', wasmExports['engiGetAttrNameByIndex'], 4);
   _engiGetEntityArgumentType = Module['_engiGetEntityArgumentType'] = createExportWrapper('engiGetEntityArgumentType', wasmExports['engiGetEntityArgumentType'], 3);
@@ -9537,7 +9605,6 @@ function assignWasmExports(wasmExports) {
   _engiGetArgumentType = Module['_engiGetArgumentType'] = createExportWrapper('engiGetArgumentType', wasmExports['engiGetArgumentType'], 1);
   _engiGetAttributeType = Module['_engiGetAttributeType'] = createExportWrapper('engiGetAttributeType', wasmExports['engiGetAttributeType'], 1);
   _engiGetEntityArgumentIndex = Module['_engiGetEntityArgumentIndex'] = createExportWrapper('engiGetEntityArgumentIndex', wasmExports['engiGetEntityArgumentIndex'], 2);
-  _engiGetAggrElement = Module['_engiGetAggrElement'] = createExportWrapper('engiGetAggrElement', wasmExports['engiGetAggrElement'], 4);
   _engiGetEntityArgument = Module['_engiGetEntityArgument'] = createExportWrapper('engiGetEntityArgument', wasmExports['engiGetEntityArgument'], 2);
   _sdaiGetADBTypePathx = Module['_sdaiGetADBTypePathx'] = createExportWrapper('sdaiGetADBTypePathx', wasmExports['sdaiGetADBTypePathx'], 3);
   _xxxxOpenModelByStream = Module['_xxxxOpenModelByStream'] = createExportWrapper('xxxxOpenModelByStream', wasmExports['xxxxOpenModelByStream'], 3);
@@ -9666,6 +9733,8 @@ var wasmImports = {
   /** @export */
   _emval_create_invoker: __emval_create_invoker,
   /** @export */
+  _emval_decref: __emval_decref,
+  /** @export */
   _emval_invoke: __emval_invoke,
   /** @export */
   _emval_run_destructors: __emval_run_destructors,
@@ -9776,13 +9845,8 @@ function checkUnflushedContent() {
   try { // it doesn't matter if it fails
     _fflush(0);
     // also flush in the JS FS layer
-    for (var name of ['stdout', 'stderr']) {
-      var info = FS.analyzePath('/dev/' + name);
-      if (!info) return;
-      var stream = info.object;
-      var rdev = stream.rdev;
-      var tty = TTY.ttys[rdev];
-      if (tty?.output?.length) {
+    for (var tty of Object.values(TTY.ttys)) {
+      if (tty.output.length) {
         has = true;
       }
     }

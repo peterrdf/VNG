@@ -320,6 +320,7 @@ namespace VNGPortal.Workflows
                                 {
                                     throw new Exception($"SPARQL query is empty for SHACL Validation - SPARQL Query: '{shaclShape.Id} - {geometryQuery.Id}'");
                                 }
+                                _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclShape.Id, geometryQuery.Id, query);
 
                                 string templateArgRegExpr = string.Empty;
                                 if (geometryQuery.Parameters.ContainsKey("templateArgRegExpr"))

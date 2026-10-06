@@ -45,4 +45,57 @@ geom:GeometryShape
     sh:severity sh:Violation .
 	    ]]>
 	</shape>
+	<views>
+		<view>
+			<type>violation</type>
+			<visualization>3dview</visualization>
+			<queries>
+				<sparql>
+					<id><![CDATA[RetrieveGeometryByGlobalIdTemplate]]></id>
+					<query>
+						<![CDATA[
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX geom: <https://vng.nl/geometry/>
+
+SELECT ?globalIdValue ?base64Data
+WHERE {
+    VALUES ?globalIdValue { ###GLOBAL_IDS_LIST### }
+    GRAPH <https://vng.nl/geometries/> {
+    ?geometry   geom:globalId	?globalIdValue ;
+                geom:base64Data	?base64Data .
+    }
+}
+	    ]]>
+					</query>
+					<parameters>
+						<templateArgRegExpr><![CDATA[GlobalId=\[(?<globalId>[^\]]+)\]]]></templateArgRegExpr>
+						<templateArgRegExprMatch><![CDATA[globalId]]></templateArgRegExprMatch>
+						<templateArgName><![CDATA[###GLOBAL_IDS_LIST###]]></templateArgName>
+					</parameters>
+					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
+				</sparql>
+				<sparql>
+					<id><![CDATA[RetriveLivingAreas]]></id>
+					<query>
+						<![CDATA[
+PREFIX dso:    <http://vng.nl/areas/>
+
+SELECT ?id ?group ?geometry
+WHERE {
+  GRAPH <areas.ttl> {
+    ?area	a       dso:area ;
+                  	dso:id    		?id ;
+                  	dso:group  	    ?group ;
+                  	dso:geometry  	?geometry .
+    FILTER(?group = "wonen")
+  }
+}
+ORDER BY ?id
+			]]>
+					</query>
+					<geometryVariable><![CDATA[geometry]]></geometryVariable>
+				</sparql>
+			</queries>
+		</view>
+	</views>
 </shacl>

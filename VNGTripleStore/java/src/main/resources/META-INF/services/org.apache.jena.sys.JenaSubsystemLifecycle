@@ -8,3 +8,6 @@ org.vng.BBoxInit
 org.vng.GetAreasInit
 org.vng.GetPDOKFeatureInit
 org.vng.CylinderInit
+org.vng.TranslationInit
+org.vng.RotationInit
+org.vng.BooleanOperationInit

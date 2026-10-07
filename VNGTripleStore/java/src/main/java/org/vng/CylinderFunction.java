@@ -41,8 +41,8 @@ public class CylinderFunction extends FunctionBase3 {
                     "handler=CreateCylinder&length=%s&radius=%s&segmentationParts=%d",
                     length.getDouble(), radius.getDouble(), segmentationParts.getInteger().longValueExact());
 
-            URI uri = URI.create(SERVICE_BASE_URL + "/CSG?" + query);
-            LOG.debug("createCylinder: GET {}", uri);
+            URI uri = URI.create(SERVICE_BASE_URL + "/GeometryModeling?" + query);
+            LOG.debug("csgCylinder: GET {}", uri);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
@@ -53,8 +53,8 @@ public class CylinderFunction extends FunctionBase3 {
             HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                LOG.error("createCylinder: HTTP error {}: {}", response.statusCode(), response.body());
-                throw new ExprEvalException("createCylinder: HTTP error " + response.statusCode()
+                LOG.error("csgCylinder: HTTP error {}: {}", response.statusCode(), response.body());
+                throw new ExprEvalException("csgCylinder: HTTP error " + response.statusCode()
                         + " from service: " + response.body());
             }
 
@@ -62,8 +62,8 @@ public class CylinderFunction extends FunctionBase3 {
             JsonValue geometry = json.hasKey("geometry") ? json.get("geometry") : json.get("Geometry");
 
             if (geometry == null || !geometry.isString()) {
-                LOG.error("createCylinder: unexpected response: {}", response.body());
-                throw new ExprEvalException("createCylinder: missing or non-string 'geometry' in response");
+                LOG.error("csgCylinder: unexpected response: {}", response.body());
+                throw new ExprEvalException("csgCylinder: missing or non-string 'geometry' in response");
             }
 
             return NodeValue.makeString(geometry.getAsString().value());
@@ -72,15 +72,15 @@ public class CylinderFunction extends FunctionBase3 {
             throw e;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ExprEvalException("createCylinder: interrupted", e);
+            throw new ExprEvalException("csgCylinder: interrupted", e);
         } catch (Exception e) {
-            LOG.error("createCylinder: HTTP call failed", e);
-            throw new ExprEvalException("createCylinder: HTTP call failed: " + e.getMessage(), e);
+            LOG.error("csgCylinder: HTTP call failed", e);
+            throw new ExprEvalException("csgCylinder: HTTP call failed: " + e.getMessage(), e);
         }
     }
 
     private static void requireNumber(String name, NodeValue v) {
         if (!v.isNumber())
-            throw new ExprEvalException("createCylinder: '" + name + "' must be numeric, got: " + v);
+            throw new ExprEvalException("csgCylinder: '" + name + "' must be numeric, got: " + v);
     }
 }

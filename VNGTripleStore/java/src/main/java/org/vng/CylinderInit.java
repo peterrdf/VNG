@@ -5,7 +5,7 @@ import org.apache.jena.sys.JenaSubsystemLifecycle;
 
 public class CylinderInit implements JenaSubsystemLifecycle {
 
-    private static final String FN_URI = "http://vng.nl/geometry-ext.ttl#csgCylinder";
+    private static final String FN_URI = "http://vng.nl/geometry-ext.ttl#gmCylinder";
 
     @Override
     public void start() {

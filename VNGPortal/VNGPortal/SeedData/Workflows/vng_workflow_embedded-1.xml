@@ -155,34 +155,28 @@
 			</parameters>
 		</step>
 		<step>
-			<name><![CDATA[Constructive solid geometry]]></name>
+			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
-				    TEST: Constructive solid geometry example.
+				    Union.
 			    ]]>
 			</description>
 			<type><![CDATA[3DVIEW]]></type>
 			<parameters>
 				<queries>
 					<sparql>
-						<id><![CDATA[Cylinder1]]></id>
+						<id><![CDATA[Union]]></id>
 						<query>
 							<![CDATA[
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
 SELECT ?base64Data
 WHERE {
-  BIND(<http://vng.nl/geometry-ext.ttl#csgCylinder>(10.0, 2.5, 36) AS ?base64Data)
-}
-							]]>
-						</query>
-						<geometryVariable><![CDATA[base64Data]]></geometryVariable>
-					</sparql>
-					<sparql>
-						<id><![CDATA[Cylinder2]]></id>
-						<query>
-							<![CDATA[
-SELECT ?base64Data
-WHERE {
-  BIND(<http://vng.nl/geometry-ext.ttl#csgCylinder>(20.0, 4.5, 36) AS ?base64Data)
+    BIND(vng:gmCylinder(1.0, 1.0, 36) AS ?a)
+	BIND(3.14159265358979 AS ?pi)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0, 36), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+	BIND(0 AS ?union)
+    BIND(vng:gmBooleanOperation(?a, ?b, ?union) AS ?base64Data)
 }
 							]]>
 						</query>
@@ -190,7 +184,38 @@ WHERE {
 					</sparql>
 				</queries>
 			</parameters>
-		</step>		
+		</step>
+		<step>
+			<name><![CDATA[Geometry Modeling]]></name>
+			<description>
+				<![CDATA[
+				    Difference.
+			    ]]>
+			</description>
+			<type><![CDATA[3DVIEW]]></type>
+			<parameters>
+				<queries>
+					<sparql>
+						<id><![CDATA[Union]]></id>
+						<query>
+							<![CDATA[
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?base64Data
+WHERE {
+    BIND(vng:gmCylinder(1.0, 1.0, 36) AS ?a)
+	BIND(3.14159265358979 AS ?pi)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0, 36), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+	BIND(1 AS ?difference)
+    BIND(vng:gmBooleanOperation(?a, ?b, ?difference) AS ?base64Data)
+}
+							]]>
+						</query>
+						<geometryVariable><![CDATA[base64Data]]></geometryVariable>
+					</sparql>
+				</queries>
+			</parameters>
+		</step>
 		<step>
 			<name><![CDATA[IFC to RDF conversion]]></name>
 			<description />

@@ -253,6 +253,9 @@
 		<None Update="SeedData\Workflows\vng_workflow_embedded-5.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\Workflows\vng_workflow_embedded-50.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\Workflows\vng_workflow_embedded-6.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

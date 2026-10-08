@@ -5,7 +5,7 @@ services:
     depends_on:
        - vngtriplestore
        - vngservice
-    image: vngportal:1.15
+    image: vngportal:1.16
     ports:
       - "1145:8080"
     environment:

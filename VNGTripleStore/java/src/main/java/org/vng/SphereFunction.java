@@ -21,11 +21,11 @@ import java.util.Locale;
 
 /**
  * SPARQL extension function:
- *  vng:gmCylinder(?length, ?radius [, ?segmentationParts = 36]) -> base64 geometry (xsd:string)
+ *   vng:gmSphere(?radius [, ?segmentationParts = 36]) -> base64 geometry (xsd:string)
  */
-public class CylinderFunction extends FunctionBase {
+public class SphereFunction extends FunctionBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CylinderFunction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SphereFunction.class);
     private static final String SERVICE_BASE_URL = "http://vngservice:8080";
     private static final Duration TIMEOUT = Duration.ofMinutes(5);
     private static final long DEFAULT_SEGMENTATION_PARTS = 36;
@@ -36,32 +36,31 @@ public class CylinderFunction extends FunctionBase {
 
     @Override
     public void checkBuild(String uri, ExprList args) {
-        if (args.size() < 2 || args.size() > 3)
+        if (args.size() < 1 || args.size() > 2)
             throw new QueryBuildException(
-                    "gmCylinder: expects 2 or 3 arguments, got " + args.size());
+                "gmSphere: expects 1 or 2 arguments, got " + args.size());
     }
 
     @Override
     public NodeValue exec(List<NodeValue> args) {
-        NodeValue segmentationParts = args.size() > 2
-                ? args.get(2)
+        NodeValue segmentationParts = args.size() > 1
+                ? args.get(1)
                 : NodeValue.makeInteger(DEFAULT_SEGMENTATION_PARTS);
-        return exec(args.get(0), args.get(1), segmentationParts);
+        return exec(args.get(0), segmentationParts);
     }
 
-    public NodeValue exec(NodeValue length, NodeValue radius, NodeValue segmentationParts) {
-        requireNumber("length", length);
+    public NodeValue exec(NodeValue radius, NodeValue segmentationParts) {
         requireNumber("radius", radius);
         requireNumber("segmentationParts", segmentationParts);
 
         try {
             // Locale.ROOT guarantees '.' as decimal separator
             String query = String.format(Locale.ROOT,
-                    "handler=CreateCylinder&length=%s&radius=%s&segmentationParts=%d",
-                    length.getDouble(), radius.getDouble(), segmentationParts.getInteger().longValueExact());
+                    "handler=CreateSphere&radius=%s&segmentationParts=%d",
+                    radius.getDouble(), segmentationParts.getInteger().longValueExact());
 
             URI uri = URI.create(SERVICE_BASE_URL + "/GeometryModeling?" + query);
-            LOG.debug("gmCylinder: GET {}", uri);
+            LOG.debug("gmSphere: GET {}", uri);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
@@ -72,8 +71,8 @@ public class CylinderFunction extends FunctionBase {
             HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                LOG.error("gmCylinder: HTTP error {}: {}", response.statusCode(), response.body());
-                throw new ExprEvalException("gmCylinder: HTTP error " + response.statusCode()
+                LOG.error("gmSphere: HTTP error {}: {}", response.statusCode(), response.body());
+                throw new ExprEvalException("gmSphere: HTTP error " + response.statusCode()
                         + " from service: " + response.body());
             }
 
@@ -81,8 +80,8 @@ public class CylinderFunction extends FunctionBase {
             JsonValue geometry = json.hasKey("geometry") ? json.get("geometry") : json.get("Geometry");
 
             if (geometry == null || !geometry.isString()) {
-                LOG.error("gmCylinder: unexpected response: {}", response.body());
-                throw new ExprEvalException("gmCylinder: missing or non-string 'geometry' in response");
+                LOG.error("gmSphere: unexpected response: {}", response.body());
+                throw new ExprEvalException("gmSphere: missing or non-string 'geometry' in response");
             }
 
             return NodeValue.makeString(geometry.getAsString().value());
@@ -91,15 +90,15 @@ public class CylinderFunction extends FunctionBase {
             throw e;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ExprEvalException("gmCylinder: interrupted", e);
+            throw new ExprEvalException("gmSphere: interrupted", e);
         } catch (Exception e) {
-            LOG.error("gmCylinder: HTTP call failed", e);
-            throw new ExprEvalException("gmCylinder: HTTP call failed: " + e.getMessage(), e);
+            LOG.error("gmSphere: HTTP call failed", e);
+            throw new ExprEvalException("gmSphere: HTTP call failed: " + e.getMessage(), e);
         }
     }
 
     private static void requireNumber(String name, NodeValue v) {
         if (!v.isNumber())
-            throw new ExprEvalException("gmCylinder: '" + name + "' must be numeric, got: " + v);
+            throw new ExprEvalException("gmSphere: '" + name + "' must be numeric, got: " + v);
     }
 }

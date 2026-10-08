@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * SPARQL extension function:
- *   vng:gmBooleanOperation(?base64Content1, ?base64Content2, [type])
+ *   vng:gmBooleanOperation(?base64Content1, ?base64Content2, ?type)
      type:
         0  Union
         1  Difference

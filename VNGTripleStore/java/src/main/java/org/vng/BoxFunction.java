@@ -13,17 +13,17 @@ import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.sparql.expr.ExprEvalException;
 import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.function.FunctionBase4;
+import org.apache.jena.sparql.function.FunctionBase3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * SPARQL extension function:
- *   vng:csgRotation(?base64Content, ?alpha, ?beta, ?gamma)
+ *   vng:gmBox(?length, ?width, ?height)
  */
-public class RotationFunction extends FunctionBase4 {
+public class BoxFunction extends FunctionBase3 {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RotationFunction.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BoxFunction.class);
     private static final String SERVICE_BASE_URL = "http://vngservice:8080";
     private static final Duration TIMEOUT = Duration.ofMinutes(5);
 
@@ -32,41 +32,37 @@ public class RotationFunction extends FunctionBase4 {
         .build();
 
     @Override
-    public NodeValue exec(NodeValue base64Content, NodeValue alpha, NodeValue beta, NodeValue gamma) {
-        if (!base64Content.isString()) {
-            throw new ExprEvalException("csgRotation: first argument must be a string");
-        }
-        if (!alpha.isNumber() || !beta.isNumber() || !gamma.isNumber()) {
-            throw new ExprEvalException("csgRotation: alpha, beta, gamma must be numeric");
+    public NodeValue exec(NodeValue length, NodeValue width, NodeValue height) {
+        if (!length.isNumber() || !width.isNumber() || !height.isNumber()) {
+            throw new ExprEvalException("gmBox: length, width, height must be numeric");
         }
 
         try {
-            String body = form("base64Content", base64Content.getString())
-                + "&" + form("alpha", Double.toString(alpha.getDouble()))
-                + "&" + form("beta", Double.toString(beta.getDouble()))
-                + "&" + form("gamma", Double.toString(gamma.getDouble()));
+            String query = param("handler", "CreateBox")
+                + "&" + param("length", Double.toString(length.getDouble()))
+                + "&" + param("width", Double.toString(width.getDouble()))
+                + "&" + param("height", Double.toString(height.getDouble()));
 
-            URI uri = URI.create(SERVICE_BASE_URL + "/GeometryModeling?handler=CreateRotation");
+            URI uri = URI.create(SERVICE_BASE_URL + "/GeometryModeling?" + query);
             HttpRequest request = HttpRequest.newBuilder(uri)
                 .timeout(TIMEOUT)
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .GET()
                 .build();
 
             HttpResponse<String> response =
                 CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                LOG.error("csgRotation: HTTP {}: {}", response.statusCode(), response.body());
-                throw new ExprEvalException("csgRotation: HTTP " + response.statusCode());
+                LOG.error("gmBox: HTTP {}: {}", response.statusCode(), response.body());
+                throw new ExprEvalException("gmBox: HTTP " + response.statusCode());
             }
 
             JsonObject json = JSON.parse(response.body()).getAsObject();
             JsonValue geometry = json.hasKey("geometry") ? json.get("geometry") : json.get("Geometry");
 
             if (geometry == null || !geometry.isString()) {
-                LOG.error("csgRotation: unexpected response: {}", response.body());
-                throw new ExprEvalException("csgRotation: missing or non-string 'geometry' in response");
+                LOG.error("gmBox: unexpected response: {}", response.body());
+                throw new ExprEvalException("gmBox: missing or non-string 'geometry' in response");
             }
 
             return NodeValue.makeString(geometry.getAsString().value());
@@ -74,14 +70,14 @@ public class RotationFunction extends FunctionBase4 {
             throw e;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ExprEvalException("csgRotation: interrupted", e);
+            throw new ExprEvalException("gmBox: interrupted", e);
         } catch (Exception e) {
-            LOG.error("csgRotation failed", e);
-            throw new ExprEvalException("csgRotation failed: " + e.getMessage(), e);
+            LOG.error("gmBox failed", e);
+            throw new ExprEvalException("gmBox failed: " + e.getMessage(), e);
         }
     }
 
-    private static String form(String name, String value) {
+    private static String param(String name, String value) {
         return URLEncoder.encode(name, StandardCharsets.UTF_8) + "="
             + URLEncoder.encode(value, StandardCharsets.UTF_8);
     }

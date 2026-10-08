@@ -11,3 +11,5 @@ org.vng.CylinderInit
 org.vng.TranslationInit
 org.vng.RotationInit
 org.vng.BooleanOperationInit
+org.vng.SphereInit
+org.vng.BoxInit

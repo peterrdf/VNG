@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
 /**
  * SPARQL extension function:
  *   vng:csgTranslation(?base64Content, ?x, ?y, ?z)
- * Calls the VNGService CSG page handler OnPostCreateTranslation and returns
- * the updated base64 geometry as xsd:string.
  */
 public class TranslationFunction extends FunctionBase4 {
 

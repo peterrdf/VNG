@@ -43,7 +43,68 @@ namespace VNGService.Pages
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating cylinder model.");
+                _logger.LogError(ex, "Error creating Cylinder model.");
+                throw;
+            }
+            finally
+            {
+                engine.CloseModel(owlModel);
+            }
+        }
+
+        public IActionResult OnGetCreateSphere(double radius, long segmentationParts)
+        {
+            var base64Content = string.Empty;
+
+            long owlModel = engine.CreateModel();
+            try
+            {
+                long owlClassSphere = engine.GetClassByName(owlModel, "Sphere");
+                long owlInstanceSphere = engine.CreateInstance(owlClassSphere, "");
+                engine.SetDatatypeProperty(owlInstanceSphere, engine.GetPropertyByName(owlModel, "radius"), radius);
+                engine.SetDatatypeProperty(owlInstanceSphere, engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts);
+
+                var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
+                engine.SaveModel(owlModel, modelPath);
+                base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
+                System.IO.File.Delete(modelPath);
+
+                return new JsonResult(new { Geometry = base64Content });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating Sphere model.");
+                throw;
+            }
+            finally
+            {
+                engine.CloseModel(owlModel);
+            }
+        }
+
+        public IActionResult OnGetCreateBox(double length, double width, double height)
+        {
+            var base64Content = string.Empty;
+
+            long owlModel = engine.CreateModel();
+            try
+            {
+                long owlClassBox = engine.GetClassByName(owlModel, "Box");
+                long owlInstanceBox = engine.CreateInstance(owlClassBox, "");
+                engine.SetDatatypeProperty(owlInstanceBox, engine.GetPropertyByName(owlModel, "length"), length);
+                engine.SetDatatypeProperty(owlInstanceBox, engine.GetPropertyByName(owlModel, "width"), width);
+                engine.SetDatatypeProperty(owlInstanceBox, engine.GetPropertyByName(owlModel, "height"), height);
+
+                var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
+                engine.SaveModel(owlModel, modelPath);
+                base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
+                System.IO.File.Delete(modelPath);
+
+                return new JsonResult(new { Geometry = base64Content });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating Box model.");
                 throw;
             }
             finally
@@ -107,7 +168,7 @@ namespace VNGService.Pages
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error translating model.");
+                _logger.LogError(ex, "Error Translating model.");
                 throw;
             }
             finally
@@ -158,7 +219,7 @@ namespace VNGService.Pages
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error translating model.");
+                _logger.LogError(ex, "Error Translating model.");
                 throw;
             }
             finally
@@ -200,7 +261,7 @@ namespace VNGService.Pages
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error translating model.");
+                _logger.LogError(ex, "Error Translating model.");
                 throw;
             }
             finally

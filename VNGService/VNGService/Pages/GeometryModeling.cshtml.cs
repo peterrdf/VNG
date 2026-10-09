@@ -8,6 +8,9 @@ namespace VNGService.Pages
     [IgnoreAntiforgeryToken]
     public class GeometryModelingModel : PageModel
     {
+        private const long flagbit0 = 1;   // 2^^0
+        private const long flagbit4 = 16;  // 2^^4
+
         private readonly IConfiguration _configuration;
         private readonly ILogger<DSOModel> _logger;
 
@@ -28,6 +31,10 @@ namespace VNGService.Pages
             var base64Content = string.Empty;
 
             long owlModel = engine.CreateModel();
+            long setting = flagbit0 + flagbit4;
+            long mask = flagbit0 + flagbit4;
+            engine.SetOverrideFileIO(owlModel, setting, mask);
+
             try
             {
                 long owlClassCylinder = engine.GetClassByName(owlModel, "Cylinder");
@@ -39,7 +46,7 @@ namespace VNGService.Pages
                 AssignMaterialToInstance(owlModel, owlInstanceCylinder, r, g, b, t);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                engine.SaveModel(owlModel, modelPath);
+                engine.SaveInstanceTree(owlInstanceCylinder, modelPath);
                 base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                 System.IO.File.Delete(modelPath);
 
@@ -63,6 +70,10 @@ namespace VNGService.Pages
             var base64Content = string.Empty;
 
             long owlModel = engine.CreateModel();
+            long setting = flagbit0 + flagbit4;
+            long mask = flagbit0 + flagbit4;
+            engine.SetOverrideFileIO(owlModel, setting, mask);
+
             try
             {
                 long owlClassSphere = engine.GetClassByName(owlModel, "Sphere");
@@ -73,7 +84,7 @@ namespace VNGService.Pages
                 AssignMaterialToInstance(owlModel, owlInstanceSphere, r, g, b, t);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                engine.SaveModel(owlModel, modelPath);
+                engine.SaveInstanceTree(owlInstanceSphere, modelPath);
                 base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                 System.IO.File.Delete(modelPath);
 
@@ -97,6 +108,10 @@ namespace VNGService.Pages
             var base64Content = string.Empty;
 
             long owlModel = engine.CreateModel();
+            long setting = flagbit0 + flagbit4;
+            long mask = flagbit0 + flagbit4;
+            engine.SetOverrideFileIO(owlModel, setting, mask);
+
             try
             {
                 long owlClassBox = engine.GetClassByName(owlModel, "Box");
@@ -108,7 +123,7 @@ namespace VNGService.Pages
                 AssignMaterialToInstance(owlModel, owlInstanceBox, r, g, b, t);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                engine.SaveModel(owlModel, modelPath);
+                engine.SaveInstanceTree(owlInstanceBox, modelPath);
                 base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                 System.IO.File.Delete(modelPath);
 
@@ -131,6 +146,10 @@ namespace VNGService.Pages
             System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
 
             long owlModel = engine.CreateModel();
+            long setting = flagbit0 + flagbit4;
+            long mask = flagbit0 + flagbit4;
+            engine.SetOverrideFileIO(owlModel, setting, mask);
+
             try
             {
                 long owlRootInstance = engine.ImportModel(owlModel, modelPath);
@@ -172,7 +191,7 @@ namespace VNGService.Pages
                     owlRootInstance);
 
                 var translatedModelPath = Path.Combine(Path.GetTempPath(), $"translated_{Guid.NewGuid()}.bin");
-                engine.SaveModel(owlModel, translatedModelPath);
+                engine.SaveInstanceTree(owlTransformationInstance, translatedModelPath);
                 var translatedBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(translatedModelPath));
                 System.IO.File.Delete(translatedModelPath);
 
@@ -196,6 +215,10 @@ namespace VNGService.Pages
             System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
 
             long owlModel = engine.CreateModel();
+            long setting = flagbit0 + flagbit4;
+            long mask = flagbit0 + flagbit4;
+            engine.SetOverrideFileIO(owlModel, setting, mask);
+
             try
             {
                 long owlRootInstance = engine.ImportModel(owlModel, modelPath);
@@ -223,7 +246,7 @@ namespace VNGService.Pages
                     owlRootInstance);
 
                 var rotatedModelPath = Path.Combine(Path.GetTempPath(), $"rotated_{Guid.NewGuid()}.bin");
-                engine.SaveModel(owlModel, rotatedModelPath);
+                engine.SaveInstanceTree(owlTransformationInstance, rotatedModelPath);
                 var rotatedBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(rotatedModelPath));
                 System.IO.File.Delete(rotatedModelPath);
 
@@ -250,6 +273,10 @@ namespace VNGService.Pages
             System.IO.File.WriteAllBytes(modelPath2, Convert.FromBase64String(base64Content2));
 
             long owlModel = engine.CreateModel();
+            long setting = flagbit0 + flagbit4;
+            long mask = flagbit0 + flagbit4;
+            engine.SetOverrideFileIO(owlModel, setting, mask);
+
             try
             {
                 long owlRootInstance1 = engine.ImportModel(owlModel, modelPath1);
@@ -265,7 +292,7 @@ namespace VNGService.Pages
                 engine.CalculateInstance(owlInstanceBooleanOperation, out long _, out long _);
 
                 var unionModelPath = Path.Combine(Path.GetTempPath(), $"union_{Guid.NewGuid()}.bin");
-                engine.SaveModel(owlModel, unionModelPath);
+                engine.SaveInstanceTree(owlInstanceBooleanOperation, unionModelPath);
                 var unionBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(unionModelPath));
                 System.IO.File.Delete(unionModelPath);
 

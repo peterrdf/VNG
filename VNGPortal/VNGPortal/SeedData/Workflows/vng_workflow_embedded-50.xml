@@ -46,7 +46,7 @@ WHERE {
 			<parameters>
 				<queries>
 					<sparql>
-						<id><![CDATA[Union]]></id>
+						<id><![CDATA[Difference]]></id>
 						<query>
 							<![CDATA[
 PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
@@ -70,7 +70,7 @@ WHERE {
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
-				    Difference.
+				    Union.
 			    ]]>
 			</description>
 			<type><![CDATA[3DVIEW]]></type>
@@ -132,7 +132,7 @@ WHERE {
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
-				    Difference.
+				    Union.
 			    ]]>
 			</description>
 			<type><![CDATA[3DVIEW]]></type>
@@ -170,7 +170,7 @@ WHERE {
 			<parameters>
 				<queries>
 					<sparql>
-						<id><![CDATA[Union]]></id>
+						<id><![CDATA[Difference]]></id>
 						<query>
 							<![CDATA[
 PREFIX vng: <http://vng.nl/geometry-ext.ttl#>

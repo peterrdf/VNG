@@ -22,9 +22,9 @@ PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
 
 SELECT ?base64Data
 WHERE {
-    BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+    BIND(vng:gmCylinder(1.0, 1.0, 0.0, 1.0, 0.0, 1.0) AS ?a)
 	BIND(3.14159265358979 AS ?pi)
-    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0, 0.0, 1.0, 0.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
 	BIND(0 AS ?union)
     BIND(vng:gmBooleanOperation(?a, ?b, ?union) AS ?base64Data)
 }
@@ -53,9 +53,9 @@ PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
 
 SELECT ?base64Data
 WHERE {
-    BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+    BIND(vng:gmCylinder(1.0, 1.0, 0.0, 1.0, 0.0, 1.0) AS ?a)
 	BIND(3.14159265358979 AS ?pi)
-    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0, 0.0, 1.0, 0.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
 	BIND(1 AS ?difference)
     BIND(vng:gmBooleanOperation(?a, ?b, ?difference) AS ?base64Data)
 }
@@ -84,9 +84,9 @@ PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
 
 SELECT ?base64Data
 WHERE {
-    BIND(vng:gmSphere(1.0) AS ?a)
+    BIND(vng:gmSphere(1.0, 0.0, 0.0, 1.0, 1.0) AS ?a)
 	BIND(3.14159265358979 AS ?pi)
-    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0, 0.0, 1.0, 0.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
 	BIND(0 AS ?union)
     BIND(vng:gmBooleanOperation(?a, ?b, ?union) AS ?base64Data)
 }
@@ -115,9 +115,9 @@ PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
 
 SELECT ?base64Data
 WHERE {
-    BIND(vng:gmSphere(1.0) AS ?a)
+    BIND(vng:gmSphere(1.0, 0.0, 0.0, 1.0, 1.0) AS ?a)
 	BIND(3.14159265358979 AS ?pi)
-    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0, 0.0, 1.0, 0.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
 	BIND(1 AS ?difference)
     BIND(vng:gmBooleanOperation(?a, ?b, ?difference) AS ?base64Data)
 }
@@ -146,9 +146,9 @@ PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
 
 SELECT ?base64Data
 WHERE {
-    BIND(vng:gmBox(2.0, 2.0, 2.0) AS ?a)
+    BIND(vng:gmBox(2.0, 2.0, 2.0, 1.0, 0.0, 0.0, 1.0) AS ?a)
 	BIND(3.14159265358979 AS ?pi)
-    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0, 0.0, 1.0, 0.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
 	BIND(0 AS ?union)
     BIND(vng:gmBooleanOperation(?a, ?b, ?union) AS ?base64Data)
 }
@@ -177,9 +177,9 @@ PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
 
 SELECT ?base64Data
 WHERE {
-    BIND(vng:gmBox(2.0, 2.0, 2.0) AS ?a)
+    BIND(vng:gmBox(2.0, 2.0, 2.0, 1.0, 0.0, 0.0, 1.0) AS ?a)
 	BIND(3.14159265358979 AS ?pi)
-    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0, 0.0, 1.0, 0.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
 	BIND(1 AS ?difference)
     BIND(vng:gmBooleanOperation(?a, ?b, ?difference) AS ?base64Data)
 }

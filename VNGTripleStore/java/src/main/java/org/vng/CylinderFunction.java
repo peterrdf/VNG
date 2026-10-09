@@ -21,7 +21,12 @@ import java.util.Locale;
 
 /**
  * SPARQL extension function:
- *  vng:gmCylinder(?length, ?radius [, ?segmentationParts = 36]) -> base64 geometry (xsd:string)
+ *  vng:gmCylinder(?length, ?radius)
+ *  vng:gmCylinder(?length, ?radius, ?segmentationParts)
+ *  vng:gmCylinder(?length, ?radius, ?r, ?g, ?b, ?t)
+ *  vng:gmCylinder(?length, ?radius, ?segmentationParts, ?r, ?g, ?b, ?t)
+ *  -> base64 geometry (xsd:string)
+ *  segmentationParts defaults to 36.
  */
 public class CylinderFunction extends FunctionBase {
 
@@ -36,29 +41,72 @@ public class CylinderFunction extends FunctionBase {
 
     @Override
     public void checkBuild(String uri, ExprList args) {
-        if (args.size() < 2 || args.size() > 3)
+        int n = args.size();
+        if (n != 2 && n != 3 && n != 6 && n != 7)
             throw new QueryBuildException(
-                    "gmCylinder: expects 2 or 3 arguments, got " + args.size());
+                    "gmCylinder: expects 2, 3, 6 or 7 arguments, got " + n);
     }
 
     @Override
     public NodeValue exec(List<NodeValue> args) {
-        NodeValue segmentationParts = args.size() > 2
-                ? args.get(2)
-                : NodeValue.makeInteger(DEFAULT_SEGMENTATION_PARTS);
-        return exec(args.get(0), args.get(1), segmentationParts);
+        int n = args.size();
+        if (n != 2 && n != 3 && n != 6 && n != 7)
+            throw new ExprEvalException("gmCylinder: expected 2, 3, 6 or 7 arguments, got " + n);
+
+        NodeValue length = args.get(0);
+        NodeValue radius = args.get(1);
+        NodeValue segmentationParts;
+        int colorIndex;
+
+        switch (n) {
+            case 2:
+                segmentationParts = NodeValue.makeInteger(DEFAULT_SEGMENTATION_PARTS);
+                colorIndex = -1;
+                break;
+            case 3:
+                segmentationParts = args.get(2);
+                colorIndex = -1;
+                break;
+            case 6:
+                segmentationParts = NodeValue.makeInteger(DEFAULT_SEGMENTATION_PARTS);
+                colorIndex = 2;
+                break;
+            default: // 7
+                segmentationParts = args.get(2);
+                colorIndex = 3;
+                break;
+        }
+
+        return exec(length, radius, segmentationParts,
+                colorIndex < 0 ? null : args.subList(colorIndex, colorIndex + 4));
     }
 
     public NodeValue exec(NodeValue length, NodeValue radius, NodeValue segmentationParts) {
+        return exec(length, radius, segmentationParts, null);
+    }
+
+    private NodeValue exec(NodeValue length, NodeValue radius, NodeValue segmentationParts, List<NodeValue> rgbt) {
         requireNumber("length", length);
         requireNumber("radius", radius);
         requireNumber("segmentationParts", segmentationParts);
 
+        String[] colorNames = { "r", "g", "b", "t" };
+        if (rgbt != null) {
+            for (int i = 0; i < rgbt.size(); i++)
+                requireNumber(colorNames[i], rgbt.get(i));
+        }
+
         try {
             // Locale.ROOT guarantees '.' as decimal separator
-            String query = String.format(Locale.ROOT,
+            StringBuilder query = new StringBuilder(String.format(Locale.ROOT,
                     "handler=CreateCylinder&length=%s&radius=%s&segmentationParts=%d",
-                    length.getDouble(), radius.getDouble(), segmentationParts.getInteger().longValueExact());
+                    length.getDouble(), radius.getDouble(), segmentationParts.getInteger().longValueExact()));
+
+            if (rgbt != null) {
+                for (int i = 0; i < rgbt.size(); i++) {
+                    query.append(String.format(Locale.ROOT, "&%s=%s", colorNames[i], rgbt.get(i).getDouble()));
+                }
+            }
 
             URI uri = URI.create(SERVICE_BASE_URL + "/GeometryModeling?" + query);
             LOG.debug("gmCylinder: GET {}", uri);

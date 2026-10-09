@@ -21,7 +21,12 @@ import java.util.Locale;
 
 /**
  * SPARQL extension function:
- *   vng:gmSphere(?radius [, ?segmentationParts = 36]) -> base64 geometry (xsd:string)
+ *   vng:gmSphere(?radius)
+ *   vng:gmSphere(?radius, ?segmentationParts)
+ *   vng:gmSphere(?radius, ?r, ?g, ?b, ?t)
+ *   vng:gmSphere(?radius, ?segmentationParts, ?r, ?g, ?b, ?t)
+ *   -> base64 geometry (xsd:string)
+ *   segmentationParts defaults to 36.
  */
 public class SphereFunction extends FunctionBase {
 
@@ -29,6 +34,7 @@ public class SphereFunction extends FunctionBase {
     private static final String SERVICE_BASE_URL = "http://vngservice:8080";
     private static final Duration TIMEOUT = Duration.ofMinutes(5);
     private static final long DEFAULT_SEGMENTATION_PARTS = 36;
+    private static final String[] COLOR_NAMES = { "r", "g", "b", "t" };
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(TIMEOUT)
@@ -36,28 +42,66 @@ public class SphereFunction extends FunctionBase {
 
     @Override
     public void checkBuild(String uri, ExprList args) {
-        if (args.size() < 1 || args.size() > 2)
+        int n = args.size();
+        if (n != 1 && n != 2 && n != 5 && n != 6)
             throw new QueryBuildException(
-                "gmSphere: expects 1 or 2 arguments, got " + args.size());
+                "gmSphere: expects 1, 2, 5 or 6 arguments, got " + n);
     }
 
     @Override
     public NodeValue exec(List<NodeValue> args) {
-        NodeValue segmentationParts = args.size() > 1
-                ? args.get(1)
-                : NodeValue.makeInteger(DEFAULT_SEGMENTATION_PARTS);
-        return exec(args.get(0), segmentationParts);
+        int n = args.size();
+        if (n != 1 && n != 2 && n != 5 && n != 6)
+            throw new ExprEvalException("gmSphere: expected 1, 2, 5 or 6 arguments, got " + n);
+
+        NodeValue radius = args.get(0);
+        NodeValue segmentationParts;
+        List<NodeValue> rgbt = null;
+
+        switch (n) {
+            case 1:
+                segmentationParts = NodeValue.makeInteger(DEFAULT_SEGMENTATION_PARTS);
+                break;
+            case 2:
+                segmentationParts = args.get(1);
+                break;
+            case 5:
+                segmentationParts = NodeValue.makeInteger(DEFAULT_SEGMENTATION_PARTS);
+                rgbt = args.subList(1, 5);
+                break;
+            default: // 6
+                segmentationParts = args.get(1);
+                rgbt = args.subList(2, 6);
+                break;
+        }
+
+        return exec(radius, segmentationParts, rgbt);
     }
 
     public NodeValue exec(NodeValue radius, NodeValue segmentationParts) {
+        return exec(radius, segmentationParts, null);
+    }
+
+    private NodeValue exec(NodeValue radius, NodeValue segmentationParts, List<NodeValue> rgbt) {
         requireNumber("radius", radius);
         requireNumber("segmentationParts", segmentationParts);
 
+        if (rgbt != null) {
+            for (int i = 0; i < rgbt.size(); i++)
+                requireNumber(COLOR_NAMES[i], rgbt.get(i));
+        }
+
         try {
             // Locale.ROOT guarantees '.' as decimal separator
-            String query = String.format(Locale.ROOT,
+            StringBuilder query = new StringBuilder(String.format(Locale.ROOT,
                     "handler=CreateSphere&radius=%s&segmentationParts=%d",
-                    radius.getDouble(), segmentationParts.getInteger().longValueExact());
+                    radius.getDouble(), segmentationParts.getInteger().longValueExact()));
+
+            if (rgbt != null) {
+                for (int i = 0; i < rgbt.size(); i++) {
+                    query.append(String.format(Locale.ROOT, "&%s=%s", COLOR_NAMES[i], rgbt.get(i).getDouble()));
+                }
+            }
 
             URI uri = URI.create(SERVICE_BASE_URL + "/GeometryModeling?" + query);
             LOG.debug("gmSphere: GET {}", uri);

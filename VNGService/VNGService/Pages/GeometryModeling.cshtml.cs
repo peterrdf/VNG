@@ -299,6 +299,41 @@ namespace VNGService.Pages
             }
         }
 
+        public IActionResult OnPostCreateColor([FromForm] string base64Content, [FromForm] double r, [FromForm] double g, [FromForm] double b, [FromForm] double t)
+        {
+            var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
+            System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
+
+            long owlModel = engine.CreateModel();
+            long setting = flagbit0 + flagbit4;
+            long mask = flagbit0 + flagbit4;
+            engine.SetOverrideFileIO(owlModel, setting, mask);
+
+            try
+            {
+                long owlRootInstance = engine.ImportModel(owlModel, modelPath);
+
+                AssignMaterialToInstance(owlModel, owlRootInstance, r, g, b, t);
+
+                var coloredPath = Path.Combine(Path.GetTempPath(), $"colored_{Guid.NewGuid()}.bin");
+                engine.SaveInstanceTree(owlRootInstance, coloredPath);
+                var coloredBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(coloredPath));
+                System.IO.File.Delete(coloredPath);
+
+                return new JsonResult(new { Geometry = coloredBase64Content });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error Coloring model.");
+                throw;
+            }
+            finally
+            {
+                engine.CloseModel(owlModel);
+                System.IO.File.Delete(modelPath);
+            }
+        }
+
         private static void AssignMaterialToInstance(long owlModel, long owlInstance, double? r, double? g, double? b, double? t)
         {
             if (r.HasValue && g.HasValue && b.HasValue)

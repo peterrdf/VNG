@@ -24,9 +24,7 @@ namespace VNGService.Pages
         {
         }
 
-        public IActionResult OnGetCreateCylinder(
-            double length, double radius, long segmentationParts,
-            double? r = null, double? g = null, double? b = null, double? t = null)
+        public IActionResult OnGetCreateCylinder(double length, double radius, long segmentationParts)
         {
             var base64Content = string.Empty;
 
@@ -42,8 +40,6 @@ namespace VNGService.Pages
                 engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "length"), length);
                 engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "radius"), radius);
                 engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts);
-
-                AssignMaterialToInstance(owlModel, owlInstanceCylinder, r, g, b, t);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
                 engine.SaveInstanceTree(owlInstanceCylinder, modelPath);
@@ -63,9 +59,7 @@ namespace VNGService.Pages
             }
         }
 
-        public IActionResult OnGetCreateSphere(
-            double radius, long segmentationParts,
-            double? r = null, double? g = null, double? b = null, double? t = null)
+        public IActionResult OnGetCreateSphere(double radius, long segmentationParts)
         {
             var base64Content = string.Empty;
 
@@ -80,8 +74,6 @@ namespace VNGService.Pages
                 long owlInstanceSphere = engine.CreateInstance(owlClassSphere, "");
                 engine.SetDatatypeProperty(owlInstanceSphere, engine.GetPropertyByName(owlModel, "radius"), radius);
                 engine.SetDatatypeProperty(owlInstanceSphere, engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts);
-
-                AssignMaterialToInstance(owlModel, owlInstanceSphere, r, g, b, t);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
                 engine.SaveInstanceTree(owlInstanceSphere, modelPath);
@@ -101,9 +93,7 @@ namespace VNGService.Pages
             }
         }
 
-        public IActionResult OnGetCreateBox(
-            double length, double width, double height,
-            double? r = null, double? g = null, double? b = null, double? t = null)
+        public IActionResult OnGetCreateBox(double length, double width, double height)
         {
             var base64Content = string.Empty;
 
@@ -119,8 +109,6 @@ namespace VNGService.Pages
                 engine.SetDatatypeProperty(owlInstanceBox, engine.GetPropertyByName(owlModel, "length"), length);
                 engine.SetDatatypeProperty(owlInstanceBox, engine.GetPropertyByName(owlModel, "width"), width);
                 engine.SetDatatypeProperty(owlInstanceBox, engine.GetPropertyByName(owlModel, "height"), height);
-
-                AssignMaterialToInstance(owlModel, owlInstanceBox, r, g, b, t);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
                 engine.SaveInstanceTree(owlInstanceBox, modelPath);

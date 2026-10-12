@@ -13,4 +13,6 @@ org.vng.RotationInit
 org.vng.BooleanOperationInit
 org.vng.SphereInit
 org.vng.BoxInit
+org.vng.PlaneInit
+org.vng.Projection2DInit
 org.vng.ColorInit

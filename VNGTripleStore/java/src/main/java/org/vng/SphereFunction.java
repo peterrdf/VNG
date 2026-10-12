@@ -22,7 +22,6 @@ import java.util.Locale;
 /**
  * SPARQL extension function:
  *   vng:gmSphere(?radius [, ?segmentationParts]) -> base64 geometry (xsd:string)
- * If ?segmentationParts is omitted, the service applies its default value.
  */
 public class SphereFunction extends FunctionBase {
 

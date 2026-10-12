@@ -190,5 +190,33 @@ WHERE {
 				</queries>
 			</parameters>
 		</step>
+		<step>
+			<name><![CDATA[Geometry Modeling]]></name>
+			<description>
+				<![CDATA[
+				    Projection: Cylinder.
+			    ]]>
+			</description>
+			<type><![CDATA[3DVIEW]]></type>
+			<parameters>
+				<queries>
+					<sparql>
+						<id><![CDATA[Projection: Cylinder]]></id>
+						<query>
+							<![CDATA[
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?base64Data
+WHERE {
+	BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+	BIND(vng:gmColor(vng:gmProjection(?a, vng:gmPlane(0.0, 0.0, 1.0, 0.0)), 0.0, 1.0, 0.0) AS ?base64Data)
+}
+							]]>
+						</query>
+						<geometryVariable><![CDATA[base64Data]]></geometryVariable>
+					</sparql>
+				</queries>
+			</parameters>
+		</step>
 	</steps>
 </workflow>

@@ -128,6 +128,90 @@ namespace VNGService.Pages
             }
         }
 
+        public IActionResult OnGetCreatePlane(double a, double b, double c, double d)
+        {
+            var base64Content = string.Empty;
+
+            long owlModel = engine.CreateModel();
+            long setting = flagbit0 + flagbit4;
+            long mask = flagbit0 + flagbit4;
+            engine.SetOverrideFileIO(owlModel, setting, mask);
+
+            try
+            {
+                long owlClassPlane = engine.GetClassByName(owlModel, "Plane");
+                long owlInstancePlane = engine.CreateInstance(owlClassPlane, "");
+                engine.SetDatatypeProperty(owlInstancePlane, engine.GetPropertyByName(owlModel, "A"), a);
+                engine.SetDatatypeProperty(owlInstancePlane, engine.GetPropertyByName(owlModel, "B"), b);
+                engine.SetDatatypeProperty(owlInstancePlane, engine.GetPropertyByName(owlModel, "C"), c);
+                engine.SetDatatypeProperty(owlInstancePlane, engine.GetPropertyByName(owlModel, "D"), d);
+
+                var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
+                engine.SaveInstanceTree(owlInstancePlane, modelPath);
+                base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
+                System.IO.File.Delete(modelPath);
+
+                return new JsonResult(new { Geometry = base64Content });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating Plane model.");
+                throw;
+            }
+            finally
+            {
+                engine.CloseModel(owlModel);
+            }
+        }
+        public IActionResult OnPostCreateProjection2D([FromForm] string base64Content1, [FromForm] string base64Content2)
+        {
+            var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
+            System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content1));
+
+            var planePath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
+            System.IO.File.WriteAllBytes(planePath, Convert.FromBase64String(base64Content2));
+
+            long owlModel = engine.CreateModel();
+            long setting = flagbit0 + flagbit4;
+            long mask = flagbit0 + flagbit4;
+            engine.SetOverrideFileIO(owlModel, setting, mask);
+
+            try
+            {
+                long owlInstanceInput = engine.ImportModel(owlModel, modelPath);
+                System.IO.File.Delete(modelPath);
+
+                long owlInstancePlane = engine.ImportModel(owlModel, planePath);
+                System.IO.File.Delete(planePath);
+
+                long owlInstanceVector3 = engine.CreateInstance(engine.GetClassByName(owlModel, "Vector3"));
+                engine.SetDatatypeProperty(owlInstanceVector3, engine.GetPropertyByName(owlModel, "z"), 1.0);
+
+                long owlInstanceShadow = engine.CreateInstance(engine.GetClassByName(owlModel, "Shadow"));
+                engine.SetObjectProperty(owlInstanceShadow, engine.GetPropertyByName(owlModel, "plane"), owlInstancePlane);
+                engine.SetObjectProperty(owlInstanceShadow, engine.GetPropertyByName(owlModel, "lightDirection"), owlInstanceVector3);
+                engine.SetObjectProperty(owlInstanceShadow, engine.GetPropertyByName(owlModel, "object"), owlInstanceInput);
+                engine.SetDatatypeProperty(owlInstanceShadow, engine.GetPropertyByName(owlModel, "type"), (long)1);
+
+                var projectionPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
+                engine.SaveInstanceTree(owlInstanceShadow, projectionPath);
+                var base64Projection = Convert.ToBase64String(System.IO.File.ReadAllBytes(projectionPath));
+                System.IO.File.Delete(projectionPath);
+
+                return new JsonResult(new { Geometry = base64Projection });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating Projection model.");
+                throw;
+            }
+            finally
+            {
+                engine.CloseModel(owlModel);
+            }
+        }
+
+
         public IActionResult OnPostCreateTranslation([FromForm] string base64Content, [FromForm] double _41, [FromForm] double _42, [FromForm] double _43)
         {
             var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");

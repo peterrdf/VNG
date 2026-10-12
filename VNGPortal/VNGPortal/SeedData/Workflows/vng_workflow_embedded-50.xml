@@ -181,7 +181,7 @@ WHERE {
 	BIND(3.14159265358979 AS ?pi)
     BIND(vng:gmCylinder(1.0, 1.0) AS ?b)
 	BIND(1 AS ?difference)
-    BIND(vng:gmColor(vng:gmBooleanOperation(?a, ?b, ?difference), 0.0, 0.0, 1.0, 0.25) AS ?base64Data)
+    BIND(vng:gmColor(vng:gmBooleanOperation(?a, ?b, ?difference), 0.0, 0.0, 1.0) AS ?base64Data)
 }
 							]]>
 						</query>

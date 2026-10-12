@@ -21,14 +21,14 @@ import java.util.Locale;
 
 /**
  * SPARQL extension function:
- *   vng:gmSphere(?radius [, ?segmentationParts = 36]) -> base64 geometry (xsd:string)
+ *   vng:gmSphere(?radius [, ?segmentationParts]) -> base64 geometry (xsd:string)
+ * If ?segmentationParts is omitted, the service applies its default value.
  */
 public class SphereFunction extends FunctionBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(SphereFunction.class);
     private static final String SERVICE_BASE_URL = "http://vngservice:8080";
     private static final Duration TIMEOUT = Duration.ofMinutes(5);
-    private static final long DEFAULT_SEGMENTATION_PARTS = 36;
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(TIMEOUT)
@@ -43,21 +43,26 @@ public class SphereFunction extends FunctionBase {
 
     @Override
     public NodeValue exec(List<NodeValue> args) {
-        NodeValue segmentationParts = args.size() > 1
-                ? args.get(1)
-                : NodeValue.makeInteger(DEFAULT_SEGMENTATION_PARTS);
+        NodeValue segmentationParts = args.size() > 1 ? args.get(1) : null;
         return exec(args.get(0), segmentationParts);
     }
 
     public NodeValue exec(NodeValue radius, NodeValue segmentationParts) {
         requireNumber("radius", radius);
-        requireNumber("segmentationParts", segmentationParts);
+        if (segmentationParts != null) {
+            requireNumber("segmentationParts", segmentationParts);
+        }
 
         try {
             // Locale.ROOT guarantees '.' as decimal separator
             String query = String.format(Locale.ROOT,
-                    "handler=CreateSphere&radius=%s&segmentationParts=%d",
-                    radius.getDouble(), segmentationParts.getInteger().longValueExact());
+                    "handler=CreateSphere&radius=%s",
+                    radius.getDouble());
+
+            if (segmentationParts != null) {
+                query += String.format(Locale.ROOT, "&segmentationParts=%d",
+                        segmentationParts.getInteger().longValueExact());
+            }
 
             URI uri = URI.create(SERVICE_BASE_URL + "/GeometryModeling?" + query);
             LOG.debug("gmSphere: GET {}", uri);

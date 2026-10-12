@@ -24,7 +24,7 @@ namespace VNGService.Pages
         {
         }
 
-        public IActionResult OnGetCreateCylinder(double length, double radius, long segmentationParts)
+        public IActionResult OnGetCreateCylinder(double length, double radius, long? segmentationParts)
         {
             var base64Content = string.Empty;
 
@@ -39,7 +39,7 @@ namespace VNGService.Pages
                 long owlInstanceCylinder = engine.CreateInstance(owlClassCylinder, "");
                 engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "length"), length);
                 engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "radius"), radius);
-                engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts);
+                engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts ?? 36);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
                 engine.SaveInstanceTree(owlInstanceCylinder, modelPath);
@@ -59,7 +59,7 @@ namespace VNGService.Pages
             }
         }
 
-        public IActionResult OnGetCreateSphere(double radius, long segmentationParts)
+        public IActionResult OnGetCreateSphere(double radius, long? segmentationParts)
         {
             var base64Content = string.Empty;
 
@@ -73,7 +73,7 @@ namespace VNGService.Pages
                 long owlClassSphere = engine.GetClassByName(owlModel, "Sphere");
                 long owlInstanceSphere = engine.CreateInstance(owlClassSphere, "");
                 engine.SetDatatypeProperty(owlInstanceSphere, engine.GetPropertyByName(owlModel, "radius"), radius);
-                engine.SetDatatypeProperty(owlInstanceSphere, engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts);
+                engine.SetDatatypeProperty(owlInstanceSphere, engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts ?? 36);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
                 engine.SaveInstanceTree(owlInstanceSphere, modelPath);
@@ -299,7 +299,7 @@ namespace VNGService.Pages
             }
         }
 
-        public IActionResult OnPostCreateColor([FromForm] string base64Content, [FromForm] double r, [FromForm] double g, [FromForm] double b, [FromForm] double t)
+        public IActionResult OnPostCreateColor([FromForm] string base64Content, [FromForm] double R, [FromForm] double G, [FromForm] double B, [FromForm] double? A)
         {
             var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
             System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
@@ -313,7 +313,7 @@ namespace VNGService.Pages
             {
                 long owlRootInstance = engine.ImportModel(owlModel, modelPath);
 
-                AssignMaterialToInstance(owlModel, owlRootInstance, r, g, b, t);
+                AssignMaterialToInstance(owlModel, owlRootInstance, R, G, B, A);
 
                 var coloredPath = Path.Combine(Path.GetTempPath(), $"colored_{Guid.NewGuid()}.bin");
                 engine.SaveInstanceTree(owlRootInstance, coloredPath);
@@ -334,20 +334,20 @@ namespace VNGService.Pages
             }
         }
 
-        private static void AssignMaterialToInstance(long owlModel, long owlInstance, double? r, double? g, double? b, double? t)
+        private static void AssignMaterialToInstance(long owlModel, long owlInstance, double? R, double? G, double? B, double? A)
         {
-            if (r.HasValue && g.HasValue && b.HasValue)
+            if (R.HasValue && G.HasValue && B.HasValue)
             {
                 long owlClassColorComponent = engine.GetClassByName(owlModel, "ColorComponent");
                 long owlInstanceColorComponent = engine.CreateInstance(owlClassColorComponent, "");
-                engine.SetDatatypeProperty(owlInstanceColorComponent, engine.GetPropertyByName(owlModel, "R"), r.Value);
-                engine.SetDatatypeProperty(owlInstanceColorComponent, engine.GetPropertyByName(owlModel, "G"), g.Value);
-                engine.SetDatatypeProperty(owlInstanceColorComponent, engine.GetPropertyByName(owlModel, "B"), b.Value);
+                engine.SetDatatypeProperty(owlInstanceColorComponent, engine.GetPropertyByName(owlModel, "R"), R.Value);
+                engine.SetDatatypeProperty(owlInstanceColorComponent, engine.GetPropertyByName(owlModel, "G"), G.Value);
+                engine.SetDatatypeProperty(owlInstanceColorComponent, engine.GetPropertyByName(owlModel, "B"), B.Value);
 
                 long owlClassColor = engine.GetClassByName(owlModel, "Color");
                 long owlInstanceColor = engine.CreateInstance(owlClassColor, "");
                 engine.SetObjectProperty(owlInstanceColor, engine.GetPropertyByName(owlModel, "ambient"), owlInstanceColorComponent);
-                engine.SetDatatypeProperty(owlInstanceColor, engine.GetPropertyByName(owlModel, "transparency"), (t ?? 1.0));
+                engine.SetDatatypeProperty(owlInstanceColor, engine.GetPropertyByName(owlModel, "transparency"), (A ?? 1.0));
 
                 long owlClassMaterial = engine.GetClassByName(owlModel, "Material");
                 long owlInstanceMaterial = engine.CreateInstance(owlClassMaterial, "");

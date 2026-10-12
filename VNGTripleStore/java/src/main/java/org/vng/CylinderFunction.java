@@ -21,14 +21,13 @@ import java.util.Locale;
 
 /**
  * SPARQL extension function:
- *  vng:gmCylinder(?length, ?radius [, ?segmentationParts = 36]) -> base64 geometry (xsd:string)
+ *  vng:gmCylinder(?length, ?radius [, ?segmentationParts]) -> base64 geometry (xsd:string)
  */
 public class CylinderFunction extends FunctionBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(CylinderFunction.class);
     private static final String SERVICE_BASE_URL = "http://vngservice:8080";
     private static final Duration TIMEOUT = Duration.ofMinutes(5);
-    private static final long DEFAULT_SEGMENTATION_PARTS = 36;
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(TIMEOUT)
@@ -43,22 +42,27 @@ public class CylinderFunction extends FunctionBase {
 
     @Override
     public NodeValue exec(List<NodeValue> args) {
-        NodeValue segmentationParts = args.size() > 2
-                ? args.get(2)
-                : NodeValue.makeInteger(DEFAULT_SEGMENTATION_PARTS);
+        NodeValue segmentationParts = args.size() > 2 ? args.get(2) : null;
         return exec(args.get(0), args.get(1), segmentationParts);
     }
 
     public NodeValue exec(NodeValue length, NodeValue radius, NodeValue segmentationParts) {
         requireNumber("length", length);
         requireNumber("radius", radius);
-        requireNumber("segmentationParts", segmentationParts);
+        if (segmentationParts != null) {
+            requireNumber("segmentationParts", segmentationParts);
+        }
 
         try {
             // Locale.ROOT guarantees '.' as decimal separator
             String query = String.format(Locale.ROOT,
-                    "handler=CreateCylinder&length=%s&radius=%s&segmentationParts=%d",
-                    length.getDouble(), radius.getDouble(), segmentationParts.getInteger().longValueExact());
+                    "handler=CreateCylinder&length=%s&radius=%s",
+                    length.getDouble(), radius.getDouble());
+
+            if (segmentationParts != null) {
+                query += String.format(Locale.ROOT, "&segmentationParts=%d",
+                        segmentationParts.getInteger().longValueExact());
+            }
 
             URI uri = URI.create(SERVICE_BASE_URL + "/GeometryModeling?" + query);
             LOG.debug("gmCylinder: GET {}", uri);

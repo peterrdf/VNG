@@ -104,10 +104,14 @@ namespace VNGService.Pages
 
                         if (geometryInstance != 0)
                         {
-                            var modelPath = Path.Combine(modelsDir, $"Area_{item.Identificatie}.bin");
-                            Engine.SaveInstanceTree(geometryInstance, modelPath);
-                            var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
-                            System.IO.File.Delete(modelPath);
+                            using var memoryStream = new MemoryStream();
+                            Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
+                            {
+                                byte[] buffer = new byte[size];
+                                Marshal.Copy(value, buffer, 0, (int)size);
+
+                                memoryStream.Write(buffer, 0, (int)size);
+                            }, 20000);
 
                             areas.Add(new Area
                             {
@@ -115,7 +119,7 @@ namespace VNGService.Pages
                                 Name = item.Naam ?? "$",
                                 Group = item.Groep?.Waarde ?? "$",
                                 Type = item.Type?.Waarde ?? "$",
-                                Geometry = base64Content
+                                Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
                             });
                         }
                     }
@@ -411,10 +415,14 @@ namespace VNGService.Pages
                                 SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
                             }
 
-                            var modelPath = Path.Combine(modelsDir, $"DestinationArea_{planDetails.Embedded.Bestemmingsvlakken[j].Id}.bin");
-                            Engine.SaveInstanceTree(geometryInstance, modelPath);
-                            var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
-                            System.IO.File.Delete(modelPath);
+                            using var memoryStream = new MemoryStream();
+                            Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
+                            {
+                                byte[] buffer = new byte[size];
+                                Marshal.Copy(value, buffer, 0, (int)size);
+
+                                memoryStream.Write(buffer, 0, (int)size);
+                            }, 20000);
 
                             zoningAreas.Add(new Area
                             {
@@ -422,7 +430,7 @@ namespace VNGService.Pages
                                 Name = planDetails.Embedded.Bestemmingsvlakken[j].Naam,
                                 Group = planDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
                                 Type = planDetails.Embedded.Bestemmingsvlakken[j].Type,
-                                Geometry = base64Content
+                                Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
                             });
                         }
                     }
@@ -468,10 +476,14 @@ namespace VNGService.Pages
                                         SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
                                     }
 
-                                    var modelPath = Path.Combine(modelsDir, $"DestinationArea_{nextPlanDetails.Embedded.Bestemmingsvlakken[j].Id}.bin");    
-                                    Engine.SaveInstanceTree(geometryInstance, modelPath);
-                                    var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
-                                    System.IO.File.Delete(modelPath);
+                                    using var memoryStream = new MemoryStream();
+                                    Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
+                                    {
+                                        byte[] buffer = new byte[size];
+                                        Marshal.Copy(value, buffer, 0, (int)size);
+
+                                        memoryStream.Write(buffer, 0, (int)size);
+                                    }, 20000);
 
                                     zoningAreas.Add(new Area
                                     {
@@ -479,7 +491,7 @@ namespace VNGService.Pages
                                         Name = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
                                         Group = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
                                         Type = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Type,
-                                        Geometry = base64Content
+                                        Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
                                     });
                                 }
                             }

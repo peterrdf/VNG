@@ -34,15 +34,13 @@ namespace VNGService.Pages
                 return new JsonResult(new { Projection = "" });
             }
 
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
+
             var tempId = Guid.NewGuid().ToString("N");
             var modelPath = Path.Combine(modelsDir, $"{tempId}.bin");
             System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
-
-            long owlModel = Engine.CreateModel(); 
-            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
-
             long owlInstanceInput = Engine.ImportModel(owlModel, modelPath);
-
             System.IO.File.Delete(modelPath);
 
             double[]? transformationMatrix = null;
@@ -69,15 +67,13 @@ namespace VNGService.Pages
                 return new JsonResult(new { Projection = "" });
             }
 
-            var tempId = Guid.NewGuid().ToString("N");
-            var modelPath = Path.Combine(modelsDir, $"{tempId}.bin");
-            System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
-
-            long owlModel = Engine.CreateModel(); 
+            long owlModel = Engine.CreateModel();
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
+            var tempId = Guid.NewGuid().ToString("N");
+            var modelPath = Path.Combine(modelsDir, $"{tempId}.bin");
+            System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content)); 
             long owlInstanceInput = Engine.ImportModel(owlModel, modelPath);
-
             System.IO.File.Delete(modelPath);
 
             long owlInstancePlane = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Plane"));
@@ -93,18 +89,20 @@ namespace VNGService.Pages
             Engine.SetObjectProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "plane"), owlInstancePlane);
             Engine.SetObjectProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "lightDirection"), owlInstanceVector3);
             Engine.SetObjectProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "object"), owlInstanceInput);
-            Engine.SetDatatypeProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "type"), (long)1);            
+            Engine.SetDatatypeProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "type"), (long)1);
 
-            modelPath = Path.Combine(modelsDir, $"projection_{tempId}.bin");
-            Engine.SaveInstanceTree(owlInstanceShadow, modelPath);
+            using var memoryStream = new MemoryStream();
+            Engine.SaveInstanceTreeS(owlInstanceShadow, (value, size) =>
+            {
+                byte[] buffer = new byte[size];
+                Marshal.Copy(value, buffer, 0, (int)size);
 
-            var projectionBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
-
-            System.IO.File.Delete(modelPath);
+                memoryStream.Write(buffer, 0, (int)size);
+            }, 20000);
 
             Engine.CloseModel(owlModel);            
 
-            return new JsonResult(new { Projection = projectionBase64Content });
+            return new JsonResult(new { Projection = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
         }
 
         public IActionResult OnPostTopologicalRelation([FromForm] string base64Content1, [FromForm] string base64Content2)
@@ -130,16 +128,12 @@ namespace VNGService.Pages
 
                 var modelPath1 = Path.Combine(modelsDir, $"{tempId}_1.bin");
                 System.IO.File.WriteAllBytes(modelPath1, Convert.FromBase64String(base64Content1));
-
                 long owlInstanceInputOne = Engine.ImportModel(owlModel, modelPath1);
-
                 System.IO.File.Delete(modelPath1);
 
                 var modelPath2 = Path.Combine(modelsDir, $"{tempId}_2.bin");
                 System.IO.File.WriteAllBytes(modelPath2, Convert.FromBase64String(base64Content2));
-
                 long owlInstanceInputTwo = Engine.ImportModel(owlModel, modelPath2);
-
                 System.IO.File.Delete(modelPath2);
 
                 topologicalRelation = GetTopologicalRelation(owlModel, owlInstanceInputOne, owlInstanceInputTwo);
@@ -178,9 +172,7 @@ namespace VNGService.Pages
 
                 var modelPath1 = Path.Combine(modelsDir, $"{tempId}_1.bin");
                 System.IO.File.WriteAllBytes(modelPath1, Convert.FromBase64String(base64Content1));
-
                 long owlInstanceInputOne = Engine.ImportModel(owlModel, modelPath1);
-
                 System.IO.File.Delete(modelPath1);
 
                 var base64Datas = base64Content2.Split('|');
@@ -190,9 +182,7 @@ namespace VNGService.Pages
                     {
                         var modelPath2 = Path.Combine(modelsDir, $"{tempId}_2_{i}.bin");
                         System.IO.File.WriteAllBytes(modelPath2, Convert.FromBase64String(base64Datas[i]));
-
                         long owlInstanceInputTwo = Engine.ImportModel(owlModel, modelPath2);
-
                         System.IO.File.Delete(modelPath2);
 
                         topologicalRelation = GetTopologicalRelation(owlModel, owlInstanceInputOne, owlInstanceInputTwo);
@@ -206,9 +196,7 @@ namespace VNGService.Pages
                 {
                     var modelPath2 = Path.Combine(modelsDir, $"{tempId}_2.bin");
                     System.IO.File.WriteAllBytes(modelPath2, Convert.FromBase64String(base64Content2));
-
                     long owlInstanceInputTwo = Engine.ImportModel(owlModel, modelPath2);
-
                     System.IO.File.Delete(modelPath2);
 
                     topologicalRelation = GetTopologicalRelation(owlModel, owlInstanceInputOne, owlInstanceInputTwo);

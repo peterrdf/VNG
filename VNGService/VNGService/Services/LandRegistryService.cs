@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using RDF;
 using System;
 using System.Diagnostics;
@@ -208,16 +209,20 @@ namespace VNGService.Services
                                 }
                             }
 
-                            var modelPath = Path.Combine(modelsDir, $"Building_{feature.Id}.bin");
-                            Engine.SaveInstanceTree(owlBuildingInstance, modelPath);
-                            var base64Content = Convert.ToBase64String(File.ReadAllBytes(modelPath));
-                            File.Delete(modelPath);
+                            using var memoryStream = new MemoryStream();
+                            Engine.SaveInstanceTreeS(owlBuildingInstance, (value, size) =>
+                            {
+                                byte[] buffer = new byte[size];
+                                Marshal.Copy(value, buffer, 0, (int)size);
+
+                                memoryStream.Write(buffer, 0, (int)size);
+                            }, 20000);
 
                             buildings.Add(new Building
                             {
                                 Id = premiseId,
                                 Name = buildingName,
-                                Geometry = base64Content
+                                Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
                             });
                         }
                     }
@@ -292,16 +297,22 @@ namespace VNGService.Services
                             //value = parcel.Perceel?.AKRKadastraleGemeenteCodeWaarde ?? "$";
                             //SetStringPropertyW(owlParcelInstance, AKRKadastraleGemeenteCodeWaardeProperty, value);
 
-                            var modelPath = Path.Combine(modelsDir, $"Parcel_{parcel.Perceel!.IdentificatieLokaalID}.bin");
-                            Engine.SaveInstanceTree(owlParcelInstance, modelPath);
-                            var base64Content = Convert.ToBase64String(File.ReadAllBytes(modelPath));
-                            File.Delete(modelPath);
+                            using var memoryStream = new MemoryStream();
+                            Engine.SaveInstanceTreeS(owlParcelInstance, (value, size) =>
+                            {
+                                byte[] buffer = new byte[size];
+                                Marshal.Copy(value, buffer, 0, (int)size);
+
+                                memoryStream.Write(buffer, 0, (int)size);
+                            }, 20000);
+
+                            Engine.CloseModel(owlModel);
 
                             parcels.Add(new Parcel
                             {
                                 Id = parcel.Perceel.IdentificatieLokaalID,
                                 Name = parcel.Perceel?.KadastraleGemeenteWaarde ?? "$",
-                                Geometry = base64Content
+                                Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
                             });
                         }
                     }

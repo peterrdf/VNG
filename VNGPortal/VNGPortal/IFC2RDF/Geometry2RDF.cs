@@ -87,7 +87,7 @@ namespace VNGPortal.IFC2RDF
 
                     if (prGeometry.Value.OwlInstance != 0 && !string.IsNullOrEmpty(globalId))
                     {
-                        var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{resultId}.bin");
+                        var base64Content = string.Empty;
 
                         long owlTransformationInstance = CreateMapConversionTransformation(sdaiModel, dScale, out double dEastings, out double dNorthings);
                         if (owlTransformationInstance != 0)
@@ -96,12 +96,30 @@ namespace VNGPortal.IFC2RDF
                                 owlTransformationInstance,
                                 Engine.GetPropertyByName(owlModel, "object"),
                                 prGeometry.Value.OwlInstance);
-                            Engine.SaveInstanceTree(owlTransformationInstance, modelPath);
+
+                            using var memoryStream = new MemoryStream();
+                            Engine.SaveInstanceTreeS(owlTransformationInstance, (value, size) =>
+                            {
+                                byte[] buffer = new byte[size];
+                                Marshal.Copy(value, buffer, 0, (int)size);
+
+                                memoryStream.Write(buffer, 0, (int)size);
+                            }, 20000);
+                            base64Content = Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length);
+
                             Engine.RemoveInstance(owlTransformationInstance);
                         }
                         else
                         {
-                            Engine.SaveInstanceTree(prGeometry.Value.OwlInstance, modelPath);
+                            using var memoryStream = new MemoryStream();
+                            Engine.SaveInstanceTreeS(prGeometry.Value.OwlInstance, (value, size) =>
+                            {
+                                byte[] buffer = new byte[size];
+                                Marshal.Copy(value, buffer, 0, (int)size);
+
+                                memoryStream.Write(buffer, 0, (int)size);
+                            }, 20000);
+                            base64Content = Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length);
                         }
 
                         //// BBox
@@ -113,9 +131,6 @@ namespace VNGPortal.IFC2RDF
                         //// Scale
                         //startVector[0] *= dScale; startVector[1] *= dScale; startVector[2] *= dScale;
                         //endVector[0] *= dScale; endVector[1] *= dScale; endVector[2] *= dScale;
-
-                        var base64Content = Convert.ToBase64String(File.ReadAllBytes(modelPath));
-                        File.Delete(modelPath);
 
                         // Sanitize entity & expressID
                         var safeEntityName = ToSafeTurtleLocalName(prGeometry.Value.Entity ?? string.Empty);

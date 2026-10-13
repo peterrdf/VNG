@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RDF;
 using System;
+using System.Runtime.InteropServices;
 
 namespace VNGService.Pages
 {
@@ -23,8 +24,6 @@ namespace VNGService.Pages
 
         public IActionResult OnGetCreateCylinder(double length, double radius, long? segmentationParts)
         {
-            var base64Content = string.Empty;
-
             long owlModel = Engine.CreateModel(); 
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
@@ -36,12 +35,16 @@ namespace VNGService.Pages
                 Engine.SetDatatypeProperty(owlInstanceCylinder, Engine.GetPropertyByName(owlModel, "radius"), radius);
                 Engine.SetDatatypeProperty(owlInstanceCylinder, Engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts ?? 36);
 
-                var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                Engine.SaveInstanceTree(owlInstanceCylinder, modelPath);
-                base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
-                System.IO.File.Delete(modelPath);
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlInstanceCylinder, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                return new JsonResult(new { Geometry = base64Content });
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
             }
             catch (Exception ex)
             {
@@ -56,8 +59,6 @@ namespace VNGService.Pages
 
         public IActionResult OnGetCreateSphere(double radius, long? segmentationParts)
         {
-            var base64Content = string.Empty;
-
             long owlModel = Engine.CreateModel(); 
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
@@ -68,12 +69,16 @@ namespace VNGService.Pages
                 Engine.SetDatatypeProperty(owlInstanceSphere, Engine.GetPropertyByName(owlModel, "radius"), radius);
                 Engine.SetDatatypeProperty(owlInstanceSphere, Engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts ?? 36);
 
-                var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                Engine.SaveInstanceTree(owlInstanceSphere, modelPath);
-                base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
-                System.IO.File.Delete(modelPath);
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlInstanceSphere, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                return new JsonResult(new { Geometry = base64Content });
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
             }
             catch (Exception ex)
             {
@@ -88,8 +93,6 @@ namespace VNGService.Pages
 
         public IActionResult OnGetCreateBox(double length, double width, double height)
         {
-            var base64Content = string.Empty;
-
             long owlModel = Engine.CreateModel(); 
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
@@ -101,12 +104,16 @@ namespace VNGService.Pages
                 Engine.SetDatatypeProperty(owlInstanceBox, Engine.GetPropertyByName(owlModel, "width"), width);
                 Engine.SetDatatypeProperty(owlInstanceBox, Engine.GetPropertyByName(owlModel, "height"), height);
 
-                var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                Engine.SaveInstanceTree(owlInstanceBox, modelPath);
-                base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
-                System.IO.File.Delete(modelPath);
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlInstanceBox, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                return new JsonResult(new { Geometry = base64Content });
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
             }
             catch (Exception ex)
             {
@@ -121,8 +128,6 @@ namespace VNGService.Pages
 
         public IActionResult OnGetCreatePlane(double a, double b, double c, double d)
         {
-            var base64Content = string.Empty;
-
             long owlModel = Engine.CreateModel();
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
@@ -135,12 +140,16 @@ namespace VNGService.Pages
                 Engine.SetDatatypeProperty(owlInstancePlane, Engine.GetPropertyByName(owlModel, "C"), c);
                 Engine.SetDatatypeProperty(owlInstancePlane, Engine.GetPropertyByName(owlModel, "D"), d);
 
-                var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                Engine.SaveInstanceTree(owlInstancePlane, modelPath);
-                base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
-                System.IO.File.Delete(modelPath);
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlInstancePlane, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                return new JsonResult(new { Geometry = base64Content });
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
             }
             catch (Exception ex)
             {
@@ -180,12 +189,16 @@ namespace VNGService.Pages
                 Engine.SetObjectProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "object"), owlInstanceInput);
                 Engine.SetDatatypeProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "type"), (long)1);
 
-                var projectionPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                Engine.SaveInstanceTree(owlInstanceShadow, projectionPath);
-                var base64Projection = Convert.ToBase64String(System.IO.File.ReadAllBytes(projectionPath));
-                System.IO.File.Delete(projectionPath);
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlInstanceShadow, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                return new JsonResult(new { Geometry = base64Projection });
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
             }
             catch (Exception ex)
             {
@@ -247,12 +260,16 @@ namespace VNGService.Pages
                     Engine.GetPropertyByName(owlModel, "object"),
                     owlRootInstance);
 
-                var translatedModelPath = Path.Combine(Path.GetTempPath(), $"translated_{Guid.NewGuid()}.bin");
-                Engine.SaveInstanceTree(owlTransformationInstance, translatedModelPath);
-                var translatedBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(translatedModelPath));
-                System.IO.File.Delete(translatedModelPath);
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlTransformationInstance, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                return new JsonResult(new { Geometry = translatedBase64Content });
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
             }
             catch (Exception ex)
             {
@@ -300,12 +317,16 @@ namespace VNGService.Pages
                     Engine.GetPropertyByName(owlModel, "object"),
                     owlRootInstance);
 
-                var rotatedModelPath = Path.Combine(Path.GetTempPath(), $"rotated_{Guid.NewGuid()}.bin");
-                Engine.SaveInstanceTree(owlTransformationInstance, rotatedModelPath);
-                var rotatedBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(rotatedModelPath));
-                System.IO.File.Delete(rotatedModelPath);
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlTransformationInstance, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                return new JsonResult(new { Geometry = rotatedBase64Content });
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
             }
             catch (Exception ex)
             {
@@ -344,12 +365,16 @@ namespace VNGService.Pages
                 Engine.SetDatatypeProperty(owlInstanceBooleanOperation, Engine.GetPropertyByName(owlModel, "type"), type);
                 Engine.CalculateInstance(owlInstanceBooleanOperation, out long _, out long _);
 
-                var unionModelPath = Path.Combine(Path.GetTempPath(), $"union_{Guid.NewGuid()}.bin");
-                Engine.SaveInstanceTree(owlInstanceBooleanOperation, unionModelPath);
-                var unionBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(unionModelPath));
-                System.IO.File.Delete(unionModelPath);
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlInstanceBooleanOperation, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                return new JsonResult(new { Geometry = unionBase64Content });
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
             }
             catch (Exception ex)
             {
@@ -378,12 +403,16 @@ namespace VNGService.Pages
 
                 AssignMaterialToInstance(owlModel, owlRootInstance, R, G, B, A);
 
-                var coloredPath = Path.Combine(Path.GetTempPath(), $"colored_{Guid.NewGuid()}.bin");
-                Engine.SaveInstanceTree(owlRootInstance, coloredPath);
-                var coloredBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(coloredPath));
-                System.IO.File.Delete(coloredPath);
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlRootInstance, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                return new JsonResult(new { Geometry = coloredBase64Content });
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
             }
             catch (Exception ex)
             {

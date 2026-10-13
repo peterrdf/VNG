@@ -218,5 +218,66 @@ WHERE {
 				</queries>
 			</parameters>
 		</step>
+		<step>
+			<name><![CDATA[Geometry Modeling]]></name>
+			<description>
+				<![CDATA[
+				    Geometry Modeling: Cylinder's Area, Volume & Content.
+			    ]]>
+			</description>
+			<type><![CDATA[TEXTVIEW]]></type>
+			<parameters>
+				<queries>
+					<sparql>
+						<id><![CDATA[Geometry Area: Cylinder's Area, Volume & Content.]]></id>
+						<query>
+							<![CDATA[
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?area
+WHERE {
+	BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+	BIND(vng:gmArea(?a) AS ?area)
+}
+							]]>
+						</query>
+						<valueVariable><![CDATA[area]]></valueVariable>
+						<valueVariableLabel><![CDATA[Area]]></valueVariableLabel>						
+					</sparql>
+					<sparql>
+						<id><![CDATA[Geometry Area: Cylinder's Area, Volume & Content.]]></id>
+						<query>
+							<![CDATA[
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?volume
+WHERE {
+	BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+	BIND(vng:gmVolume(?a) AS ?volume)
+}
+							]]>
+						</query>
+						<valueVariable><![CDATA[volume]]></valueVariable>
+						<valueVariableLabel><![CDATA[Volume]]></valueVariableLabel>
+					</sparql>
+					<sparql>
+						<id><![CDATA[Geometry Area: Cylinder's Area, Volume & Content.]]></id>
+						<query>
+							<![CDATA[
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?content
+WHERE {
+	BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+	BIND(vng:gmContent(?a) AS ?content)
+}
+							]]>
+						</query>
+						<valueVariable><![CDATA[content]]></valueVariable>
+						<valueVariableLabel><![CDATA[Content]]></valueVariableLabel>
+					</sparql>
+				</queries>
+			</parameters>
+		</step>
 	</steps>
 </workflow>

@@ -104,7 +104,7 @@ public class IndexModel : PageModel
         // Add null terminator to byte arrays for P/Invoke marshaling
         var filePathBytes = Encoding.UTF8.GetBytes(filePath + "\0");
         var schemaBytes = Encoding.UTF8.GetBytes("\0");
-        var sdaiModel = ifcengine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
+        var sdaiModel = IFCEngine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
         if (sdaiModel == 0)
         {
             _logger.LogError("Failed to open IFC model: {FilePath}", filePath);
@@ -115,23 +115,23 @@ public class IndexModel : PageModel
         double dNorthings = 0.0;
 
         long owlModel = 0;
-        ifcengine.owlGetModel(sdaiModel, out owlModel);
+        IFCEngine.owlGetModel(sdaiModel, out owlModel);
 
-        long sdaiAggr = ifcengine.sdaiGetEntityExtentBN(sdaiModel, "IFCMAPCONVERSION");
+        long sdaiAggr = IFCEngine.sdaiGetEntityExtentBN(sdaiModel, "IFCMAPCONVERSION");
         if (sdaiAggr == 0)
         {
             _logger.LogWarning("No IFCMAPCONVERSION entity found in the model.");
             return Task.FromResult(false);
         }
 
-        ifcengine.engiGetAggrElement(sdaiAggr, 0, ifcengine.sdaiINSTANCE, out long sdaiIfcMapConversionInstance);
+        IFCEngine.engiGetAggrElement(sdaiAggr, 0, IFCEngine.sdaiINSTANCE, out long sdaiIfcMapConversionInstance);
         if (sdaiIfcMapConversionInstance == 0)
         {
             _logger.LogWarning("No instance of IFCMAPCONVERSION found in the model.");
             return Task.FromResult(false);
         }
 
-        long sdaiIfcMapConversionEntity = ifcengine.sdaiGetInstanceType(sdaiIfcMapConversionInstance);
+        long sdaiIfcMapConversionEntity = IFCEngine.sdaiGetInstanceType(sdaiIfcMapConversionInstance);
         if (sdaiIfcMapConversionEntity == 0)
         {
             _logger.LogWarning("Failed to get the entity type of the IFCMAPCONVERSION instance.");
@@ -139,7 +139,7 @@ public class IndexModel : PageModel
         }
 
         long iIndex = 0;
-        long sdaiAttr = ifcengine.engiGetEntityAttributeByIndex(
+        long sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
             sdaiIfcMapConversionEntity,
             iIndex++,
             false,
@@ -147,16 +147,16 @@ public class IndexModel : PageModel
 
         while (sdaiAttr != 0)
         {
-            ifcengine.engiGetEntityArgumentName(sdaiIfcMapConversionEntity,
+            IFCEngine.engiGetEntityArgumentName(sdaiIfcMapConversionEntity,
                 iIndex,
-                ifcengine.sdaiSTRING,
+                IFCEngine.sdaiSTRING,
                 out IntPtr attributeName);
             if (attributeName != IntPtr.Zero)
             {
                 string? strAttributeName = Marshal.PtrToStringAnsi(attributeName);
                 if (strAttributeName == "Eastings")
                 {
-                    if (ifcengine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, ifcengine.sdaiREAL, out dEastings) == 0)
+                    if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dEastings) == 0)
                     {
                         _logger.LogWarning("Failed to get Eastings attribute.");
                         return Task.FromResult(false);
@@ -164,7 +164,7 @@ public class IndexModel : PageModel
                 }
                 else if (strAttributeName == "Northings")
                 {
-                    if (ifcengine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, ifcengine.sdaiREAL, out dNorthings) == 0)
+                    if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dNorthings) == 0)
                     {
                         _logger.LogWarning("Failed to get Northings attribute.");
                         return Task.FromResult(false);
@@ -172,7 +172,7 @@ public class IndexModel : PageModel
                 }
             }
 
-            sdaiAttr = ifcengine.engiGetEntityAttributeByIndex(
+            sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
                 sdaiIfcMapConversionEntity,
                 iIndex++,
                 false,

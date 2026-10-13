@@ -311,7 +311,7 @@ namespace VNGPortal.SPARQL
 
                     var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{resultId}.bin");
                     File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Data));
-                    engine.ImportModel(owlModel, modelPath);
+                    Engine.ImportModel(owlModel, modelPath);
                     File.Delete(modelPath);
                 }
 

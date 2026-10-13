@@ -8,12 +8,6 @@ namespace VNGPortal.IFC2RDF
     public class Geometry2RDF
     {
         #region Constants
-        private const long flagbit0 = 1;   // 2^^0
-        private const long flagbit1 = 2;   // 2^^1
-        private const long flagbit2 = 4;   // 2^^2
-        private const long flagbit3 = 8;   // 2^^3
-        private const long flagbit4 = 16;   // 2^^4
-
         private const string GraphIRI = "https://vng.nl/geometries/";
 
         // Sanitize a string so it is safe to use as a Turtle local name
@@ -57,18 +51,15 @@ namespace VNGPortal.IFC2RDF
                 }
 
                 // Scale
-                double dScale = ifcengine.getProjectUnitConversionFactor(sdaiModel, "LENGTHUNIT", out IntPtr _, out IntPtr _, out IntPtr _);
+                double dScale = IFCEngine.getProjectUnitConversionFactor(sdaiModel, "LENGTHUNIT", out IntPtr _, out IntPtr _, out IntPtr _);
                 if (dScale == 0.0)
                 {
                     dScale = 1.0;
                 }
 
                 long owlModel = 0;
-                ifcengine.owlGetModel(sdaiModel, out owlModel);
-
-                long setting = flagbit0 + flagbit4;
-                long mask = flagbit0 + flagbit4;
-                engine.SetOverrideFileIO(owlModel, setting, mask);
+                IFCEngine.owlGetModel(sdaiModel, out owlModel);
+                Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
                 var sb = new StringBuilder();
                 sb.AppendLine("@prefix geom:     <https://vng.nl/geometry/> .");
@@ -85,9 +76,9 @@ namespace VNGPortal.IFC2RDF
                 var resultId = Guid.NewGuid().ToString();
                 foreach (var prGeometry in model.Geometries)
                 {
-                    long expressID = ifcengine.internalGetP21Line(prGeometry.Value.Instance);
+                    long expressID = IFCEngine.internalGetP21Line(prGeometry.Value.Instance);
 
-                    ifcengine.sdaiGetAttrBN(prGeometry.Value.Instance, "GlobalId", ifcengine.sdaiSTRING, out IntPtr ptrGlobalId);
+                    IFCEngine.sdaiGetAttrBN(prGeometry.Value.Instance, "GlobalId", IFCEngine.sdaiSTRING, out IntPtr ptrGlobalId);
                     string? globalId = string.Empty;
                     if (ptrGlobalId != IntPtr.Zero)
                     {
@@ -101,23 +92,23 @@ namespace VNGPortal.IFC2RDF
                         long owlTransformationInstance = CreateMapConversionTransformation(sdaiModel, dScale, out double dEastings, out double dNorthings);
                         if (owlTransformationInstance != 0)
                         {
-                            engine.SetObjectProperty(
+                            Engine.SetObjectProperty(
                                 owlTransformationInstance,
-                                engine.GetPropertyByName(owlModel, "object"),
+                                Engine.GetPropertyByName(owlModel, "object"),
                                 prGeometry.Value.OwlInstance);
-                            engine.SaveInstanceTree(owlTransformationInstance, modelPath);
-                            engine.RemoveInstance(owlTransformationInstance);
+                            Engine.SaveInstanceTree(owlTransformationInstance, modelPath);
+                            Engine.RemoveInstance(owlTransformationInstance);
                         }
                         else
                         {
-                            engine.SaveInstanceTree(prGeometry.Value.OwlInstance, modelPath);
+                            Engine.SaveInstanceTree(prGeometry.Value.OwlInstance, modelPath);
                         }
 
                         //// BBox
                         //double[]? transformationMatrix = null;
                         //double[] startVector = new double[3];
                         //double[] endVector = new double[3];
-                        //engine.GetBoundingBox(prGeometry.Value.OwlInstance, transformationMatrix, startVector, endVector);
+                        //Engine.GetBoundingBox(prGeometry.Value.OwlInstance, transformationMatrix, startVector, endVector);
 
                         //// Scale
                         //startVector[0] *= dScale; startVector[1] *= dScale; startVector[2] *= dScale;
@@ -164,7 +155,7 @@ namespace VNGPortal.IFC2RDF
             {
                 if (sdaiModel != 0)
                 {
-                    ifcengine.sdaiCloseModel(sdaiModel);
+                    IFCEngine.sdaiCloseModel(sdaiModel);
                 }
             }
         }
@@ -176,23 +167,23 @@ namespace VNGPortal.IFC2RDF
             dNorthings = 0.0;
 
             long owlModel = 0;
-            ifcengine.owlGetModel(sdaiModel, out owlModel);
+            IFCEngine.owlGetModel(sdaiModel, out owlModel);
 
-            long sdaiAggr = ifcengine.sdaiGetEntityExtentBN(sdaiModel, "IFCMAPCONVERSION");
+            long sdaiAggr = IFCEngine.sdaiGetEntityExtentBN(sdaiModel, "IFCMAPCONVERSION");
             if (sdaiAggr == 0)
             {
                 _logger.LogWarning("No IFCMAPCONVERSION entity found in the model.");
                 return 0;
             }
 
-            ifcengine.engiGetAggrElement(sdaiAggr, 0, ifcengine.sdaiINSTANCE, out long sdaiIfcMapConversionInstance);
+            IFCEngine.engiGetAggrElement(sdaiAggr, 0, IFCEngine.sdaiINSTANCE, out long sdaiIfcMapConversionInstance);
             if (sdaiIfcMapConversionInstance == 0)
             {
                 _logger.LogWarning("No instance of IFCMAPCONVERSION found in the model.");
                 return 0;
             }
 
-            long sdaiIfcMapConversionEntity = ifcengine.sdaiGetInstanceType(sdaiIfcMapConversionInstance);
+            long sdaiIfcMapConversionEntity = IFCEngine.sdaiGetInstanceType(sdaiIfcMapConversionInstance);
             if (sdaiIfcMapConversionEntity == 0)
             {
                 _logger.LogWarning("Failed to get the entity type of the IFCMAPCONVERSION instance.");
@@ -207,7 +198,7 @@ namespace VNGPortal.IFC2RDF
             bool bHasXAxisOrdinate = false;
 
             long iIndex = 0;
-            long sdaiAttr = ifcengine.engiGetEntityAttributeByIndex(
+            long sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
                 sdaiIfcMapConversionEntity,
                 iIndex++,
                 false,
@@ -215,34 +206,34 @@ namespace VNGPortal.IFC2RDF
 
             while (sdaiAttr != 0)
             {
-                ifcengine.engiGetEntityArgumentName(sdaiIfcMapConversionEntity,
+                IFCEngine.engiGetEntityArgumentName(sdaiIfcMapConversionEntity,
                     iIndex,
-                    ifcengine.sdaiSTRING,
+                    IFCEngine.sdaiSTRING,
                     out IntPtr attributeName);
                 if (attributeName != IntPtr.Zero)
                 {
                     string? strAttributeName = Marshal.PtrToStringAnsi(attributeName);
                     if (strAttributeName == "Eastings")
                     {
-                        ifcengine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, ifcengine.sdaiREAL, out dEastings);
+                        IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dEastings);
                     }
                     else if (strAttributeName == "Northings")
                     {
-                        ifcengine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, ifcengine.sdaiREAL, out dNorthings);
+                        IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dNorthings);
                     }
                     else if (strAttributeName == "XAxisAbscissa")
                     {
-                        ifcengine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, ifcengine.sdaiREAL, out dXAxisAbscissa);
+                        IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dXAxisAbscissa);
                         bHasXAxisAbscissa = true;
                     }
                     else if (strAttributeName == "XAxisOrdinate")
                     {
-                        ifcengine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, ifcengine.sdaiREAL, out dXAxisOrdinate);
+                        IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dXAxisOrdinate);
                         bHasXAxisOrdinate = true;
                     }
                 }
 
-                sdaiAttr = ifcengine.engiGetEntityAttributeByIndex(
+                sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
                     sdaiIfcMapConversionEntity,
                     iIndex++,
                     false,
@@ -260,7 +251,7 @@ namespace VNGPortal.IFC2RDF
             double dCos = Math.Cos(dRotationAngle) * dScale;
             double dSin = Math.Sin(dRotationAngle) * dScale;
 
-            long owlMatrixInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "Matrix"));
+            long owlMatrixInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Matrix"));
 
             // Rotation + scale around Z-axis (yaw), then translation
             List<double> vecMatrix = new List<double>
@@ -278,16 +269,16 @@ namespace VNGPortal.IFC2RDF
                 dNorthings, // _42
                 0.0,        // _43
             };
-            engine.SetDatatypeProperty(
+            Engine.SetDatatypeProperty(
                             owlMatrixInstance,
-                            engine.GetPropertyByName(owlModel, "coordinates"),
+                            Engine.GetPropertyByName(owlModel, "coordinates"),
                             vecMatrix.ToArray(),
                             vecMatrix.Count);
 
-            long owlTransformationInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "Transformation"));
-            engine.SetObjectProperty(
+            long owlTransformationInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Transformation"));
+            Engine.SetObjectProperty(
                                 owlTransformationInstance,
-                                engine.GetPropertyByName(owlModel, "matrix"),
+                                Engine.GetPropertyByName(owlModel, "matrix"),
                                 owlMatrixInstance);
 
             return owlTransformationInstance;

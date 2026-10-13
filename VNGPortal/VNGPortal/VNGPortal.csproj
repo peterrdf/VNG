@@ -274,4 +274,11 @@
 	  <Folder Include="Services\" />
 	</ItemGroup>
 
+	<PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('linux'))">
+		<DefineConstants>$(DefineConstants);LINUX</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('win'))">
+		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+	</PropertyGroup>
+
 </Project>

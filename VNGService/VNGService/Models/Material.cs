@@ -14,49 +14,49 @@ namespace VNGService.Models
 
         public static long GetPlanDefaultMaterial(long owlModel)
         {
-            long owlColorComponentInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "ColorComponent"));
+            long owlColorComponentInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "ColorComponent"));
 
             double value = 0.95;
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "R"),
+                RDF.Engine.GetPropertyByName(owlModel, "R"),
                 ref value,
                 1);
 
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "G"),
+                RDF.Engine.GetPropertyByName(owlModel, "G"),
                 ref value,
                 1);
 
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "B"),
+                RDF.Engine.GetPropertyByName(owlModel, "B"),
                 ref value,
                 1);
 
-            long owlColorInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "Color"));
-            RDF.engine.SetObjectProperty(
+            long owlColorInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "Color"));
+            RDF.Engine.SetObjectProperty(
                owlColorInstance,
-               RDF.engine.GetPropertyByName(owlModel, "ambient"),
+               RDF.Engine.GetPropertyByName(owlModel, "ambient"),
                ref owlColorComponentInstance,
                1);
-            RDF.engine.SetObjectProperty(
+            RDF.Engine.SetObjectProperty(
               owlColorInstance,
-              RDF.engine.GetPropertyByName(owlModel, "diffuse"),
+              RDF.Engine.GetPropertyByName(owlModel, "diffuse"),
               ref owlColorComponentInstance,
               1);
             //double transparency = 0.75;
-            //RDF.engine.SetDatatypeProperty(
+            //RDF.Engine.SetDatatypeProperty(
             //    owlColorInstance,
-            //    RDF.engine.GetPropertyByName(owlModel, "transparency"),
+            //    RDF.Engine.GetPropertyByName(owlModel, "transparency"),
             //    ref transparency,
             //    1);
 
-            long owlMaterialInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "Material"));
-            RDF.engine.SetObjectProperty(
+            long owlMaterialInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "Material"));
+            RDF.Engine.SetObjectProperty(
                 owlMaterialInstance,
-                RDF.engine.GetPropertyByName(owlModel, "color"),
+                RDF.Engine.GetPropertyByName(owlModel, "color"),
                 ref owlColorInstance,
                 1);
 
@@ -65,43 +65,43 @@ namespace VNGService.Models
 
         public static long GetParcelDefaultMaterial(long owlModel)
         {
-            long owlColorComponentInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "ColorComponent"));
+            long owlColorComponentInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "ColorComponent"));
 
             double value = 0.85;
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "R"),
+                RDF.Engine.GetPropertyByName(owlModel, "R"),
                 ref value,
                 1);
 
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "G"),
+                RDF.Engine.GetPropertyByName(owlModel, "G"),
                 ref value,
                 1);
 
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "B"),
+                RDF.Engine.GetPropertyByName(owlModel, "B"),
                 ref value,
                 1);
             
-            long owlColorInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "Color"));
-            RDF.engine.SetObjectProperty(
+            long owlColorInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "Color"));
+            RDF.Engine.SetObjectProperty(
                owlColorInstance,
-               RDF.engine.GetPropertyByName(owlModel, "ambient"),
+               RDF.Engine.GetPropertyByName(owlModel, "ambient"),
                ref owlColorComponentInstance,
                1);
-            RDF.engine.SetObjectProperty(
+            RDF.Engine.SetObjectProperty(
               owlColorInstance,
-              RDF.engine.GetPropertyByName(owlModel, "diffuse"),
+              RDF.Engine.GetPropertyByName(owlModel, "diffuse"),
               ref owlColorComponentInstance,
               1);
 
-            long owlMaterialInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "Material"));
-            RDF.engine.SetObjectProperty(
+            long owlMaterialInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "Material"));
+            RDF.Engine.SetObjectProperty(
                 owlMaterialInstance,
-                RDF.engine.GetPropertyByName(owlModel, "color"),
+                RDF.Engine.GetPropertyByName(owlModel, "color"),
                 ref owlColorInstance,
                 1);
 
@@ -110,45 +110,45 @@ namespace VNGService.Models
 
         public static long GetBuildingDefaultMaterial(long owlModel)
         {
-            long owlColorComponentInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "ColorComponent"));
+            long owlColorComponentInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "ColorComponent"));
 
             double value = 1.0;
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "R"),
+                RDF.Engine.GetPropertyByName(owlModel, "R"),
                 ref value,
                 1);
 
             value = 0.0;
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "G"),
+                RDF.Engine.GetPropertyByName(owlModel, "G"),
                 ref value,
                 1);
 
             value = 0.0;
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "B"),
+                RDF.Engine.GetPropertyByName(owlModel, "B"),
                 ref value,
                 1);
 
-            long owlColorInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "Color"));
-            RDF.engine.SetObjectProperty(
+            long owlColorInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "Color"));
+            RDF.Engine.SetObjectProperty(
                owlColorInstance,
-               RDF.engine.GetPropertyByName(owlModel, "ambient"),
+               RDF.Engine.GetPropertyByName(owlModel, "ambient"),
                ref owlColorComponentInstance,
                1);
-            RDF.engine.SetObjectProperty(
+            RDF.Engine.SetObjectProperty(
               owlColorInstance,
-              RDF.engine.GetPropertyByName(owlModel, "diffuse"),
+              RDF.Engine.GetPropertyByName(owlModel, "diffuse"),
               ref owlColorComponentInstance,
               1);
 
-            long owlMaterialInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "Material"));
-            RDF.engine.SetObjectProperty(
+            long owlMaterialInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "Material"));
+            RDF.Engine.SetObjectProperty(
                 owlMaterialInstance,
-                RDF.engine.GetPropertyByName(owlModel, "color"),
+                RDF.Engine.GetPropertyByName(owlModel, "color"),
                 ref owlColorInstance,
                 1);
 
@@ -157,45 +157,45 @@ namespace VNGService.Models
 
         public static long GetWaterDefaultMaterial(long owlModel)
         {
-            long owlColorComponentInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "ColorComponent"));
+            long owlColorComponentInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "ColorComponent"));
 
             double value = 0.0;
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "R"),
+                RDF.Engine.GetPropertyByName(owlModel, "R"),
                 ref value,
                 1);
 
             value = 0.0;
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "G"),
+                RDF.Engine.GetPropertyByName(owlModel, "G"),
                 ref value,
                 1);
 
             value = 1.0;
-            RDF.engine.SetDatatypeProperty(
+            RDF.Engine.SetDatatypeProperty(
                 owlColorComponentInstance,
-                RDF.engine.GetPropertyByName(owlModel, "B"),
+                RDF.Engine.GetPropertyByName(owlModel, "B"),
                 ref value,
                 1);
 
-            long owlColorInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "Color"));
-            RDF.engine.SetObjectProperty(
+            long owlColorInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "Color"));
+            RDF.Engine.SetObjectProperty(
                owlColorInstance,
-               RDF.engine.GetPropertyByName(owlModel, "ambient"),
+               RDF.Engine.GetPropertyByName(owlModel, "ambient"),
                ref owlColorComponentInstance,
                1);
-            RDF.engine.SetObjectProperty(
+            RDF.Engine.SetObjectProperty(
               owlColorInstance,
-              RDF.engine.GetPropertyByName(owlModel, "diffuse"),
+              RDF.Engine.GetPropertyByName(owlModel, "diffuse"),
               ref owlColorComponentInstance,
               1);
 
-            long owlMaterialInstance = RDF.engine.CreateInstance(RDF.engine.GetClassByName(owlModel, "Material"));
-            RDF.engine.SetObjectProperty(
+            long owlMaterialInstance = RDF.Engine.CreateInstance(RDF.Engine.GetClassByName(owlModel, "Material"));
+            RDF.Engine.SetObjectProperty(
                 owlMaterialInstance,
-                RDF.engine.GetPropertyByName(owlModel, "color"),
+                RDF.Engine.GetPropertyByName(owlModel, "color"),
                 ref owlColorInstance,
                 1);
 

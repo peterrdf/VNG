@@ -511,37 +511,37 @@ namespace VNGPortal.IFC2RDF
         protected virtual void SetFormat(int_t iModel)
         {
             int_t setting = 0, mask = 0;
-            mask += ifcengine.flagbit2;       //    PRECISION (32/64 bit)
-            mask += ifcengine.flagbit3;       //	INDEX ARRAY (32/64 bit)
-            mask += ifcengine.flagbit5;       //    NORMALS
-            mask += ifcengine.flagbit8;       //    TRIANGLES
-            mask += ifcengine.flagbit9;       //    LINES
-            mask += ifcengine.flagbit10;      //    POINTS
-            mask += ifcengine.flagbit13;      //    CONCEPTUAL FACE POLYGONS
-            mask += ifcengine.flagbit15;      //    ADVANCED NORMALS
+            mask += IFCEngine.flagbit2;       //    PRECISION (32/64 bit)
+            mask += IFCEngine.flagbit3;       //	INDEX ARRAY (32/64 bit)
+            mask += IFCEngine.flagbit5;       //    NORMALS
+            mask += IFCEngine.flagbit8;       //    TRIANGLES
+            mask += IFCEngine.flagbit9;       //    LINES
+            mask += IFCEngine.flagbit10;      //    POINTS
+            mask += IFCEngine.flagbit13;      //    CONCEPTUAL FACE POLYGONS
+            mask += IFCEngine.flagbit15;      //    ADVANCED NORMALS
 
             setting += 0;                         //    SINGLE PRECISION (float)
             setting += 0;                         //    32 BIT INDEX ARRAY (Int32)
-            setting += ifcengine.flagbit5;    //    NORMALS ON
-            setting += ifcengine.flagbit8;    //    TRIANGLES ON
-            setting += ifcengine.flagbit9;    //    LINES ON
-            setting += ifcengine.flagbit10;   //    POINTS ON
-            setting += ifcengine.flagbit13;   //    CONCEPTUAL FACE POLYGONS ON
-            setting += ifcengine.flagbit15;   //    ADVANCED NORMALS
+            setting += IFCEngine.flagbit5;    //    NORMALS ON
+            setting += IFCEngine.flagbit8;    //    TRIANGLES ON
+            setting += IFCEngine.flagbit9;    //    LINES ON
+            setting += IFCEngine.flagbit10;   //    POINTS ON
+            setting += IFCEngine.flagbit13;   //    CONCEPTUAL FACE POLYGONS ON
+            setting += IFCEngine.flagbit15;   //    ADVANCED NORMALS
 
-            RDF.engine.SetFormat(iModel, (ulong)setting, (ulong)mask);
-            RDF.engine.SetBehavior(iModel, 2048 + 4096, 2048 + 4096);
-            ifcengine.setSegmentation(iModel, 16, 0.0);
+            RDF.Engine.SetFormat(iModel, (ulong)setting, (ulong)mask);
+            RDF.Engine.SetBehavior(iModel, 2048 + 4096, 2048 + 4096);
+            IFCEngine.setSegmentation(iModel, 16, 0.0);
         }
 
         protected int_t GetModel()
         {
-            return ifcengine.sdaiGetInstanceModel(Instance);
+            return IFCEngine.sdaiGetInstanceModel(Instance);
         }
 
         protected uint GetVertexLength()
         {
-            return (uint)(RDF.engine.SetFormat(GetModel(), 0, 0) / sizeof(float));
+            return (uint)(RDF.Engine.SetFormat(GetModel(), 0, 0) / sizeof(float));
         }
 
         #endregion // Methods

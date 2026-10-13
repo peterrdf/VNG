@@ -86,14 +86,14 @@ namespace VNGPortal.IFC2RDF
 
         public static long GetColorInstance(long iMaterialInstance)
         {
-            long iModel = RDF.engine.GetModel(iMaterialInstance);
+            long iModel = RDF.Engine.GetModel(iMaterialInstance);
 
             IntPtr valuesPtr;
             long iCard = 0;
 
-            RDF.engine.GetObjectProperty(
+            RDF.Engine.GetObjectProperty(
                 iMaterialInstance,
-                RDF.engine.GetPropertyByName(iModel, "color"),
+                RDF.Engine.GetPropertyByName(iModel, "color"),
                 out valuesPtr,
                 out iCard);
 
@@ -110,14 +110,14 @@ namespace VNGPortal.IFC2RDF
 
         public static long GetColorComponentInstance(long iColorInstance, string strColorComponent)
         {
-            long iModel = RDF.engine.GetModel(iColorInstance);
+            long iModel = RDF.Engine.GetModel(iColorInstance);
 
             IntPtr valuesPtr;
             long iCard = 0;
 
-            RDF.engine.GetObjectProperty(
+            RDF.Engine.GetObjectProperty(
                 iColorInstance,
-                RDF.engine.GetPropertyByName(iModel, strColorComponent),
+                RDF.Engine.GetPropertyByName(iModel, strColorComponent),
                 out valuesPtr,
                 out iCard);
 
@@ -134,14 +134,14 @@ namespace VNGPortal.IFC2RDF
 
         public static double GetColorComponentInstanceProperty(long iColorComponentInstance, string strProperty)
         {
-            long iModel = RDF.engine.GetModel(iColorComponentInstance);
+            long iModel = RDF.Engine.GetModel(iColorComponentInstance);
 
             IntPtr valuesPtr;
             long iCard = 0;
 
-            RDF.engine.GetDatatypeProperty(
+            RDF.Engine.GetDatatypeProperty(
                 iColorComponentInstance,
-                RDF.engine.GetPropertyByName(iModel, strProperty),
+                RDF.Engine.GetPropertyByName(iModel, strProperty),
                 out valuesPtr,
                 out iCard);
 
@@ -158,14 +158,14 @@ namespace VNGPortal.IFC2RDF
 
         public static double GetTransparency(long iColorInstance)
         {
-            long iModel = RDF.engine.GetModel(iColorInstance);
+            long iModel = RDF.Engine.GetModel(iColorInstance);
 
             IntPtr valuesPtr;
             long iCard = 0;
 
-            RDF.engine.GetDatatypeProperty(
+            RDF.Engine.GetDatatypeProperty(
                 iColorInstance,
-                RDF.engine.GetPropertyByName(iModel, "transparency"),
+                RDF.Engine.GetPropertyByName(iModel, "transparency"),
                 out valuesPtr,
                 out iCard);
 
@@ -265,7 +265,7 @@ namespace VNGPortal.IFC2RDF
 
         public static _material? Create(long iConceptualFaceInstance)
         {
-            long iMaterialInstance = RDF.engine.GetConceptualFaceMaterial(iConceptualFaceInstance);
+            long iMaterialInstance = RDF.Engine.GetConceptualFaceMaterial(iConceptualFaceInstance);
             if (iMaterialInstance != 0)
             {
                 long iColorInstance = _color.GetColorInstance(iMaterialInstance);

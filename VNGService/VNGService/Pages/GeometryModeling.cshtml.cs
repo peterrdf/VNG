@@ -8,9 +8,6 @@ namespace VNGService.Pages
     [IgnoreAntiforgeryToken]
     public class GeometryModelingModel : PageModel
     {
-        private const long flagbit0 = 1;   // 2^^0
-        private const long flagbit4 = 16;  // 2^^4
-
         private readonly IConfiguration _configuration;
         private readonly ILogger<DSOModel> _logger;
 
@@ -28,21 +25,19 @@ namespace VNGService.Pages
         {
             var base64Content = string.Empty;
 
-            long owlModel = engine.CreateModel();
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel(); 
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
-                long owlClassCylinder = engine.GetClassByName(owlModel, "Cylinder");
-                long owlInstanceCylinder = engine.CreateInstance(owlClassCylinder, "");
-                engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "length"), length);
-                engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "radius"), radius);
-                engine.SetDatatypeProperty(owlInstanceCylinder, engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts ?? 36);
+                long owlClassCylinder = Engine.GetClassByName(owlModel, "Cylinder");
+                long owlInstanceCylinder = Engine.CreateInstance(owlClassCylinder, "");
+                Engine.SetDatatypeProperty(owlInstanceCylinder, Engine.GetPropertyByName(owlModel, "length"), length);
+                Engine.SetDatatypeProperty(owlInstanceCylinder, Engine.GetPropertyByName(owlModel, "radius"), radius);
+                Engine.SetDatatypeProperty(owlInstanceCylinder, Engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts ?? 36);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                engine.SaveInstanceTree(owlInstanceCylinder, modelPath);
+                Engine.SaveInstanceTree(owlInstanceCylinder, modelPath);
                 base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                 System.IO.File.Delete(modelPath);
 
@@ -55,7 +50,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
             }
         }
 
@@ -63,20 +58,18 @@ namespace VNGService.Pages
         {
             var base64Content = string.Empty;
 
-            long owlModel = engine.CreateModel();
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel(); 
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
-                long owlClassSphere = engine.GetClassByName(owlModel, "Sphere");
-                long owlInstanceSphere = engine.CreateInstance(owlClassSphere, "");
-                engine.SetDatatypeProperty(owlInstanceSphere, engine.GetPropertyByName(owlModel, "radius"), radius);
-                engine.SetDatatypeProperty(owlInstanceSphere, engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts ?? 36);
+                long owlClassSphere = Engine.GetClassByName(owlModel, "Sphere");
+                long owlInstanceSphere = Engine.CreateInstance(owlClassSphere, "");
+                Engine.SetDatatypeProperty(owlInstanceSphere, Engine.GetPropertyByName(owlModel, "radius"), radius);
+                Engine.SetDatatypeProperty(owlInstanceSphere, Engine.GetPropertyByName(owlModel, "segmentationParts"), segmentationParts ?? 36);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                engine.SaveInstanceTree(owlInstanceSphere, modelPath);
+                Engine.SaveInstanceTree(owlInstanceSphere, modelPath);
                 base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                 System.IO.File.Delete(modelPath);
 
@@ -89,7 +82,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
             }
         }
 
@@ -97,21 +90,19 @@ namespace VNGService.Pages
         {
             var base64Content = string.Empty;
 
-            long owlModel = engine.CreateModel();
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel(); 
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
-                long owlClassBox = engine.GetClassByName(owlModel, "Box");
-                long owlInstanceBox = engine.CreateInstance(owlClassBox, "");
-                engine.SetDatatypeProperty(owlInstanceBox, engine.GetPropertyByName(owlModel, "length"), length);
-                engine.SetDatatypeProperty(owlInstanceBox, engine.GetPropertyByName(owlModel, "width"), width);
-                engine.SetDatatypeProperty(owlInstanceBox, engine.GetPropertyByName(owlModel, "height"), height);
+                long owlClassBox = Engine.GetClassByName(owlModel, "Box");
+                long owlInstanceBox = Engine.CreateInstance(owlClassBox, "");
+                Engine.SetDatatypeProperty(owlInstanceBox, Engine.GetPropertyByName(owlModel, "length"), length);
+                Engine.SetDatatypeProperty(owlInstanceBox, Engine.GetPropertyByName(owlModel, "width"), width);
+                Engine.SetDatatypeProperty(owlInstanceBox, Engine.GetPropertyByName(owlModel, "height"), height);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                engine.SaveInstanceTree(owlInstanceBox, modelPath);
+                Engine.SaveInstanceTree(owlInstanceBox, modelPath);
                 base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                 System.IO.File.Delete(modelPath);
 
@@ -124,7 +115,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
             }
         }
 
@@ -132,22 +123,20 @@ namespace VNGService.Pages
         {
             var base64Content = string.Empty;
 
-            long owlModel = engine.CreateModel();
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
-                long owlClassPlane = engine.GetClassByName(owlModel, "Plane");
-                long owlInstancePlane = engine.CreateInstance(owlClassPlane, "");
-                engine.SetDatatypeProperty(owlInstancePlane, engine.GetPropertyByName(owlModel, "A"), a);
-                engine.SetDatatypeProperty(owlInstancePlane, engine.GetPropertyByName(owlModel, "B"), b);
-                engine.SetDatatypeProperty(owlInstancePlane, engine.GetPropertyByName(owlModel, "C"), c);
-                engine.SetDatatypeProperty(owlInstancePlane, engine.GetPropertyByName(owlModel, "D"), d);
+                long owlClassPlane = Engine.GetClassByName(owlModel, "Plane");
+                long owlInstancePlane = Engine.CreateInstance(owlClassPlane, "");
+                Engine.SetDatatypeProperty(owlInstancePlane, Engine.GetPropertyByName(owlModel, "A"), a);
+                Engine.SetDatatypeProperty(owlInstancePlane, Engine.GetPropertyByName(owlModel, "B"), b);
+                Engine.SetDatatypeProperty(owlInstancePlane, Engine.GetPropertyByName(owlModel, "C"), c);
+                Engine.SetDatatypeProperty(owlInstancePlane, Engine.GetPropertyByName(owlModel, "D"), d);
 
                 var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                engine.SaveInstanceTree(owlInstancePlane, modelPath);
+                Engine.SaveInstanceTree(owlInstancePlane, modelPath);
                 base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                 System.IO.File.Delete(modelPath);
 
@@ -160,7 +149,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
             }
         }
         public IActionResult OnPostCreateProjection2D([FromForm] string base64Content1, [FromForm] string base64Content2)
@@ -171,30 +160,28 @@ namespace VNGService.Pages
             var planePath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
             System.IO.File.WriteAllBytes(planePath, Convert.FromBase64String(base64Content2));
 
-            long owlModel = engine.CreateModel();
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
-                long owlInstanceInput = engine.ImportModel(owlModel, modelPath);
+                long owlInstanceInput = Engine.ImportModel(owlModel, modelPath);
                 System.IO.File.Delete(modelPath);
 
-                long owlInstancePlane = engine.ImportModel(owlModel, planePath);
+                long owlInstancePlane = Engine.ImportModel(owlModel, planePath);
                 System.IO.File.Delete(planePath);
 
-                long owlInstanceVector3 = engine.CreateInstance(engine.GetClassByName(owlModel, "Vector3"));
-                engine.SetDatatypeProperty(owlInstanceVector3, engine.GetPropertyByName(owlModel, "z"), 1.0);
+                long owlInstanceVector3 = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Vector3"));
+                Engine.SetDatatypeProperty(owlInstanceVector3, Engine.GetPropertyByName(owlModel, "z"), 1.0);
 
-                long owlInstanceShadow = engine.CreateInstance(engine.GetClassByName(owlModel, "Shadow"));
-                engine.SetObjectProperty(owlInstanceShadow, engine.GetPropertyByName(owlModel, "plane"), owlInstancePlane);
-                engine.SetObjectProperty(owlInstanceShadow, engine.GetPropertyByName(owlModel, "lightDirection"), owlInstanceVector3);
-                engine.SetObjectProperty(owlInstanceShadow, engine.GetPropertyByName(owlModel, "object"), owlInstanceInput);
-                engine.SetDatatypeProperty(owlInstanceShadow, engine.GetPropertyByName(owlModel, "type"), (long)1);
+                long owlInstanceShadow = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Shadow"));
+                Engine.SetObjectProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "plane"), owlInstancePlane);
+                Engine.SetObjectProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "lightDirection"), owlInstanceVector3);
+                Engine.SetObjectProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "object"), owlInstanceInput);
+                Engine.SetDatatypeProperty(owlInstanceShadow, Engine.GetPropertyByName(owlModel, "type"), (long)1);
 
                 var projectionPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
-                engine.SaveInstanceTree(owlInstanceShadow, projectionPath);
+                Engine.SaveInstanceTree(owlInstanceShadow, projectionPath);
                 var base64Projection = Convert.ToBase64String(System.IO.File.ReadAllBytes(projectionPath));
                 System.IO.File.Delete(projectionPath);
 
@@ -207,7 +194,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
             }
         }
 
@@ -217,19 +204,17 @@ namespace VNGService.Pages
             var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
             System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
 
-            long owlModel = engine.CreateModel();
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
-                long owlRootInstance = engine.ImportModel(owlModel, modelPath);
+                long owlRootInstance = Engine.ImportModel(owlModel, modelPath);
 
                 //
                 // Translate
                 //
-                long owlMatrixInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "Matrix"));
+                long owlMatrixInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Matrix"));
                 List<double> vecMatrix = new List<double>
                 {
                     1.0,    // _11
@@ -245,25 +230,25 @@ namespace VNGService.Pages
                     _42,    // _42
                     _43,    // _43
                 };
-                engine.SetDatatypeProperty(
+                Engine.SetDatatypeProperty(
                     owlMatrixInstance,
-                    engine.GetPropertyByName(owlModel, "coordinates"),
+                    Engine.GetPropertyByName(owlModel, "coordinates"),
                     vecMatrix.ToArray(),
                     vecMatrix.Count);
 
-                long owlTransformationInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "Transformation"));
-                engine.SetObjectProperty(
+                long owlTransformationInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Transformation"));
+                Engine.SetObjectProperty(
                     owlTransformationInstance,
-                    engine.GetPropertyByName(owlModel, "matrix"),
+                    Engine.GetPropertyByName(owlModel, "matrix"),
                     owlMatrixInstance);
 
-                engine.SetObjectProperty(
+                Engine.SetObjectProperty(
                     owlTransformationInstance,
-                    engine.GetPropertyByName(owlModel, "object"),
+                    Engine.GetPropertyByName(owlModel, "object"),
                     owlRootInstance);
 
                 var translatedModelPath = Path.Combine(Path.GetTempPath(), $"translated_{Guid.NewGuid()}.bin");
-                engine.SaveInstanceTree(owlTransformationInstance, translatedModelPath);
+                Engine.SaveInstanceTree(owlTransformationInstance, translatedModelPath);
                 var translatedBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(translatedModelPath));
                 System.IO.File.Delete(translatedModelPath);
 
@@ -276,7 +261,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
                 System.IO.File.Delete(modelPath);
             }
         }
@@ -286,39 +271,37 @@ namespace VNGService.Pages
             var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
             System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
 
-            long owlModel = engine.CreateModel();
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
-                long owlRootInstance = engine.ImportModel(owlModel, modelPath);
+                long owlRootInstance = Engine.ImportModel(owlModel, modelPath);
 
                 //
                 // Translate
                 //
-                long owlMatrixInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "Matrix"));
+                long owlMatrixInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Matrix"));
                 double[] vecMatrix = MatrixRotateByEulerAngles(alpha, beta, gamma);
-                engine.SetDatatypeProperty(
+                Engine.SetDatatypeProperty(
                     owlMatrixInstance,
-                    engine.GetPropertyByName(owlModel, "coordinates"),
+                    Engine.GetPropertyByName(owlModel, "coordinates"),
                     vecMatrix,
                     vecMatrix.Length);
 
-                long owlTransformationInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "Transformation"));
-                engine.SetObjectProperty(
+                long owlTransformationInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Transformation"));
+                Engine.SetObjectProperty(
                     owlTransformationInstance,
-                    engine.GetPropertyByName(owlModel, "matrix"),
+                    Engine.GetPropertyByName(owlModel, "matrix"),
                     owlMatrixInstance);
 
-                engine.SetObjectProperty(
+                Engine.SetObjectProperty(
                     owlTransformationInstance,
-                    engine.GetPropertyByName(owlModel, "object"),
+                    Engine.GetPropertyByName(owlModel, "object"),
                     owlRootInstance);
 
                 var rotatedModelPath = Path.Combine(Path.GetTempPath(), $"rotated_{Guid.NewGuid()}.bin");
-                engine.SaveInstanceTree(owlTransformationInstance, rotatedModelPath);
+                Engine.SaveInstanceTree(owlTransformationInstance, rotatedModelPath);
                 var rotatedBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(rotatedModelPath));
                 System.IO.File.Delete(rotatedModelPath);
 
@@ -331,7 +314,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
                 System.IO.File.Delete(modelPath);
             }
         }
@@ -344,27 +327,25 @@ namespace VNGService.Pages
             var modelPath2 = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
             System.IO.File.WriteAllBytes(modelPath2, Convert.FromBase64String(base64Content2));
 
-            long owlModel = engine.CreateModel();
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
-                long owlRootInstance1 = engine.ImportModel(owlModel, modelPath1);
-                long owlRootInstance2 = engine.ImportModel(owlModel, modelPath2);
+                long owlRootInstance1 = Engine.ImportModel(owlModel, modelPath1);
+                long owlRootInstance2 = Engine.ImportModel(owlModel, modelPath2);
 
                 //
                 // Union
                 //
-                long owlInstanceBooleanOperation = engine.CreateInstance(engine.GetClassByName(owlModel, "BooleanOperation"));
-                engine.SetObjectProperty(owlInstanceBooleanOperation, engine.GetPropertyByName(owlModel, "firstObject"), owlRootInstance1);
-                engine.SetObjectProperty(owlInstanceBooleanOperation, engine.GetPropertyByName(owlModel, "secondObject"), owlRootInstance2);
-                engine.SetDatatypeProperty(owlInstanceBooleanOperation, engine.GetPropertyByName(owlModel, "type"), type);
-                engine.CalculateInstance(owlInstanceBooleanOperation, out long _, out long _);
+                long owlInstanceBooleanOperation = Engine.CreateInstance(Engine.GetClassByName(owlModel, "BooleanOperation"));
+                Engine.SetObjectProperty(owlInstanceBooleanOperation, Engine.GetPropertyByName(owlModel, "firstObject"), owlRootInstance1);
+                Engine.SetObjectProperty(owlInstanceBooleanOperation, Engine.GetPropertyByName(owlModel, "secondObject"), owlRootInstance2);
+                Engine.SetDatatypeProperty(owlInstanceBooleanOperation, Engine.GetPropertyByName(owlModel, "type"), type);
+                Engine.CalculateInstance(owlInstanceBooleanOperation, out long _, out long _);
 
                 var unionModelPath = Path.Combine(Path.GetTempPath(), $"union_{Guid.NewGuid()}.bin");
-                engine.SaveInstanceTree(owlInstanceBooleanOperation, unionModelPath);
+                Engine.SaveInstanceTree(owlInstanceBooleanOperation, unionModelPath);
                 var unionBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(unionModelPath));
                 System.IO.File.Delete(unionModelPath);
 
@@ -377,7 +358,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
                 System.IO.File.Delete(modelPath1);
                 System.IO.File.Delete(modelPath2);
             }
@@ -388,19 +369,17 @@ namespace VNGService.Pages
             var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
             System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
 
-            long owlModel = engine.CreateModel();
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
-                long owlRootInstance = engine.ImportModel(owlModel, modelPath);
+                long owlRootInstance = Engine.ImportModel(owlModel, modelPath);
 
                 AssignMaterialToInstance(owlModel, owlRootInstance, R, G, B, A);
 
                 var coloredPath = Path.Combine(Path.GetTempPath(), $"colored_{Guid.NewGuid()}.bin");
-                engine.SaveInstanceTree(owlRootInstance, coloredPath);
+                Engine.SaveInstanceTree(owlRootInstance, coloredPath);
                 var coloredBase64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(coloredPath));
                 System.IO.File.Delete(coloredPath);
 
@@ -413,7 +392,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
                 System.IO.File.Delete(modelPath);
             }
         }
@@ -422,22 +401,22 @@ namespace VNGService.Pages
         {
             if (R.HasValue && G.HasValue && B.HasValue)
             {
-                long owlClassColorComponent = engine.GetClassByName(owlModel, "ColorComponent");
-                long owlInstanceColorComponent = engine.CreateInstance(owlClassColorComponent, "");
-                engine.SetDatatypeProperty(owlInstanceColorComponent, engine.GetPropertyByName(owlModel, "R"), R.Value);
-                engine.SetDatatypeProperty(owlInstanceColorComponent, engine.GetPropertyByName(owlModel, "G"), G.Value);
-                engine.SetDatatypeProperty(owlInstanceColorComponent, engine.GetPropertyByName(owlModel, "B"), B.Value);
+                long owlClassColorComponent = Engine.GetClassByName(owlModel, "ColorComponent");
+                long owlInstanceColorComponent = Engine.CreateInstance(owlClassColorComponent, "");
+                Engine.SetDatatypeProperty(owlInstanceColorComponent, Engine.GetPropertyByName(owlModel, "R"), R.Value);
+                Engine.SetDatatypeProperty(owlInstanceColorComponent, Engine.GetPropertyByName(owlModel, "G"), G.Value);
+                Engine.SetDatatypeProperty(owlInstanceColorComponent, Engine.GetPropertyByName(owlModel, "B"), B.Value);
 
-                long owlClassColor = engine.GetClassByName(owlModel, "Color");
-                long owlInstanceColor = engine.CreateInstance(owlClassColor, "");
-                engine.SetObjectProperty(owlInstanceColor, engine.GetPropertyByName(owlModel, "ambient"), owlInstanceColorComponent);
-                engine.SetDatatypeProperty(owlInstanceColor, engine.GetPropertyByName(owlModel, "transparency"), (A ?? 1.0));
+                long owlClassColor = Engine.GetClassByName(owlModel, "Color");
+                long owlInstanceColor = Engine.CreateInstance(owlClassColor, "");
+                Engine.SetObjectProperty(owlInstanceColor, Engine.GetPropertyByName(owlModel, "ambient"), owlInstanceColorComponent);
+                Engine.SetDatatypeProperty(owlInstanceColor, Engine.GetPropertyByName(owlModel, "transparency"), (A ?? 1.0));
 
-                long owlClassMaterial = engine.GetClassByName(owlModel, "Material");
-                long owlInstanceMaterial = engine.CreateInstance(owlClassMaterial, "");
-                engine.SetObjectProperty(owlInstanceMaterial, engine.GetPropertyByName(owlModel, "color"), owlInstanceColor);
+                long owlClassMaterial = Engine.GetClassByName(owlModel, "Material");
+                long owlInstanceMaterial = Engine.CreateInstance(owlClassMaterial, "");
+                Engine.SetObjectProperty(owlInstanceMaterial, Engine.GetPropertyByName(owlModel, "color"), owlInstanceColor);
 
-                engine.SetObjectProperty(owlInstance, engine.GetPropertyByName(owlModel, "material"), owlInstanceMaterial);
+                Engine.SetObjectProperty(owlInstance, Engine.GetPropertyByName(owlModel, "material"), owlInstanceMaterial);
             }
         }
 

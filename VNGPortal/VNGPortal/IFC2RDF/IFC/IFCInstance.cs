@@ -41,7 +41,7 @@ namespace VNGPortal.IFC2RDF.IFC
         {
             base.SetFormat(iModel);
 
-            ifcengine.setFilter(iModel, ifcengine.flagbit1, ifcengine.flagbit1);
+            IFCEngine.setFilter(iModel, IFCEngine.flagbit1, IFCEngine.flagbit1);
         }
 
         #endregion // Methods

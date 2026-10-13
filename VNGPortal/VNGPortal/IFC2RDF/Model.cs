@@ -342,7 +342,7 @@ namespace VNGPortal.IFC2RDF
         {
             if (UpdteVertexBuffers)
             {
-                long iClassInstance = RDF.engine.GetInstanceGeometryClass(iInstance);
+                long iClassInstance = RDF.Engine.GetInstanceGeometryClass(iInstance);
                 if (iClassInstance == 0)
                 {
                     return;
@@ -351,18 +351,18 @@ namespace VNGPortal.IFC2RDF
                 double[] transformationMatrix = null;
                 double[] startVector = new double[3];
                 double[] endVector = new double[3];
-                if (RDF.engine.GetBoundingBox(iInstance, transformationMatrix, startVector, endVector) == 0)
+                if (!RDF.Engine.GetBoundingBox(iInstance, transformationMatrix, startVector, endVector))
                 {
                     return;
                 }
 
-                RDF.engine.SetVertexBufferOffset(
+                RDF.Engine.SetVertexBufferOffset(
                     Instance,
                     -(startVector[0] + endVector[0]) / 2.0,
                     -(startVector[1] + endVector[1]) / 2.0,
                     -(startVector[2] + endVector[2]) / 2.0);
 
-                RDF.engine.ClearedExternalBuffers(Instance);
+                RDF.Engine.ClearedExternalBuffers(Instance);
 
                 UpdteVertexBuffers = false;
             }
@@ -370,7 +370,7 @@ namespace VNGPortal.IFC2RDF
 
         public uint GetVertexLength()
         {
-            return (uint)(RDF.engine.SetFormat(Instance, 0, 0) / sizeof(float));
+            return (uint)(RDF.Engine.SetFormat(Instance, 0, 0) / sizeof(float));
         }
 
         protected virtual void Reset()
@@ -379,7 +379,7 @@ namespace VNGPortal.IFC2RDF
             FilePath = "";
             if (Instance != 0)
             {
-                ifcengine.sdaiCloseModel(Instance);
+                IFCEngine.sdaiCloseModel(Instance);
                 Instance = 0;
             }
             UpdteVertexBuffers = true;

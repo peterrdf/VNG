@@ -127,28 +127,28 @@ namespace VNGPortal.IFC2RDF.IFC
         {
             Dictionary<string, IFCUnit> dicUnits = new Dictionary<string, IFCUnit>();
 
-            ifcengine.sdaiGetAttrBN(iProject, "UnitsInContext", ifcengine.sdaiINSTANCE, out IntPtr unitsInContext);
-            ifcengine.sdaiGetAttrBN((int_t)unitsInContext, "Units", ifcengine.sdaiAGGR, out IntPtr units);
+            IFCEngine.sdaiGetAttrBN(iProject, "UnitsInContext", IFCEngine.sdaiINSTANCE, out IntPtr unitsInContext);
+            IFCEngine.sdaiGetAttrBN((int_t)unitsInContext, "Units", IFCEngine.sdaiAGGR, out IntPtr units);
 
-            int_t iUnitsCount = ifcengine.sdaiGetMemberCount((int_t)units);
+            int_t iUnitsCount = IFCEngine.sdaiGetMemberCount((int_t)units);
             for (int_t iUnit = 0; iUnit < iUnitsCount; iUnit++)
             {
                 int_t iUnitInstance;
-                ifcengine.engiGetAggrElement((int_t)units, iUnit, ifcengine.sdaiINSTANCE, out iUnitInstance);
+                IFCEngine.engiGetAggrElement((int_t)units, iUnit, IFCEngine.sdaiINSTANCE, out iUnitInstance);
 
                 if (IsInstanceOf(iModel, iUnitInstance, "IFCCONVERSIONBASEDUNIT"))
                 {
                     int_t iConversionFactorInstance = 0;
-                    ifcengine.sdaiGetAttrBN(iUnitInstance, "ConversionFactor", ifcengine.sdaiINSTANCE, out iConversionFactorInstance);
+                    IFCEngine.sdaiGetAttrBN(iUnitInstance, "ConversionFactor", IFCEngine.sdaiINSTANCE, out iConversionFactorInstance);
 
                     if (iConversionFactorInstance != 0)
                     {
                         int_t iUnitComponentInstance;
-                        ifcengine.sdaiGetAttrBN(iConversionFactorInstance, "UnitComponent", ifcengine.sdaiINSTANCE, out iUnitComponentInstance);
+                        IFCEngine.sdaiGetAttrBN(iConversionFactorInstance, "UnitComponent", IFCEngine.sdaiINSTANCE, out iUnitComponentInstance);
 
                         if (IsInstanceOf(iModel, iUnitComponentInstance, "IFCSIUNIT"))
                         {
-                            ifcengine.sdaiGetAttrBN(iUnitComponentInstance, "UnitType", ifcengine.sdaiSTRING, out IntPtr unitType);
+                            IFCEngine.sdaiGetAttrBN(iUnitComponentInstance, "UnitType", IFCEngine.sdaiSTRING, out IntPtr unitType);
 
                             string? strUnitType = string.Empty;
                             if (unitType != IntPtr.Zero)
@@ -156,7 +156,7 @@ namespace VNGPortal.IFC2RDF.IFC
                                 strUnitType = Marshal.PtrToStringAnsi(unitType);
                             }
 
-                            ifcengine.sdaiGetAttrBN(iUnitComponentInstance, "Prefix", ifcengine.sdaiSTRING, out IntPtr prefix);
+                            IFCEngine.sdaiGetAttrBN(iUnitComponentInstance, "Prefix", IFCEngine.sdaiSTRING, out IntPtr prefix);
 
                             string? strPrefix = string.Empty;
                             if (prefix != IntPtr.Zero)
@@ -164,7 +164,7 @@ namespace VNGPortal.IFC2RDF.IFC
                                 strPrefix = Marshal.PtrToStringAnsi(prefix);
                             }
 
-                            ifcengine.sdaiGetAttrBN(iUnitComponentInstance, "Name", ifcengine.sdaiSTRING, out IntPtr name);
+                            IFCEngine.sdaiGetAttrBN(iUnitComponentInstance, "Name", IFCEngine.sdaiSTRING, out IntPtr name);
 
                             string? strName = string.Empty;
                             if (name != IntPtr.Zero)
@@ -184,7 +184,7 @@ namespace VNGPortal.IFC2RDF.IFC
                 {
                     if (IsInstanceOf(iModel, iUnitInstance, "IFCSIUNIT"))
                     {
-                        ifcengine.sdaiGetAttrBN(iUnitInstance, "UnitType", ifcengine.sdaiSTRING, out IntPtr unitType);
+                        IFCEngine.sdaiGetAttrBN(iUnitInstance, "UnitType", IFCEngine.sdaiSTRING, out IntPtr unitType);
 
                         string? strUnitType = string.Empty;
                         if (unitType != IntPtr.Zero)
@@ -192,7 +192,7 @@ namespace VNGPortal.IFC2RDF.IFC
                             strUnitType = Marshal.PtrToStringAnsi(unitType);
                         }
 
-                        ifcengine.sdaiGetAttrBN(iUnitInstance, "Prefix", ifcengine.sdaiSTRING, out IntPtr prefix);
+                        IFCEngine.sdaiGetAttrBN(iUnitInstance, "Prefix", IFCEngine.sdaiSTRING, out IntPtr prefix);
 
                         string? strPrefix = string.Empty;
                         if (prefix != IntPtr.Zero)
@@ -200,7 +200,7 @@ namespace VNGPortal.IFC2RDF.IFC
                             strPrefix = Marshal.PtrToStringAnsi(prefix);
                         }
 
-                        ifcengine.sdaiGetAttrBN(iUnitInstance, "Name", ifcengine.sdaiSTRING, out IntPtr name);
+                        IFCEngine.sdaiGetAttrBN(iUnitInstance, "Name", IFCEngine.sdaiSTRING, out IntPtr name);
 
                         string? strName = string.Empty;
                         if (name != IntPtr.Zero)
@@ -795,7 +795,7 @@ namespace VNGPortal.IFC2RDF.IFC
 
         private static bool IsInstanceOf(int_t iModel, int_t iInstance, string strType)
         {
-            if (ifcengine.sdaiGetInstanceType(iInstance) == ifcengine.sdaiGetEntity(iModel, Encoding.Unicode.GetBytes(strType)))
+            if (IFCEngine.sdaiGetInstanceType(iInstance) == IFCEngine.sdaiGetEntity(iModel, Encoding.Unicode.GetBytes(strType)))
             {
                 return true;
             }

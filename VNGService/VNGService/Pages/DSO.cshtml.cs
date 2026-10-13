@@ -18,12 +18,6 @@ namespace VNGService.Pages
         private readonly IConfiguration _configuration;
         private readonly ILogger<DSOModel> _logger;
 
-        private const long flagbit0 = 1;   // 2^^0
-        private const long flagbit1 = 2;   // 2^^1
-        private const long flagbit2 = 4;   // 2^^2
-        private const long flagbit3 = 8;   // 2^^3
-        private const long flagbit4 = 16;  // 2^^4
-
         public DSOModel(IConfiguration configuration, ILogger<DSOModel> logger)
         {
             _configuration = configuration;
@@ -63,15 +57,12 @@ namespace VNGService.Pages
 
             DsoOmgevingsdocumentenService dsoService = new(_configuration, _logger);
 
-            long owlModel = engine.CreateModel();
-
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             // Unicode support for property values
-            engine.SetCharacterSerialization(owlModel, 0, 0, 0);
-            _ = engine.CreateProperty(
+            Engine.SetCharacterSerialization(owlModel, 0, 0, false);
+            _ = Engine.CreateProperty(
                 owlModel,
                 DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 "tag");
@@ -114,7 +105,7 @@ namespace VNGService.Pages
                         if (geometryInstance != 0)
                         {
                             var modelPath = Path.Combine(modelsDir, $"Area_{item.Identificatie}.bin");
-                            engine.SaveInstanceTree(geometryInstance, modelPath);
+                            Engine.SaveInstanceTree(geometryInstance, modelPath);
                             var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                             System.IO.File.Delete(modelPath);
 
@@ -139,7 +130,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
             }
         }
 
@@ -152,15 +143,12 @@ namespace VNGService.Pages
 
         public async Task<List<Area>> GetZoningAreas(double eastings, double northings)
         {
-            long owlModel = engine.CreateModel();
-
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel(); 
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             // Unicode support for property values
-            engine.SetCharacterSerialization(owlModel, 0, 0, 0);
-            _ = engine.CreateProperty(
+            Engine.SetCharacterSerialization(owlModel, 0, 0, false);
+            _ = Engine.CreateProperty(
                 owlModel,
                 DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 "tag");
@@ -248,7 +236,7 @@ namespace VNGService.Pages
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
             }
 
             return new List<Area>();
@@ -381,7 +369,7 @@ namespace VNGService.Pages
             var planDetails = await FetchZoningAreas(httpClient, queryParams, plan.Id);
             if (planDetails?.Embedded.Bestemmingsvlakken.Count > 0)
             {
-                long verwijzingNaarTekstProperty = engine.CreateProperty(
+                long verwijzingNaarTekstProperty = Engine.CreateProperty(
                    owlModel,
                    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                    "VerwijzingNaarTekst");
@@ -424,7 +412,7 @@ namespace VNGService.Pages
                             }
 
                             var modelPath = Path.Combine(modelsDir, $"DestinationArea_{planDetails.Embedded.Bestemmingsvlakken[j].Id}.bin");
-                            engine.SaveInstanceTree(geometryInstance, modelPath);
+                            Engine.SaveInstanceTree(geometryInstance, modelPath);
                             var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                             System.IO.File.Delete(modelPath);
 
@@ -481,7 +469,7 @@ namespace VNGService.Pages
                                     }
 
                                     var modelPath = Path.Combine(modelsDir, $"DestinationArea_{nextPlanDetails.Embedded.Bestemmingsvlakken[j].Id}.bin");    
-                                    engine.SaveInstanceTree(geometryInstance, modelPath);
+                                    Engine.SaveInstanceTree(geometryInstance, modelPath);
                                     var base64Content = Convert.ToBase64String(System.IO.File.ReadAllBytes(modelPath));
                                     System.IO.File.Delete(modelPath);
 
@@ -563,10 +551,10 @@ namespace VNGService.Pages
                     {
                         var polygon = geometry.PolygonCoordinates;
 
-                        long owlBoundaryRepresentationInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "BoundaryRepresentation"));
+                        long owlBoundaryRepresentationInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "BoundaryRepresentation"));
                         SetStringPropertyW(
                             owlBoundaryRepresentationInstance,
-                            engine.GetPropertyByName(owlModel, "tag"),
+                            Engine.GetPropertyByName(owlModel, "tag"),
                             name);
 
                         int index = 0;
@@ -594,23 +582,23 @@ namespace VNGService.Pages
                             }
                         }
 
-                        engine.SetDatatypeProperty(
+                        Engine.SetDatatypeProperty(
                             owlBoundaryRepresentationInstance,
-                            engine.GetPropertyByName(owlModel, "indices"),
+                            Engine.GetPropertyByName(owlModel, "indices"),
                             indices.ToArray(),
                             indices.Count);
 
-                        engine.SetDatatypeProperty(
+                        Engine.SetDatatypeProperty(
                             owlBoundaryRepresentationInstance,
-                            engine.GetPropertyByName(owlModel, "vertices"),
+                            Engine.GetPropertyByName(owlModel, "vertices"),
                             vertices.ToArray(),
                             vertices.Count);
 
                         if (owlMaterialInstance != 0)
                         {
-                            engine.SetObjectProperty(
+                            Engine.SetObjectProperty(
                                 owlBoundaryRepresentationInstance,
-                                engine.GetPropertyByName(owlModel, "material"),
+                                Engine.GetPropertyByName(owlModel, "material"),
                                 owlMaterialInstance);
                         }
 
@@ -626,7 +614,7 @@ namespace VNGService.Pages
                         {
                             var polygon = geometry.MultiPolygonCoordinates[i];
 
-                            long owlBoundaryRepresentationInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "BoundaryRepresentation"));
+                            long owlBoundaryRepresentationInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "BoundaryRepresentation"));
                             polygonInstances.Add(owlBoundaryRepresentationInstance);
 
                             int index = 0;
@@ -654,35 +642,35 @@ namespace VNGService.Pages
                                 }
                             }
 
-                            engine.SetDatatypeProperty(
+                            Engine.SetDatatypeProperty(
                                 owlBoundaryRepresentationInstance,
-                                engine.GetPropertyByName(owlModel, "indices"),
+                                Engine.GetPropertyByName(owlModel, "indices"),
                                 indices.ToArray(),
                                 indices.Count);
 
-                            engine.SetDatatypeProperty(
+                            Engine.SetDatatypeProperty(
                                 owlBoundaryRepresentationInstance,
-                                engine.GetPropertyByName(owlModel, "vertices"),
+                                Engine.GetPropertyByName(owlModel, "vertices"),
                                 vertices.ToArray(),
                                 vertices.Count);
 
                             if (owlMaterialInstance != 0)
                             {
-                                engine.SetObjectProperty(
+                                Engine.SetObjectProperty(
                                     owlBoundaryRepresentationInstance,
-                                    engine.GetPropertyByName(owlModel, "material"),
+                                    Engine.GetPropertyByName(owlModel, "material"),
                                     owlMaterialInstance);
                             }
                         }
 
-                        long owlCollectionInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "Collection"));
+                        long owlCollectionInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Collection"));
                         SetStringPropertyW(
                             owlCollectionInstance,
-                            engine.GetPropertyByName(owlModel, "tag"),
+                            Engine.GetPropertyByName(owlModel, "tag"),
                             name);
-                        engine.SetObjectProperty(
+                        Engine.SetObjectProperty(
                                 owlCollectionInstance,
-                                engine.GetPropertyByName(owlModel, "objects"),
+                                Engine.GetPropertyByName(owlModel, "objects"),
                                 polygonInstances.ToArray(),
                                 polygonInstances.Count);
 
@@ -693,28 +681,28 @@ namespace VNGService.Pages
                 case "Point":
                     if (geometry.PointCoordinates != null)
                     {
-                        long owlPointInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "Point3D"));
+                        long owlPointInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Point3D"));
                         SetStringPropertyW(
                             owlPointInstance,
-                            engine.GetPropertyByName(owlModel, "tag"),
+                            Engine.GetPropertyByName(owlModel, "tag"),
                             name);
 
                         double value = geometry.PointCoordinates[0];
-                        engine.SetDatatypeProperty(
+                        Engine.SetDatatypeProperty(
                             owlPointInstance,
-                            engine.GetPropertyByName(owlModel, "x"),
+                            Engine.GetPropertyByName(owlModel, "x"),
                             ref value,
                             1);
                         value = geometry.PointCoordinates[1];
-                        engine.SetDatatypeProperty(
+                        Engine.SetDatatypeProperty(
                             owlPointInstance,
-                            engine.GetPropertyByName(owlModel, "y"),
+                            Engine.GetPropertyByName(owlModel, "y"),
                             ref value,
                             1);
                         value = z;
-                        engine.SetDatatypeProperty(
+                        Engine.SetDatatypeProperty(
                             owlPointInstance,
-                            engine.GetPropertyByName(owlModel, "z"),
+                            Engine.GetPropertyByName(owlModel, "z"),
                             ref value,
                             1);
 
@@ -734,15 +722,15 @@ namespace VNGService.Pages
                             vertices.Add(z); // Z coordinate
                         }
 
-                        long owlPolyLineInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "PolyLine3D"));
+                        long owlPolyLineInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "PolyLine3D"));
                         SetStringPropertyW(
                             owlPolyLineInstance,
-                            engine.GetPropertyByName(owlModel, "tag"),
+                            Engine.GetPropertyByName(owlModel, "tag"),
                             name);
 
-                        engine.SetDatatypeProperty(
+                        Engine.SetDatatypeProperty(
                             owlPolyLineInstance,
-                            engine.GetPropertyByName(owlModel, "coordinates"),
+                            Engine.GetPropertyByName(owlModel, "coordinates"),
                             vertices.ToArray(),
                             vertices.Count);
 
@@ -766,7 +754,7 @@ namespace VNGService.Pages
         #region OWL API Interop
         const long DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY = 8;
 
-        [DllImport(engine.enginedll, EntryPoint = "SetDatatypeProperty")]
+        [DllImport(Engine.enginedll, EntryPoint = "SetDatatypeProperty")]
         public static extern Int64 SetDatatypeProperty(Int64 owlInstance, Int64 owlDatatypeProperty, IntPtr values, Int64 card);
 
         private static void SetStringPropertyW(long owlInstance, long property, string value)

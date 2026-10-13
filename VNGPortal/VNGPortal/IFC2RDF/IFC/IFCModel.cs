@@ -59,13 +59,13 @@ namespace VNGPortal.IFC2RDF.IFC
             // Add null terminator to byte arrays for P/Invoke marshaling
             var filePathBytes = Encoding.UTF8.GetBytes(strFilePath + "\0");
             var schemaBytes = Encoding.UTF8.GetBytes("\0");
-            Instance = ifcengine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
+            Instance = IFCEngine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
             if (Instance == 0)
             {
                 return false;
             }
 
-            ifcengine.GetSPFFHeaderItem(Instance, 9, 0, ifcengine.sdaiSTRING, out IntPtr outputValue);
+            IFCEngine.GetSPFFHeaderItem(Instance, 9, 0, IFCEngine.sdaiSTRING, out IntPtr outputValue);
 
             string? strVersion = Marshal.PtrToStringAnsi(outputValue);
             if (strVersion == null || !strVersion.Contains("IFC"))
@@ -73,23 +73,23 @@ namespace VNGPortal.IFC2RDF.IFC
                 return false;
             }
 
-            ifcengine.setBRepProperties(Instance, 7, 0.9, 0.0, 20000);
+            IFCEngine.setBRepProperties(Instance, 7, 0.9, 0.0, 20000);
 
-            _ifcSpaceEntity = ifcengine.sdaiGetEntity(Instance, "IFCSPACE");
-            _ifcOpeningElementEntity = ifcengine.sdaiGetEntity(Instance, "IFCOPENINGELEMENT");
-            _ifcDistributionElementEntity = ifcengine.sdaiGetEntity(Instance, "IFCDISTRIBUTIONELEMENT");
-            _ifcElectricalElementEntity = ifcengine.sdaiGetEntity(Instance, "IFCELECTRICALELEMENT");
-            _ifcElementAssemblyEntity = ifcengine.sdaiGetEntity(Instance, "IFCELEMENTASSEMBLY");
-            _ifcElementComponentEntity = ifcengine.sdaiGetEntity(Instance, "IFCELEMENTCOMPONENT");
-            _ifcEquipmentElementEntity = ifcengine.sdaiGetEntity(Instance, "IFCEQUIPMENTELEMENT");
-            _ifcFeatureElementEntity = ifcengine.sdaiGetEntity(Instance, "IFCFEATUREELEMENT");
-            _ifcFeatureElementSubtractionEntity = ifcengine.sdaiGetEntity(Instance, "IFCFEATUREELEMENTSUBTRACTION");
-            _ifcFurnishingElementEntity = ifcengine.sdaiGetEntity(Instance, "IFCFURNISHINGELEMENT");
-            _ifcReinforcingElementEntity = ifcengine.sdaiGetEntity(Instance, "IFCREINFORCINGELEMENT");
-            _ifcTransportElementEntity = ifcengine.sdaiGetEntity(Instance, "IFCTRANSPORTELEMENT");
-            _ifcVirtualElementEntity = ifcengine.sdaiGetEntity(Instance, "IFCVIRTUALELEMENT");
+            _ifcSpaceEntity = IFCEngine.sdaiGetEntity(Instance, "IFCSPACE");
+            _ifcOpeningElementEntity = IFCEngine.sdaiGetEntity(Instance, "IFCOPENINGELEMENT");
+            _ifcDistributionElementEntity = IFCEngine.sdaiGetEntity(Instance, "IFCDISTRIBUTIONELEMENT");
+            _ifcElectricalElementEntity = IFCEngine.sdaiGetEntity(Instance, "IFCELECTRICALELEMENT");
+            _ifcElementAssemblyEntity = IFCEngine.sdaiGetEntity(Instance, "IFCELEMENTASSEMBLY");
+            _ifcElementComponentEntity = IFCEngine.sdaiGetEntity(Instance, "IFCELEMENTCOMPONENT");
+            _ifcEquipmentElementEntity = IFCEngine.sdaiGetEntity(Instance, "IFCEQUIPMENTELEMENT");
+            _ifcFeatureElementEntity = IFCEngine.sdaiGetEntity(Instance, "IFCFEATUREELEMENT");
+            _ifcFeatureElementSubtractionEntity = IFCEngine.sdaiGetEntity(Instance, "IFCFEATUREELEMENTSUBTRACTION");
+            _ifcFurnishingElementEntity = IFCEngine.sdaiGetEntity(Instance, "IFCFURNISHINGELEMENT");
+            _ifcReinforcingElementEntity = IFCEngine.sdaiGetEntity(Instance, "IFCREINFORCINGELEMENT");
+            _ifcTransportElementEntity = IFCEngine.sdaiGetEntity(Instance, "IFCTRANSPORTELEMENT");
+            _ifcVirtualElementEntity = IFCEngine.sdaiGetEntity(Instance, "IFCVIRTUALELEMENT");
 
-            RetrieveObjectsRecursively(ifcengine.sdaiGetEntity(Instance, "IFCOBJECT"), DEFAULT_CIRCLE_SEGMENTS);
+            RetrieveObjectsRecursively(IFCEngine.sdaiGetEntity(Instance, "IFCOBJECT"), DEFAULT_CIRCLE_SEGMENTS);
             RetrieveObjects("IFCPROJECT", DEFAULT_CIRCLE_SEGMENTS);
             RetrieveObjects("IFCRELSPACEBOUNDARY", DEFAULT_CIRCLE_SEGMENTS);
 
@@ -100,27 +100,27 @@ namespace VNGPortal.IFC2RDF.IFC
 
         private void RetrieveObjects(string strEntityName, int_t iCircleSegments)
         {
-            int_t iInstances = ifcengine.sdaiGetEntityExtentBN(Instance, strEntityName);
-            int_t iInstancesCount = ifcengine.sdaiGetMemberCount(iInstances);
+            int_t iInstances = IFCEngine.sdaiGetEntityExtentBN(Instance, strEntityName);
+            int_t iInstancesCount = IFCEngine.sdaiGetMemberCount(iInstances);
 
             for (int_t i = 0; i < iInstancesCount; ++i)
             {
                 int_t iInstance = 0;
-                ifcengine.engiGetAggrElement(iInstances, i, ifcengine.sdaiINSTANCE, out iInstance);
+                IFCEngine.engiGetAggrElement(iInstances, i, IFCEngine.sdaiINSTANCE, out iInstance);
                 Debug.Assert(iInstance != 0);
 
                 PreLoadInstance(iInstance);
 
                 if (iCircleSegments != DEFAULT_CIRCLE_SEGMENTS)
                 {
-                    ifcengine.circleSegments(iCircleSegments, 5);
+                    IFCEngine.circleSegments(iCircleSegments, 5);
                 }
 
                 IFCInstance ifcInstance = new IFCInstance(_iInstanceID++, iInstance, strEntityName);
 
                 if (iCircleSegments != DEFAULT_CIRCLE_SEGMENTS)
                 {
-                    ifcengine.circleSegments(DEFAULT_CIRCLE_SEGMENTS, 5);
+                    IFCEngine.circleSegments(DEFAULT_CIRCLE_SEGMENTS, 5);
                 }
 
                 ifcInstance.Enabled =
@@ -168,12 +168,12 @@ namespace VNGPortal.IFC2RDF.IFC
                 iCircleSegments = 6;
             }
 
-            int_t iInstances = ifcengine.sdaiGetEntityExtent(Instance, iParentEntity);
-            int_t iIntancesCount = ifcengine.sdaiGetMemberCount(iInstances);
+            int_t iInstances = IFCEngine.sdaiGetEntityExtent(Instance, iParentEntity);
+            int_t iIntancesCount = IFCEngine.sdaiGetMemberCount(iInstances);
 
             if (iIntancesCount != 0)
             {
-                ifcengine.engiGetEntityName(iParentEntity, ifcengine.sdaiSTRING, out IntPtr name);
+                IFCEngine.engiGetEntityName(iParentEntity, IFCEngine.sdaiSTRING, out IntPtr name);
 
                 string? strParentEntityName = Marshal.PtrToStringAnsi(name);
                 if (strParentEntityName != null)
@@ -182,11 +182,11 @@ namespace VNGPortal.IFC2RDF.IFC
                 }
             }
 
-            iIntancesCount = ifcengine.engiGetEntityCount(Instance);
+            iIntancesCount = IFCEngine.engiGetEntityCount(Instance);
             for (int_t i = 0; i < iIntancesCount; i++)
             {
-                int_t iEntity = ifcengine.engiGetEntityElement(Instance, i);
-                if (ifcengine.engiGetEntityParent(iEntity) == iParentEntity)
+                int_t iEntity = IFCEngine.engiGetEntityElement(Instance, i);
+                if (IFCEngine.engiGetEntityParent(iEntity) == iParentEntity)
                 {
                     RetrieveObjectsRecursively(iEntity, iCircleSegments);
                 }

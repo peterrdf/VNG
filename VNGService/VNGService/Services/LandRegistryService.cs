@@ -19,12 +19,6 @@ namespace VNGService.Services
 
         private readonly BagApiService _bagService;
 
-        private const long flagbit0 = 1;   // 2^^0
-        private const long flagbit1 = 2;   // 2^^1
-        private const long flagbit2 = 4;   // 2^^2
-        private const long flagbit3 = 8;   // 2^^3
-        private const long flagbit4 = 16;  // 2^^4
-
         #endregion // Fields
 
         public LandRegistryService(IConfiguration configuration, ILogger<LandRegistryService> logger)
@@ -39,16 +33,13 @@ namespace VNGService.Services
 
         public async Task<List<Building>> GetBuildings(double eastings, double northings, double bboxLength)
         {
-            long owlModel = engine.CreateModel();
-
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             //#todo: fix base64 encoding support for Unicode properties
             // Unicode support for property values
-            //engine.SetCharacterSerialization(owlModel, 0, 0, 0);
-            //_ = engine.CreateProperty(
+            //Engine.SetCharacterSerialization(owlModel, 0, 0, 0);
+            //_ = Engine.CreateProperty(
             //    owlModel,
             //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
             //    "tag");
@@ -69,22 +60,19 @@ namespace VNGService.Services
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
             }
         }
         
         public async Task<List<Parcel>> GetParcels(double eastings, double northings, double bboxLength)
         {
-            long owlModel = engine.CreateModel();
-
-            long setting = flagbit0 + flagbit4;
-            long mask = flagbit0 + flagbit4;
-            engine.SetOverrideFileIO(owlModel, setting, mask);
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             //#todo: fix base64 encoding support for Unicode properties
             // Unicode support for property values
-            //engine.SetCharacterSerialization(owlModel, 0, 0, 0);
-            //_ = engine.CreateProperty(
+            //Engine.SetCharacterSerialization(owlModel, 0, 0, 0);
+            //_ = Engine.CreateProperty(
             //    owlModel,
             //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
             //    "tag");
@@ -105,7 +93,7 @@ namespace VNGService.Services
             }
             finally
             {
-                engine.CloseModel(owlModel);
+                Engine.CloseModel(owlModel);
             }
         }
 
@@ -131,35 +119,35 @@ namespace VNGService.Services
             {
                 //#todo: fix base64 encoding support for Unicode properties
                 // Number Identifier Properties
-                //long huisnummerProperty = engine.CreateProperty(
+                //long huisnummerProperty = Engine.CreateProperty(
                 //   owlModel,
                 //   DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //   "huisnummer");
-                //long huisletterProperty = engine.CreateProperty(
+                //long huisletterProperty = Engine.CreateProperty(
                 //    owlModel,
                 //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //    "huisletter");
-                //long postcodeProperty = engine.CreateProperty(
+                //long postcodeProperty = Engine.CreateProperty(
                 //    owlModel,
                 //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //    "postcode");
 
                 //// Address Properties
-                //long CityProperty = engine.CreateProperty(
+                //long CityProperty = Engine.CreateProperty(
                 //    owlModel,
                 //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //    "City");
-                //long StreetNameProperty = engine.CreateProperty(
+                //long StreetNameProperty = Engine.CreateProperty(
                 //    owlModel,
                 //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //    "StreetName");
 
                 //// Building Properties
-                //long bronhouderProperty = engine.CreateProperty(
+                //long bronhouderProperty = Engine.CreateProperty(
                 //    owlModel,
                 //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //    "bronhouder");
-                //long identificatieBAGPNDProperty = engine.CreateProperty(
+                //long identificatieBAGPNDProperty = Engine.CreateProperty(
                 //    owlModel,
                 //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //    "identificatieBAGPND");
@@ -221,7 +209,7 @@ namespace VNGService.Services
                             }
 
                             var modelPath = Path.Combine(modelsDir, $"Building_{feature.Id}.bin");
-                            engine.SaveInstanceTree(owlBuildingInstance, modelPath);
+                            Engine.SaveInstanceTree(owlBuildingInstance, modelPath);
                             var base64Content = Convert.ToBase64String(File.ReadAllBytes(modelPath));
                             File.Delete(modelPath);
 
@@ -258,15 +246,15 @@ namespace VNGService.Services
             {
                 //#todo: fix base64 encoding support for Unicode properties
                 // Parcel Identifier Properties
-                //long perceelnummerProperty = engine.CreateProperty(
+                //long perceelnummerProperty = Engine.CreateProperty(
                 //    owlModel,
                 //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //    "perceelnummer");
-                //long kadastraleGemeenteWaardeProperty = engine.CreateProperty(
+                //long kadastraleGemeenteWaardeProperty = Engine.CreateProperty(
                 //    owlModel,
                 //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //    "kadastraleGemeenteWaarde");
-                //long AKRKadastraleGemeenteCodeWaardeProperty = engine.CreateProperty(
+                //long AKRKadastraleGemeenteCodeWaardeProperty = Engine.CreateProperty(
                 //    owlModel,
                 //    DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
                 //    "AKRKadastraleGemeenteCodeWaarde");
@@ -305,7 +293,7 @@ namespace VNGService.Services
                             //SetStringPropertyW(owlParcelInstance, AKRKadastraleGemeenteCodeWaardeProperty, value);
 
                             var modelPath = Path.Combine(modelsDir, $"Parcel_{parcel.Perceel!.IdentificatieLokaalID}.bin");
-                            engine.SaveInstanceTree(owlParcelInstance, modelPath);
+                            Engine.SaveInstanceTree(owlParcelInstance, modelPath);
                             var base64Content = Convert.ToBase64String(File.ReadAllBytes(modelPath));
                             File.Delete(modelPath);
 
@@ -332,11 +320,11 @@ namespace VNGService.Services
                     {
                         var polygon = geometry.AsPolygon();
 
-                        long owlBoundaryRepresentationInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "BoundaryRepresentation"));
+                        long owlBoundaryRepresentationInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "BoundaryRepresentation"));
                         // #todo: fix base64 encoding support for Unicode properties
                         //SetStringPropertyW(
                         //    owlBoundaryRepresentationInstance,
-                        //    engine.GetPropertyByName(owlModel, "tag"), 
+                        //    Engine.GetPropertyByName(owlModel, "tag"), 
                         //    name);
 
                         int index = 0;
@@ -364,23 +352,23 @@ namespace VNGService.Services
                             }
                         }
 
-                        engine.SetDatatypeProperty(
+                        Engine.SetDatatypeProperty(
                             owlBoundaryRepresentationInstance,
-                            engine.GetPropertyByName(owlModel, "indices"),
+                            Engine.GetPropertyByName(owlModel, "indices"),
                             indices.ToArray(),
                             indices.Count);
 
-                        engine.SetDatatypeProperty(
+                        Engine.SetDatatypeProperty(
                             owlBoundaryRepresentationInstance,
-                            engine.GetPropertyByName(owlModel, "vertices"),
+                            Engine.GetPropertyByName(owlModel, "vertices"),
                             vertices.ToArray(),
                             vertices.Count);
 
                         if (owlMaterialInstance != 0)
                         {
-                            engine.SetObjectProperty(
+                            Engine.SetObjectProperty(
                                 owlBoundaryRepresentationInstance,
-                                engine.GetPropertyByName(owlModel, "material"),
+                                Engine.GetPropertyByName(owlModel, "material"),
                                 owlMaterialInstance);
                         }
 
@@ -404,16 +392,16 @@ namespace VNGService.Services
                             }
                         }
 
-                        long owlPolyLineInstance = engine.CreateInstance(engine.GetClassByName(owlModel, "PolyLine3D"));
+                        long owlPolyLineInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "PolyLine3D"));
                         //#todo: fix base64 encoding support for Unicode properties
                         //SetStringPropertyW(
                         //    owlPolyLineInstance, 
-                        //    engine.GetPropertyByName(owlModel, "tag"), 
+                        //    Engine.GetPropertyByName(owlModel, "tag"), 
                         //    name);
 
-                        engine.SetDatatypeProperty(
+                        Engine.SetDatatypeProperty(
                             owlPolyLineInstance,
-                            engine.GetPropertyByName(owlModel, "coordinates"),
+                            Engine.GetPropertyByName(owlModel, "coordinates"),
                             vertices.ToArray(),
                             vertices.Count);
 
@@ -432,7 +420,7 @@ namespace VNGService.Services
         #region OWL API Interop
         const long DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY = 8;
 
-        [DllImport(engine.enginedll, EntryPoint = "SetDatatypeProperty")]
+        [DllImport(Engine.enginedll, EntryPoint = "SetDatatypeProperty")]
         public static extern Int64 SetDatatypeProperty(Int64 owlInstance, Int64 owlDatatypeProperty, IntPtr values, Int64 card);
 
         private static void SetStringPropertyW(long owlInstance, long property, string value)

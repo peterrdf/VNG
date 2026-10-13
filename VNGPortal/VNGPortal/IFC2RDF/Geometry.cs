@@ -38,10 +38,10 @@ namespace VNGPortal.IFC2RDF
 
             /* Geometry */
 
-            int_t iSdaiModel = ifcengine.sdaiGetInstanceModel(Instance);
+            int_t iSdaiModel = IFCEngine.sdaiGetInstanceModel(Instance);
 
             long owlInstance = 0;
-            ifcengine.owlBuildInstance(iSdaiModel, Instance, out owlInstance);
+            IFCEngine.owlBuildInstance(iSdaiModel, Instance, out owlInstance);
 
             OwlInstance = owlInstance;
         }

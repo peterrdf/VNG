@@ -182,7 +182,7 @@ namespace VNGPortal.Workflows
                                     throw new Exception($"3DVIEW workflow step: '{step.Name}' has no valid geometry queries.");
                                 }
 
-                                long owlModel = engine.CreateModel();
+                                long owlModel = Engine.CreateModel();
                                 try
                                 {
                                     foreach (var geometryQuery in geometryQueries)
@@ -195,7 +195,7 @@ namespace VNGPortal.Workflows
 
                                     var viewModel = $"3dview_{Guid.NewGuid().ToString()}.bin";
                                     var viewModelPath = Path.Combine(ModelDir, viewModel);
-                                    engine.SaveModel(owlModel, viewModelPath);
+                                    Engine.SaveModel(owlModel, viewModelPath);
 
                                     await _signalRStatus.Send3DViewUpdate(
                                         taskDescriptor.GroupName,
@@ -359,7 +359,7 @@ namespace VNGPortal.Workflows
                             continue;
                         }
 
-                        long owlModel = engine.CreateModel();
+                        long owlModel = Engine.CreateModel();
                         try
                         {
                             foreach (var geometryQuery in shaclViolationView.Queries)
@@ -410,7 +410,7 @@ namespace VNGPortal.Workflows
 
                             var shaclErrorsModel = $"shacl_errors_{Guid.NewGuid().ToString()}.bin";
                             var shaclErrorsModelPath = Path.Combine(ModelDir, shaclErrorsModel);
-                            engine.SaveModel(owlModel, shaclErrorsModelPath);
+                            Engine.SaveModel(owlModel, shaclErrorsModelPath);
 
                             await _signalRStatus.Send3DViewUpdate(
                                 TaskDescriptor.GroupName,
@@ -421,7 +421,7 @@ namespace VNGPortal.Workflows
                         }
                         finally
                         {
-                            engine.CloseModel(owlModel);
+                            Engine.CloseModel(owlModel);
                         }
                     }
                 } // foreach (var shaclViolationView in shaclViolationViews)

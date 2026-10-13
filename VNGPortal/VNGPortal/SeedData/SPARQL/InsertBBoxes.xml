@@ -3,12 +3,12 @@
 	<id><![CDATA[InsertBBoxes]]></id>
 	<query>
 		<![CDATA[
-PREFIX geom: <https://vng.nl/geometry/>
-PREFIX pf:   <java:org.example.>
+PREFIX geom:    <https://vng.nl/geometry/>
+PREFIX vng:     <http://vng.nl/geometry-ext.ttl#>
 
 INSERT {
     GRAPH <https://vng.nl/geometries/> {
-        ?instance geom:bboxMinX ?minX ;
+        ?instance   geom:bboxMinX ?minX ;
                     geom:bboxMinY ?minY ;
                     geom:bboxMinZ ?minZ ;
                     geom:bboxMaxX ?maxX ;
@@ -21,7 +21,7 @@ WHERE {
         ?instance geom:base64Data ?base64Data .
         FILTER NOT EXISTS { ?instance geom:bboxMinX ?any }
     }
-    (?minX ?minY ?minZ ?maxX ?maxY ?maxZ) pf:BBoxPropFunction ?base64Data .
+    (?minX ?minY ?minZ ?maxX ?maxY ?maxZ) vng:gmBoundingBox ?base64Data .
 }
 		]]>
 	</query>

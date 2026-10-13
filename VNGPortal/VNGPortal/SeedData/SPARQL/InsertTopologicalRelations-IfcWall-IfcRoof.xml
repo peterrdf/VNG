@@ -8,7 +8,7 @@ PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
 PREFIX express: <https://w3id.org/express#>
 PREFIX geom:    <https://vng.nl/geometry/>
 PREFIX dso:     <http://vng.nl/areas/>
-PREFIX ext:     <http://vng.nl/geometry-ext.ttl#>
+PREFIX vng:     <http://vng.nl/geometry-ext.ttl#>
 PREFIX topo:    <http://vng.nl/topology/>
 
 DELETE {
@@ -45,7 +45,7 @@ WHERE {
         }
     }
 
-    BIND(ext:topologicalRelation(?base64Data1, ?allBase64) AS ?topologicalRelation)
+    BIND(vng:gmTopology(?base64Data1, ?allBase64) AS ?topologicalRelation)
 
     OPTIONAL {
         GRAPH <https://vng.nl/geometries/> {

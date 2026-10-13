@@ -5,8 +5,7 @@ import org.apache.jena.sys.JenaSubsystemLifecycle;
 
 public class BBoxInit implements JenaSubsystemLifecycle {
 
-    private static final String PF_URI =
-        "http://vng.nl/geometry-ext.ttl#bbox";
+    private static final String PF_URI = "http://vng.nl/geometry-ext.ttl#gmBoundingBox";
 
     @Override
     public void start() {

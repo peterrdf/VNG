@@ -16,3 +16,7 @@ org.vng.BoxInit
 org.vng.PlaneInit
 org.vng.Projection2DInit
 org.vng.ColorInit
+org.vng.AreaInit
+org.vng.VolumeInit
+org.vng.DistanceInit
+org.vng.ContentInit

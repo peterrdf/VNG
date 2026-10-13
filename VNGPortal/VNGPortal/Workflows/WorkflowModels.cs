@@ -91,6 +91,38 @@ public class SPARQLGeometryQuery : SPARQLQuery
     }
 }
 
+[XmlRoot("sparql")]
+public class SPARQLVariableQuery : SPARQLQuery
+{
+    [XmlElement("valueVariable")]
+    public string ValueVariable { get; set; } = string.Empty;
+
+    [XmlElement("valueVariableLabel")]
+    public string ValueVariableLabel { get; set; } = string.Empty;    
+
+    public static SPARQLVariableQuery FromXml(XElement e)
+    {
+        var parameters = new ParameterDictionary();
+        var parametersElement = e.Element("parameters");
+        if (parametersElement != null)
+        {
+            foreach (var p in parametersElement.Elements())
+            {
+                parameters[p.Name.LocalName] = p.Value.Trim();
+            }
+        }
+
+        return new SPARQLVariableQuery
+        {
+            Id = e.Element("id")?.Value.Trim() ?? "",
+            Query = e.Element("query")?.Value.Trim() ?? "",
+            ValueVariable = e.Element("valueVariable")?.Value.Trim() ?? "",
+            ValueVariableLabel = e.Element("valueVariableLabel")?.Value.Trim() ?? "",
+            Parameters = parameters
+        };
+    }
+}
+
 public class SHACLView
 {
     [XmlElement("type")]

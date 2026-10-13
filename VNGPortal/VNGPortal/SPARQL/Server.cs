@@ -323,5 +323,34 @@ namespace VNGPortal.SPARQL
                 throw;
             }
         }
+
+        public async Task<string?> RetrieveValue(SparqlResultSet resultSet, string valueField, long owlModel)
+        {
+            ArgumentNullException.ThrowIfNull(resultSet);
+            ArgumentException.ThrowIfNullOrWhiteSpace(valueField);
+
+            return await Task.Run(() =>
+            {
+                foreach (var result in resultSet)
+                {
+                    if (!result.TryGetValue(valueField, out var node) || node == null)
+                    {
+                        continue;
+                    }
+
+                    // Return the first bound value only
+                    return node switch
+                    {
+                        VDS.RDF.ILiteralNode literal => literal.Value,
+                        VDS.RDF.IUriNode uriNode => uriNode.Uri.ToString(),
+                        _ => node.ToString()
+                    };
+                }
+
+                _logger.LogWarning("Field '{ValueField}' not found in result set for OWL model {OwlModel}.", valueField, owlModel);
+
+                return null;
+            });
+        }
     }
 }

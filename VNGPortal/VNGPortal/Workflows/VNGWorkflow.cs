@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Lucene.Net.Search;
+using Microsoft.Extensions.Logging;
 using RDF;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using VNGPortal.IFC2RDF;
 using VNGPortal.Services;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace VNGPortal.Workflows
 {
@@ -211,6 +213,58 @@ namespace VNGPortal.Workflows
                                         taskDescriptor.GroupName,
                                         0,
                                         $"Error executing 3DVIEW workflow step: '{step.Name}'.",
+                                        true);
+                                    throw;
+                                }
+                            }
+                            break;
+
+                        case "TEXTVIEW":
+                            {
+                                if (!step.Parameters.ContainsKey("queries"))
+                                {
+                                    throw new Exception($"TEXTVIEW workflow step: '{step.Name}' is missing 'queries' parameter.");
+                                }
+
+                                var variableQueries = step.Parameters.GetVariableQueries();
+                                if (variableQueries == null || variableQueries.Count == 0)
+                                {
+                                    throw new Exception($"TEXTVIEW workflow step: '{step.Name}' has no valid geometry queries.");
+                                }
+
+                                long owlModel = Engine.CreateModel();
+                                try
+                                {
+                                    foreach (var variableQuery in variableQueries)
+                                    {
+                                        await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SPARQL Query", variableQuery.Query, "", false);
+
+                                        var queryResult = await SPARQLServer.ExecuteQueryAsync(DatasetName, variableQuery.Query);
+                                        var text = variableQuery.ValueVariableLabel + ": ";
+                                        text += await SPARQLServer.RetrieveValue(queryResult, variableQuery.ValueVariable, owlModel);
+                                        text += "\n";
+
+                                        await _signalRStatus.SendProgressUpdate(
+                                            taskDescriptor.GroupName,
+                                            (float)currentStep / stepsCount,
+                                            text,
+                                            false);
+                                    }
+
+                                    _logger.LogInformation("Workflow step {StepName} executed successfully.", step.Name);
+                                    await _signalRStatus.SendProgressUpdate(
+                                        taskDescriptor.GroupName,
+                                        (float)currentStep / stepsCount,
+                                        $"(Step {currentStep}/{stepsCount}) Workflow step: '{step.Name}' executed successfully.",
+                                        false);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, "Error executing TEXTVIEW workflow step: '{StepName}'", step.Name);
+                                    await _signalRStatus.SendProgressUpdate(
+                                        taskDescriptor.GroupName,
+                                        0,
+                                        $"Error executing TEXTVIEW workflow step: '{step.Name}'.",
                                         true);
                                     throw;
                                 }

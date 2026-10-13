@@ -64,4 +64,16 @@ public class ParameterDictionary : Dictionary<string, string>, IXmlSerializable
             .Select(SPARQLGeometryQuery.FromXml)
             .ToList();
     }
+
+    public List<SPARQLVariableQuery> GetVariableQueries(string key = "queries")
+    {
+        if (!TryGetValue(key, out var xml) || string.IsNullOrWhiteSpace(xml))
+        {
+            return new List<SPARQLVariableQuery>();
+        }
+        return XElement.Parse($"<{key}>{xml}</{key}>")
+            .Elements("sparql")
+            .Select(SPARQLVariableQuery.FromXml)
+            .ToList();
+    }
 }

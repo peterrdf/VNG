@@ -1,6 +1,6 @@
 services:
   vngservice:
-    image: vngservice:1.14
+    image: vngservice:1.15
     build:
       context: .
       dockerfile: docker/Dockerfile.prebuilt

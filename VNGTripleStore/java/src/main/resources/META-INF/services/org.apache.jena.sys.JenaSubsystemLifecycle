@@ -20,3 +20,4 @@ org.vng.AreaInit
 org.vng.VolumeInit
 org.vng.DistanceInit
 org.vng.ContentInit
+org.vng.LengthInit

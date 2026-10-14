@@ -280,6 +280,36 @@ namespace VNGService.Pages
             }
         }
 
+        public IActionResult OnPostLength([FromForm] string base64Content)
+        {
+            var modelsDir = GetModelsDir();
+            if (string.IsNullOrEmpty(modelsDir))
+            {
+                _logger.LogError("Models path is not configured.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Models path is not configured.");
+            }
+
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
+
+            try
+            {
+                long owlInstance = ImportBase64Model(owlModel, modelsDir, base64Content);
+                double[] length = Engine.GetDatatypeProperty_inDouble(owlInstance, Engine.GetPropertyByName(owlModel, "length"));
+                
+                return new JsonResult(new { Length = length.Length == 1 ? length[0] : 0.0 });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during volume calculation.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error during volume calculation.");
+            }
+            finally
+            {
+                Engine.CloseModel(owlModel);
+            }
+        }
+
         public IActionResult OnPostContent([FromForm] string base64Content)
         {
             var modelsDir = GetModelsDir();

@@ -196,6 +196,12 @@
 		<None Update="SeedData\SHACL\ValidateTopologicalRelations.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SPARQL\RetrieveBuildingElements.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SPARQL\InsertIFC4ADD2Ontology.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\SPARQL\RetrieveGeometryByGlobalIdTemplate.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

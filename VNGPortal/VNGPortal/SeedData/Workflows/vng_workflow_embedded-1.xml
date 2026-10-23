@@ -258,6 +258,18 @@
 			</parameters>
 		</step>-->
 		<step>
+			<name><![CDATA[Insert IFC4ADD2]]></name>
+			<description>
+				<![CDATA[
+				    Inserts the IFC4ADD2 ontology into the SPARQL dataset.
+			    ]]>
+			</description>
+			<type><![CDATA[SPARQL]]></type>
+			<parameters>
+				<queryRef><![CDATA[InsertIFC4ADD2Ontology]]></queryRef>
+			</parameters>
+		</step>
+		<step>
 			<name><![CDATA[Insert Areas]]></name>
 			<description>
 				<![CDATA[

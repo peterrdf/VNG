@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sparql>
 	<id><![CDATA[InsertProjections]]></id>
+	<!--
+		Explanation:
+		This SPARQL update computes and stores a 2D projection for each geometry.
+		1. Selects every ?instance in the graph <https://vng.nl/geometries/> that has
+		   geom:base64Data but does not yet have geom:projectionBase64Data (FILTER NOT EXISTS),
+		   so instances that already have a projection are skipped.
+		2. Builds a plane with vng:gmPlane(0.0, 0.0, 1.0, 0.0). This is the XY plane
+		   with normal (0, 0, 1) passing through the origin.
+		3. Calls the custom function vng:gmProjection to project the base64 geometry
+		   onto that plane (a top-down projection).
+		4. Inserts the result into the same graph as geom:projectionBase64Data on the instance.
+	-->
 	<query>
 		<![CDATA[
 PREFIX geom:    <https://vng.nl/geometry/>

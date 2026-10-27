@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shacl>
 	<id><![CDATA[ValidateTopologicalRelations]]></id>
+	<!--
+		Explanation (SHACL):
+		This SHACL shape validates the topological relation of geometries to the living areas.
+		1. geom:GeometryShape targets every subject that has a geom:globalId (sh:targetSubjectsOf).
+		2. A SPARQL-based constraint (sh:sparql) reads geom:globalId and geom:topologicalRelation
+		   of each target.
+		3. A target is reported as a violation when geom:topologicalRelation is not "CONTAINED BY",
+		   which means the element is not fully inside the "wonen" (residential) areas.
+		4. The result message is "geom:topologicalRelation is NOT 'CONTAINED BY'. GlobalId: ...".
+		5. The severity is sh:Violation.
+	-->
 	<shape>
 		<![CDATA[
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
@@ -41,6 +52,20 @@ geom:GeometryShape
 			<type>violation</type>
 			<visualization>3dview</visualization>
 			<queries>
+				<!--
+					Explanation (SPARQL):
+					Retrieves the geometry of the walls that violate the topological relation rule,
+					for the 3D view.
+					1. VALUES restricts ?ifcType to ifc:IfcWall.
+					2. Finds the IFC elements of that type with an ifc:globalId_IfcRoot and reads the
+					   GlobalId string value.
+					3. In the graph <https://vng.nl/geometries/> it matches the geometry with the same
+					   rdf:type and geom:globalId, and reads geom:base64Data and
+					   geom:topologicalRelation.
+					4. FILTER keeps only geometries whose relation is not "CONTAINED BY".
+					5. The result is ordered by ?ifcElement, and the geometry is shown in the 3D view
+					   (geometryVariable = base64Data).
+				-->
 				<sparql>
 					<id><![CDATA[RetriveTopologicalRelationVialolations]]></id>
 					<query>
@@ -72,6 +97,15 @@ ORDER BY ?ifcElement
 					</query>
 					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
 				</sparql>
+				<!--
+					Explanation (SPARQL):
+					Retrieves the living areas to show as context in the 3D view.
+					1. In the graph <areas.ttl> it selects every dso:area with its dso:id,
+					   dso:group and dso:geometry.
+					2. FILTER keeps only areas whose group is "wonen" (residential).
+					3. The result is ordered by ?id, and the geometry is shown in the 3D view
+					   (geometryVariable = geometry).
+				-->
 				<sparql>
 					<id><![CDATA[RetriveLivingAreas]]></id>
 					<query>

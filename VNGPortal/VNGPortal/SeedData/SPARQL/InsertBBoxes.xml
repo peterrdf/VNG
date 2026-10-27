@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sparql>
 	<id><![CDATA[InsertBBoxes]]></id>
+	<!--
+		Explanation:
+		This SPARQL update computes and stores bounding boxes for geometries.
+		1. Selects every ?instance in the graph <https://vng.nl/geometries/> that has
+		   geom:base64Data but does not yet have geom:bboxMinX (FILTER NOT EXISTS),
+		   so instances that already have a bounding box are skipped.
+		2. Calls the custom property function vng:gmBoundingBox with the base64 data.
+		   It returns the six bounding box values (?minX ?minY ?minZ ?maxX ?maxY ?maxZ).
+		3. Inserts these values into the same graph as geom:bboxMinX, geom:bboxMinY,
+		   geom:bboxMinZ, geom:bboxMaxX, geom:bboxMaxY and geom:bboxMaxZ on the instance.
+	-->
 	<query>
 		<![CDATA[
 PREFIX geom:    <https://vng.nl/geometry/>

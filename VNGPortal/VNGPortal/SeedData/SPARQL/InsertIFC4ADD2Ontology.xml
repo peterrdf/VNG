@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sparql>
+	<id><![CDATA[InsertIFC4ADD2Ontology]]></id>
+	<!--
+		Explanation:
+		This SPARQL update loads the IFC4 ADD2 ontology (ifcOWL) into the triple store.
+		1. Downloads the Turtle file IFC4_ADD2.ttl from the openBIMstandards/ifcOWL
+		   GitHub repository (LOAD).
+		2. Stores all its triples in the named graph <https://vng.nl/ontologies/ifc4add2>
+		   (INTO GRAPH).
+		The ontology defines the IFC classes and properties (for example ifc:IfcWall and
+		ifc:IfcMapConversion) that the other queries use. The triple store needs
+		internet access to run this query.
+	-->
+	<query>
+		<![CDATA[
+LOAD <https://raw.githubusercontent.com/openBIMstandards/ifcOWL/master/IFC4_ADD2.ttl>
+INTO GRAPH <https://vng.nl/ontologies/ifc4add2>
+	    ]]>
+	</query>
+</sparql>

@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sparql>
 	<id><![CDATA[InsertAreas]]></id>
+	<!--
+		Explanation:
+		This SPARQL update does the following:
+		1. Drops the existing named graph <areas.ttl> (silently, so no error if it doesn't exist).
+		2. Reads the map conversion (eastings/northings) from the first ifc:IfcMapConversion
+		   found in the model (LIMIT 1). These are the double values of the georeference origin.
+		3. Calls the custom property function vng:dsoArea with (?e ?n) as input. It returns
+		   the DSO areas (id, name, group, type, geometry) for that location.
+		4. Builds an IRI for each area by concatenating the dso: namespace with the area id.
+		5. Inserts each area into the graph <areas.ttl> as a dso:area with the properties
+		   dso:id, dso:name, dso:group, dso:type and dso:geometry.
+	-->
 	<query>
 		<![CDATA[
 PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>

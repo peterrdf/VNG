@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shacl>
 	<id><![CDATA[ValidateHeight]]></id>
+	<!--
+		Explanation (SHACL):
+		This SHACL shape validates the height of geometries against the highest wall.
+		1. geom:IfcElementHeightShape targets every subject that has a geom:globalId (sh:targetSubjectsOf).
+		2. A SPARQL-based constraint (sh:sparql) reads geom:globalId and geom:bboxMaxZ (the top
+		   of the bounding box) of each target.
+		3. A sub-query calculates ?globalMaxZ, the maximum geom:bboxMaxZ over all elements whose
+		   rdf:type is ifc:IfcWall (the VALUES list can be extended with more IFC types).
+		4. A target is reported as a violation when ?bboxMaxZ - ?globalMaxZ > 1, which means its top
+		   is more than 1 unit above the highest wall.
+		5. The result message is "Height violation for GlobalId=[...]: bboxMaxZ=... minus
+		   globalMaxZ=... exceeds 1."
+		6. The severity is sh:Violation.
+	-->
 	<shape>
 		<![CDATA[
 @prefix sh:   <http://www.w3.org/ns/shacl#> .

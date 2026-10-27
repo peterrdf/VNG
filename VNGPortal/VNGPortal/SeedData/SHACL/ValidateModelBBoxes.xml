@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shacl>
 	<id><![CDATA[ValidateModelBBoxes]]></id>
+	<!--
+		Explanation (SHACL):
+		This SHACL shape validates the overall bounding box of the whole model (dataset).
+		1. geom:DatasetBBoxShape targets a single node, the graph IRI <https://vng.nl/geometries/>
+		   (sh:targetNode).
+		2. A SPARQL-based constraint (sh:sparql) runs one query for that node.
+		3. A subquery goes over all geometries that have geom:eastings, geom:northings and the six
+		   bbox properties (geom:bboxMinX/Y/Z and geom:bboxMaxX/Y/Z). It calculates the global extent:
+		   - X: min and max of (bbox X - eastings)
+		   - Y: min and max of (bbox Y - northings)
+		   - Z: min and max of the bbox Z values
+		   The eastings and northings are subtracted, so X and Y are relative to the model origin.
+		4. The model is reported as a violation when the total size of the extent is smaller than 1 or
+		   larger than 100 on any axis (for example, globalMaxX - globalMinX).
+		5. The result message lists the six global values
+		   ("Dataset BBox violation: globalMinX=..., globalMaxX=..., ...").
+		6. The severity is sh:Violation.
+	-->
 	<shape>
 		<![CDATA[
 @prefix sh:   <http://www.w3.org/ns/shacl#> .

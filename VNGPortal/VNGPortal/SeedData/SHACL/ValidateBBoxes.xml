@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shacl>
 	<id><![CDATA[ValidateBBoxes]]></id>
+	<!--
+		Explanation (SHACL):
+		This SHACL shape validates the bounding boxes of geometries.
+		1. geom:GeometryShape targets every subject that has a geom:globalId (sh:targetSubjectsOf).
+		2. A SPARQL-based constraint (sh:sparql) reads the bounding box values
+		   (geom:bboxMinX/Y/Z and geom:bboxMaxX/Y/Z) of each geometry and calculates the size
+		   per axis: deltaX = maxX - minX, deltaY = maxY - minY, deltaZ = maxZ - minZ.
+		3. A geometry is reported as a violation when any delta is smaller than 1 or larger than 100.
+		4. The result message contains the GlobalId and the three deltas
+		   ("BBox violation for GlobalId=[...]: deltaX=..., deltaY=..., deltaZ=...").
+		   The 3D view uses the GlobalId=[...] part to find the geometry again.
+		5. The severity is sh:Violation.
+	-->
 	<shape>
 		<![CDATA[
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
@@ -50,6 +63,16 @@ geom:GeometryShape
 			<type>violation</type>
 			<visualization>3dview</visualization>
 			<queries>
+				<!--
+					Explanation (SPARQL):
+					Retrieves the geometry of the violating elements for the 3D view.
+					1. The placeholder ###GLOBAL_IDS_LIST### is replaced with the GlobalIds
+					   extracted from the violation messages. templateArgRegExpr matches
+					   GlobalId=[...] and the named group "globalId" provides the value.
+					2. VALUES restricts ?globalIdValue to those GlobalIds.
+					3. In the graph <https://vng.nl/geometries/> it returns the matching
+					   geom:base64Data, which is shown in the 3D view (geometryVariable = base64Data).
+				-->
 				<sparql>
 					<id><![CDATA[RetrieveGeometryByGlobalIdTemplate]]></id>
 					<query>
@@ -74,6 +97,15 @@ WHERE {
 					</parameters>
 					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
 				</sparql>
+				<!--
+					Explanation (SPARQL):
+					Retrieves the living areas to show as context in the 3D view.
+					1. In the graph <areas.ttl> it selects every dso:area with its dso:id,
+					   dso:group and dso:geometry.
+					2. FILTER keeps only areas whose group is "wonen" (residential).
+					3. The result is ordered by ?id, and the geometry is shown in the 3D view
+					   (geometryVariable = geometry).
+				-->
 				<sparql>
 					<id><![CDATA[RetriveLivingAreas]]></id>
 					<query>

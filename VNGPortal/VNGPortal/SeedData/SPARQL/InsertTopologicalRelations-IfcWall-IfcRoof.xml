@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sparql>
 	<id><![CDATA[InsertTopologicalRelations-IfcWall-IfcRoof]]></id>
+	<!--
+		Explanation:
+		This SPARQL update computes and stores the topological relation between the
+		projected geometry of IFC walls and roofs and the "wonen" (residential) DSO areas.
+		1. Restricts ?ifcType to ifc:IfcWall and ifc:IfcRoof (VALUES), then finds the elements of
+		   those types that have an ifc:globalId_IfcRoot and reads the GlobalId string value.
+		2. Matches the GlobalId to a ?geometry in the graph <https://vng.nl/geometries/>
+		   (geom:globalId) and reads its geom:projectionBase64Data.
+		3. In a sub-query, collects the geometries of all dso:area resources in the graph
+		   <areas.ttl> whose dso:group is "wonen" and concatenates them into one
+		   string (?allBase64), separated by "|".
+		4. Calls the custom function vng:gmTopology with the element projection and the
+		   concatenated area geometries to compute ?topologicalRelation.
+		5. Optionally reads any existing geom:topologicalRelation (?oldRelation).
+		6. Deletes the old relation and inserts the new one as geom:topologicalRelation
+		   on the geometry, so re-running the query replaces stale values.
+	-->
 	<query>
 		<![CDATA[
 PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>

@@ -21,7 +21,7 @@ namespace VNGService.Services
         private const string PresenterenUrl = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/presenteren/v8/";
 
         /* 
-         * https://developer.omgevingswet.overheid.nl/api-register/api/omgevingsdocument-toepasbaaropvragen/
+         * https://developer.omgevingswet.overheid.nl/api-register/api/omgevingsdocument-toepasbaar-opvragen/
          * Environmental document Applicable request
          * 
          * This specific API is based on CIM-OW, but focused on the information needs for the execution of Applicable Rules. 
@@ -32,7 +32,7 @@ namespace VNGService.Services
         private const string ToepasbaarUrl = "https://service.omgevingswet.overheid.nl/publiek/omgevingsdocumenten/api/toepasbaaropvragen/v7/";
 
         /* 
-         * https://developer.omgevingswet.overheid.nl/api-register/api/omgevingsdocument-geometrieopvragen/
+         * https://developer.omgevingswet.overheid.nl/api-register/api/omgevingsdocumenten-geometrie-opvragen/
          * Requesting geometry environmental documents
          * 
          * The Geometry Query Environment Documents API provides users with the ability to query all geometries known in the DSO. 

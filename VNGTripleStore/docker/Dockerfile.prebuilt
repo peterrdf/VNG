@@ -8,6 +8,7 @@ USER root
 # #!/bin/sh (not bash) is required because Alpine may not have bash at /bin/sh.
 # Shell form is required to expand $JVM_ARGS / $JAVA_OPTIONS at runtime.
 RUN printf '#!/bin/sh\n\
+mkdir -p /fuseki/dumps\n\
 exec java $JVM_ARGS $JAVA_OPTIONS \\\n\
   -cp "/jena-fuseki/fuseki-server.jar:/jena-fuseki/extra/vng-functions.jar" \\\n\
   org.apache.jena.fuseki.cmd.FusekiCmd "$@"\n' \

@@ -564,11 +564,11 @@ namespace VNGService.Pages
                         var polygon = geometry.PolygonCoordinates;
 
                         long owlBoundaryRepresentationInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "BoundaryRepresentation"));
-                        SetStringPropertyW(
-                            owlBoundaryRepresentationInstance,
-                            Engine.GetPropertyByName(owlModel, "tag"),
-                            name);
-
+                        // #todo: fix base64 encoding support for Unicode properties
+                        //SetStringPropertyW(
+                        //    owlBoundaryRepresentationInstance,
+                        //    Engine.GetPropertyByName(owlModel, "tag"),
+                        //    name);
                         int index = 0;
                         List<long> indices = new();
                         List<double> vertices = new();
@@ -676,10 +676,11 @@ namespace VNGService.Pages
                         }
 
                         long owlCollectionInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Collection"));
-                        SetStringPropertyW(
-                            owlCollectionInstance,
-                            Engine.GetPropertyByName(owlModel, "tag"),
-                            name);
+                        // #todo: fix base64 encoding support for Unicode properties
+                        //SetStringPropertyW(
+                        //    owlCollectionInstance,
+                        //    Engine.GetPropertyByName(owlModel, "tag"),
+                        //    name);
                         Engine.SetObjectProperty(
                                 owlCollectionInstance,
                                 Engine.GetPropertyByName(owlModel, "objects"),
@@ -694,11 +695,11 @@ namespace VNGService.Pages
                     if (geometry.PointCoordinates != null)
                     {
                         long owlPointInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Point3D"));
-                        SetStringPropertyW(
-                            owlPointInstance,
-                            Engine.GetPropertyByName(owlModel, "tag"),
-                            name);
-
+                        // #todo: fix base64 encoding support for Unicode properties
+                        //SetStringPropertyW(
+                        //    owlPointInstance,
+                        //    Engine.GetPropertyByName(owlModel, "tag"),
+                        //    name);
                         double value = geometry.PointCoordinates[0];
                         Engine.SetDatatypeProperty(
                             owlPointInstance,
@@ -735,11 +736,11 @@ namespace VNGService.Pages
                         }
 
                         long owlPolyLineInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "PolyLine3D"));
-                        SetStringPropertyW(
-                            owlPolyLineInstance,
-                            Engine.GetPropertyByName(owlModel, "tag"),
-                            name);
-
+                        // #todo: fix base64 encoding support for Unicode properties
+                        //SetStringPropertyW(
+                        //    owlPolyLineInstance,
+                        //    Engine.GetPropertyByName(owlModel, "tag"),
+                        //    name);
                         Engine.SetDatatypeProperty(
                             owlPolyLineInstance,
                             Engine.GetPropertyByName(owlModel, "coordinates"),

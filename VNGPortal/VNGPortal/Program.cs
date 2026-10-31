@@ -113,6 +113,13 @@ namespace VNGPortal
             }
             Directory.CreateDirectory(logsDir);
 
+            var dumpsDir = builder.Configuration[$"{FileStorage}:DumpsDir"];
+            if (string.IsNullOrEmpty(dumpsDir))
+            {
+                throw new InvalidOperationException("Dumps path is not configured.");
+            }
+            Directory.CreateDirectory(dumpsDir);
+
             // Serilog
             builder.Host.UseSerilog((context, services, configuration) => configuration
                 .ReadFrom.Configuration(context.Configuration)
@@ -157,6 +164,11 @@ namespace VNGPortal
             builder.Services.AddHttpClient();
 
             var app = builder.Build();
+
+            var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+            lifetime.ApplicationStopping.Register(() =>
+                Log.Warning("ApplicationStopping: shutdown requested (SIGTERM / host stop). Stack: {Trace}", Environment.StackTrace));
+            lifetime.ApplicationStopped.Register(() => Log.Warning("ApplicationStopped."));
 
             // SignalR Hubs
             app.MapHub<StatusHub>("/statusHub");

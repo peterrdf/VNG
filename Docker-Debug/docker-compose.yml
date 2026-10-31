@@ -1,5 +1,4 @@
 services:
-
   vngportal:
     container_name: vngportal
     depends_on:
@@ -11,8 +10,16 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
+      - DOTNET_DbgEnableMiniDump=1
+      - DOTNET_DbgMiniDumpType=2            # 2 = heap dump; 4 = full dump
+      - DOTNET_DbgMiniDumpName=/vng/portal/dumps/crash-%p.dmp
+      - DOTNET_EnableCrashReport=1          # writes crash-<pid>.dmp.crashreport.json with the native stack
     volumes:
       - C:\vng\portal:/vng/portal
+      - dataprotection_keys:/root/.aspnet/DataProtection-Keys
+    cap_add:
+      - SYS_PTRACE                          # lets createdump attach on locked-down hosts
+    stop_grace_period: 60s
     restart: unless-stopped
 
   vngtriplestore:
@@ -24,10 +31,16 @@ services:
       - "3030:3030"
     environment:
       ADMIN_PASSWORD: admin123
-      JVM_ARGS: -Xmx2g
+      JVM_ARGS: >-
+        -Xmx2g
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/fuseki/dumps/
+        -XX:ErrorFile=/fuseki/dumps/hs_err_pid%p.log
+        -XX:+ExitOnOutOfMemoryError
       JAVA_OPTIONS: "-Djava.library.path=/usr/lib"
     volumes:
       - fuseki_data:/fuseki
+    stop_grace_period: 30s
     restart: unless-stopped
 
   vngservice:
@@ -38,10 +51,19 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
+      - DOTNET_DbgEnableMiniDump=1
+      - DOTNET_DbgMiniDumpType=2            # 2 = heap dump; 4 = full dump
+      - DOTNET_DbgMiniDumpName=/vng/service/dumps/crash-%p.dmp
+      - DOTNET_EnableCrashReport=1          # writes crash-<pid>.dmp.crashreport.json with the native stack
     volumes:
       - service_data:/vng/service
+      - dataprotection_keys:/root/.aspnet/DataProtection-Keys
+    cap_add:
+      - SYS_PTRACE                          # lets createdump attach on locked-down hosts
+    stop_grace_period: 60s
     restart: unless-stopped
 
 volumes:
   fuseki_data:
   service_data:
+  dataprotection_keys:  

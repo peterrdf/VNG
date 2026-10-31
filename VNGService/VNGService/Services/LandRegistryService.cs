@@ -337,7 +337,6 @@ namespace VNGService.Services
                         //    owlBoundaryRepresentationInstance,
                         //    Engine.GetPropertyByName(owlModel, "tag"), 
                         //    name);
-
                         int index = 0;
                         List<long> indices = new();
                         List<double> vertices = new();
@@ -409,7 +408,6 @@ namespace VNGService.Services
                         //    owlPolyLineInstance, 
                         //    Engine.GetPropertyByName(owlModel, "tag"), 
                         //    name);
-
                         Engine.SetDatatypeProperty(
                             owlPolyLineInstance,
                             Engine.GetPropertyByName(owlModel, "coordinates"),

@@ -185,6 +185,7 @@ namespace VNGPortal.Workflows
                                 }
 
                                 long owlModel = Engine.CreateModel();
+                                Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
                                 try
                                 {
                                     foreach (var geometryQuery in geometryQueries)

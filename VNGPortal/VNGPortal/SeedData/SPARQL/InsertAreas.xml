@@ -7,7 +7,7 @@
 		1. Drops the existing named graph <areas.ttl> (silently, so no error if it doesn't exist).
 		2. Reads the map conversion (eastings/northings) from the first ifc:IfcMapConversion
 		   found in the model (LIMIT 1). These are the double values of the georeference origin.
-		3. Calls the custom property function vng:dsoArea with (?e ?n) as input. It returns
+		3. Calls the custom property function vng:dsoArea with (?e ?n 400 'wonen') as input. It returns
 		   the DSO areas (id, name, group, type, geometry) for that location.
 		4. Builds an IRI for each area by concatenating the dso: namespace with the area id.
 		5. Inserts each area into the graph <areas.ttl> as a dso:area with the properties
@@ -43,7 +43,7 @@ WHERE {
         ?ln express:hasDouble                 ?n .
     } LIMIT 1
     }
-    (?e ?n) vng:dsoArea (?id ?name ?group ?type ?geometry) .
+    (?e ?n 400 'wonen') vng:dsoArea (?id ?name ?group ?type ?geometry) .
     BIND(IRI(CONCAT(STR(dso:), ?id)) AS ?areaUri)
 }
 	    ]]>

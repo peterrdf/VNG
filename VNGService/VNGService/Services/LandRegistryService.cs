@@ -32,7 +32,7 @@ namespace VNGService.Services
             _bagService = new BagApiService(configuration, logger);
         }
 
-        public async Task<List<Building>> GetBuildings(double eastings, double northings, double bboxLength)
+        public async Task<List<Building>> GetBuildings(double eastings, double northings, double bboxSize)
         {
             long owlModel = Engine.CreateModel();
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
@@ -49,8 +49,8 @@ namespace VNGService.Services
             {
                 // https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcMapConversion.htm
                 // RD New (EPSG:28992): Lat = northings, Lon = eastings in meters
-                var point1 = new GeoPoint(Lat: northings - bboxLength / 2, Lon: eastings - bboxLength / 2);
-                var point2 = new GeoPoint(Lat: northings + bboxLength / 2, Lon: eastings + bboxLength / 2);
+                var point1 = new GeoPoint(Lat: northings - bboxSize / 2, Lon: eastings - bboxSize / 2);
+                var point2 = new GeoPoint(Lat: northings + bboxSize / 2, Lon: eastings + bboxSize / 2);
 
                 return await CreateBuildings(owlModel, point1, point2);
             }
@@ -65,7 +65,7 @@ namespace VNGService.Services
             }
         }
         
-        public async Task<List<Parcel>> GetParcels(double eastings, double northings, double bboxLength)
+        public async Task<List<Parcel>> GetParcels(double eastings, double northings, double bboxSize)
         {
             long owlModel = Engine.CreateModel();
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
@@ -82,8 +82,8 @@ namespace VNGService.Services
             {
                 // https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcMapConversion.htm
                 // RD New (EPSG:28992): Lat = northings, Lon = eastings in meters
-                var point1 = new GeoPoint(Lat: northings - bboxLength / 2, Lon: eastings - bboxLength / 2);
-                var point2 = new GeoPoint(Lat: northings + bboxLength / 2, Lon: eastings + bboxLength / 2);                
+                var point1 = new GeoPoint(Lat: northings - bboxSize / 2, Lon: eastings - bboxSize / 2);
+                var point2 = new GeoPoint(Lat: northings + bboxSize / 2, Lon: eastings + bboxSize / 2);                
 
                 return await CreateParcels(owlModel, point1, point2);
             }

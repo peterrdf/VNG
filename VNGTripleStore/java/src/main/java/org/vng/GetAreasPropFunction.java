@@ -1,5 +1,6 @@
 package org.vng;
 
+
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonArray;
 import org.apache.jena.atlas.json.JsonObject;
@@ -20,9 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +48,11 @@ public class GetAreasPropFunction extends PropertyFunctionBase {
                                Node predicate, PropFuncArg argObject,
                                ExecutionContext execCxt) {
 
-        // Subject: (?eastings ?northings)
+        // Subject: (?eastings ?northings ?bboxSize ?type)
         List<Node> subjArgs = argSubject.getArgList();
-        if (subjArgs.size() != 2)
+        if (subjArgs.size() != 4)
             throw new ExprEvalException(
-                    "dsoArea: subject must be (?eastings ?northings), got " + subjArgs.size());
+                    "dsoArea: subject must be (?eastings ?northings ?bboxSize ?type), got " + subjArgs.size());
 
         // Object: (?id ?name ?group ?type ?geometry)
         List<Node> objArgs = argObject.getArgList();
@@ -60,12 +63,18 @@ public class GetAreasPropFunction extends PropertyFunctionBase {
         // Resolve any variables in the subject from the current binding
         Node eastNode  = resolve(subjArgs.get(0), binding);
         Node northNode = resolve(subjArgs.get(1), binding);
+        Node bboxNode  = resolve(subjArgs.get(2), binding);
+        Node typeNode  = resolve(subjArgs.get(3), binding);
 
-        if (eastNode == null || northNode == null)
-            throw new ExprEvalException("dsoArea: unbound eastings or northings");
+        if (eastNode == null || northNode == null || bboxNode == null || typeNode == null)
+            throw new ExprEvalException("dsoArea: unbound eastings, northings, bboxSize or type");
 
         double eastings  = NodeValue.makeNode(eastNode).getDouble();
         double northings = NodeValue.makeNode(northNode).getDouble();
+        long bboxSize = NodeValue.makeNode(bboxNode).getInteger().longValue();
+        String typeFilter = typeNode.isLiteral()
+                ? typeNode.getLiteralLexicalForm()
+                : typeNode.toString();
 
         Var idVar   = (Var) objArgs.get(0);
         Var nameVar = (Var) objArgs.get(1);
@@ -76,8 +85,10 @@ public class GetAreasPropFunction extends PropertyFunctionBase {
         try {
             // Use %.2f to avoid scientific notation (e.g. 5.3E5) confusing the ASP.NET handler
             URI uri = URI.create(SERVICE_BASE_URL + "/DSO?handler=Areas"
-                    + "&eastings="  + String.format("%.2f", eastings)
-                    + "&northings=" + String.format("%.2f", northings));
+                    + "&eastings="  + String.format(java.util.Locale.ROOT, "%.2f", eastings)
+                    + "&northings=" + String.format(java.util.Locale.ROOT, "%.2f", northings)
+                    + "&bboxSize=" + bboxSize
+                    + "&type=" + URLEncoder.encode(typeFilter, StandardCharsets.UTF_8));
             LOG.debug("dsoArea: GET {}", uri);
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -115,8 +126,8 @@ public class GetAreasPropFunction extends PropertyFunctionBase {
             }
 
             JsonArray areas = JSON.parseAny(response.body()).getAsArray();
-            LOG.info("dsoArea: eastings={} northings={} => {} area(s) returned",
-                    eastings, northings, areas.size());
+            LOG.info("dsoArea: eastings={} northings={} bboxSize={} type={} => {} area(s) returned",
+                    eastings, northings, bboxSize, typeFilter, areas.size());
 
             // One Binding per area → one row per area in SPARQL results
             List<Binding> bindings = new ArrayList<>();

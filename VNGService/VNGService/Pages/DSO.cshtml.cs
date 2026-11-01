@@ -28,20 +28,20 @@ namespace VNGService.Pages
         {
         }
 
-        public async Task<IActionResult> OnGetAreas(double eastings, double northings)
+        public async Task<IActionResult> OnGetAreas(double eastings, double northings, int bboxSize, string type)
         {
-            var areas = await GetZoningAreas(eastings, northings);
+            var areas = await GetZoningAreas(eastings, northings, bboxSize, type);
             if (areas?.Count > 0)
             {
                 return new JsonResult(areas);
             }
 
-            areas = await GetRegulationTextAnnotations(eastings, northings);
+            areas = await GetRegulationTextAnnotations(eastings, northings, bboxSize, type);
 
             return new JsonResult(areas);
         }
 
-        public async Task<List<Area>> GetRegulationTextAnnotations(double eastings, double northings)
+        public async Task<List<Area>> GetRegulationTextAnnotations(double eastings, double northings, int bboxSize, string type)
         {
             List<Area> areas = new();
 
@@ -80,8 +80,9 @@ namespace VNGService.Pages
                     var regulationTextAnnotations = await dsoService.GetRegulationTextAnnotationsAsync(
                         regulationId,
                         eastings,
-                        northings,                        
-                        groupFilter: "wonen", //#test
+                        northings,
+                        bboxSize,
+                        groupFilter: type,
                         typeFilter: null);
 
                     foreach (var item in regulationTextAnnotations)
@@ -138,14 +139,14 @@ namespace VNGService.Pages
             }
         }
 
-        public async Task<IActionResult> OnGetZoningAreas(double eastings, double northings)
+        public async Task<IActionResult> OnGetZoningAreas(double eastings, double northings, int bboxSize, string type)
         {
-            var zoningAreas = await GetZoningAreas(eastings, northings);
+            var zoningAreas = await GetZoningAreas(eastings, northings, bboxSize, type);
 
             return new JsonResult(zoningAreas);
         }
 
-        public async Task<List<Area>> GetZoningAreas(double eastings, double northings)
+        public async Task<List<Area>> GetZoningAreas(double eastings, double northings, int bboxSize, string type)
         {
             long owlModel = Engine.CreateModel(); 
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
@@ -232,7 +233,7 @@ namespace VNGService.Pages
                     _logger.LogInformation("No plans found for the given coordinates.");
                 }
 
-                return await CreateZoningAreas(owlModel, plans);
+                return await CreateZoningAreas(owlModel, plans, bboxSize, type);
             }
             catch (Exception ex)
             {
@@ -306,7 +307,7 @@ namespace VNGService.Pages
             }
         }
 
-        private async Task<List<Area>> CreateZoningAreas(long owlModel, List<Plan> plans)
+        private async Task<List<Area>> CreateZoningAreas(long owlModel, List<Plan> plans, int bboxSize, string type)
         {
             if (plans.Count == 0)
             {
@@ -339,7 +340,7 @@ namespace VNGService.Pages
 
                 var planZoningAreas = await CreatePlanZoningAreas(
                     httpClient, queryParams, owlModel, plan,
-                    groupFilter: "wonen", //#test
+                    groupFilter: type,
                     typeFilter: null);
                 if (planZoningAreas.Count > 0)
                 {

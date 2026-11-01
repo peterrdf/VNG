@@ -118,6 +118,7 @@ namespace VNGService.Services
             string regelingId,
             double pointX,
             double pointY,
+            int bboxSize,
             string? groupFilter,
             string? typeFilter)
         {
@@ -152,7 +153,7 @@ namespace VNGService.Services
                         if (!GeometryHelper.BoundingBoxesIntersect(
                             locationDetails.BoundingBox.MinX, locationDetails.BoundingBox.MinY,
                             locationDetails.BoundingBox.MaxX, locationDetails.BoundingBox.MaxY,
-                            pointX - 200, pointY - 200, pointX + 200, pointY + 200))
+                            pointX - bboxSize / 2, pointY - bboxSize / 2, pointX + bboxSize / 2, pointY + bboxSize / 2))
                         {
                             continue;
                         }
@@ -196,7 +197,7 @@ namespace VNGService.Services
                                 if (!GeometryHelper.BoundingBoxesIntersect(
                                         locationDetails.BoundingBox.MinX, locationDetails.BoundingBox.MinY,
                                         locationDetails.BoundingBox.MaxX, locationDetails.BoundingBox.MaxY,
-                                        pointX - 200, pointY - 200, pointX + 200, pointY + 200))
+                                        pointX - bboxSize / 2, pointY - bboxSize / 2, pointX + bboxSize / 2, pointY + bboxSize / 2))
                                 {
                                     continue;
                                 }

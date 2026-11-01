@@ -26,7 +26,7 @@ namespace VNGService.Pages
         {
             try
             {
-                var buildings = await _landRegistryService.GetBuildings(eastings, northings, bboxLength: 400); // #todo: bboxLength as parameter
+                var buildings = await _landRegistryService.GetBuildings(eastings, northings, bboxSize: 400); // #todo: bboxSize as parameter
                 return new JsonResult(buildings);
             }
             catch (Exception ex)
@@ -41,7 +41,7 @@ namespace VNGService.Pages
         {
             try
             {
-                var parcels = await _landRegistryService.GetParcels(eastings, northings, bboxLength: 400); // #todo: bboxLength as parameter
+                var parcels = await _landRegistryService.GetParcels(eastings, northings, bboxSize: 400); // #todo: bboxSize as parameter
                 return new JsonResult(parcels);
             }
             catch (Exception ex)

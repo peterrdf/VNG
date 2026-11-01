@@ -185,6 +185,8 @@ namespace VNGPortal.SPARQL
         {
             try
             {
+                _logger.LogInformation("Executing insert into dataset '{DatasetName}' with query: {Query}", datasetName, query);
+
                 var updateUri = $"{_sparqlEndpoint}{datasetName}";
 
                 using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(160) };
@@ -220,6 +222,8 @@ namespace VNGPortal.SPARQL
         {
             try
             {
+                _logger.LogInformation("Executing SHACL validation on dataset '{DatasetName}' for graph '{Graph}'", datasetName, graph);
+
                 var shaclUri = $"{_sparqlEndpoint}{datasetName}/shacl?graph={Uri.EscapeDataString(graph)}";
 
                 using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
@@ -255,6 +259,8 @@ namespace VNGPortal.SPARQL
         {
             try
             {
+                _logger.LogInformation("Executing query on dataset '{DatasetName}': {Query}", datasetName, query);
+
                 var queryUri = $"{_sparqlEndpoint}{datasetName}?query={Uri.EscapeDataString(query)}";
                 using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
 

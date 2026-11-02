@@ -9,8 +9,8 @@ namespace GenerateTestData.SPARQL
     public class Server
     {
         #region Constants
-        private readonly string _sparqlEndpoint = "http://vngtriplestore:3030/"; // Docker container name for Fuseki server
-        //private readonly string _sparqlEndpoint = "http://localhost:3030/"; // Windows local development
+        //private readonly string _sparqlEndpoint = "http://vngtriplestore:3030/"; // Docker container name for Fuseki server
+        private readonly string _sparqlEndpoint = "http://localhost:3030/"; // Windows local development
         private readonly string _user = "admin";
         private readonly string _password = "admin123";
         #endregion
@@ -214,7 +214,7 @@ namespace GenerateTestData.SPARQL
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Exception occurred while insetting into dataset '{DatasetName}'", datasetName);
+                _logger.Error(ex, "Exception occurred while inserting into dataset '{DatasetName}'", datasetName);
                 throw;
             }
         }

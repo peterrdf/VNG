@@ -14,6 +14,7 @@ namespace GenerateTestData
                 .MinimumLevel.Debug()
                 .WriteTo.File(
                     Path.Combine(AppContext.BaseDirectory, "logs", "log-.txt"),
+                    outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}",
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: 14)
                 .CreateLogger();

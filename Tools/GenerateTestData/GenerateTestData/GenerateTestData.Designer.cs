@@ -32,7 +32,7 @@
             _buttonSelectIFCFile = new Button();
             _textBoxIFCFile = new TextBox();
             groupBox2 = new GroupBox();
-            textBox1 = new TextBox();
+            _textBoxRandomLocations = new TextBox();
             label2 = new Label();
             _textBoxBBoxSize = new TextBox();
             label1 = new Label();
@@ -77,7 +77,7 @@
             // 
             // groupBox2
             // 
-            groupBox2.Controls.Add(textBox1);
+            groupBox2.Controls.Add(_textBoxRandomLocations);
             groupBox2.Controls.Add(label2);
             groupBox2.Controls.Add(_textBoxBBoxSize);
             groupBox2.Controls.Add(label1);
@@ -90,22 +90,22 @@
             groupBox2.TabStop = false;
             groupBox2.Text = "Input";
             // 
-            // textBox1
+            // _textBoxRandomLocations
             // 
-            textBox1.Location = new Point(374, 51);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(76, 23);
-            textBox1.TabIndex = 5;
-            textBox1.Text = "400";
+            _textBoxRandomLocations.Location = new Point(374, 51);
+            _textBoxRandomLocations.Name = "_textBoxRandomLocations";
+            _textBoxRandomLocations.Size = new Size(76, 23);
+            _textBoxRandomLocations.TabIndex = 5;
+            _textBoxRandomLocations.Text = "10";
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Location = new Point(214, 55);
             label2.Name = "label2";
-            label2.Size = new Size(154, 15);
+            label2.Size = new Size(158, 15);
             label2.TabIndex = 4;
-            label2.Text = "Select randonly N locations:";
+            label2.Text = "Select randomly N locations:";
             // 
             // _textBoxBBoxSize
             // 
@@ -134,10 +134,10 @@
             _buttonSelectLocationsFile.UseVisualStyleBackColor = true;
             _buttonSelectLocationsFile.Click += _buttonSelectLocationsFile_Click;
             // 
-            // _textBoxLocationsFIle
+            // _textBoxLocationsFile
             // 
             _textBoxLocationsFile.Location = new Point(9, 19);
-            _textBoxLocationsFile.Name = "_textBoxLocationsFIle";
+            _textBoxLocationsFile.Name = "_textBoxLocationsFile";
             _textBoxLocationsFile.ReadOnly = true;
             _textBoxLocationsFile.Size = new Size(441, 23);
             _textBoxLocationsFile.TabIndex = 0;
@@ -203,7 +203,7 @@
         private TextBox _textBoxLocationsFile;
         private Label label1;
         private TextBox _textBoxBBoxSize;
-        private TextBox textBox1;
+        private TextBox _textBoxRandomLocations;
         private Label label2;
         private GroupBox groupBox3;
         private TextBox _textBoxLog;

@@ -1,10 +1,41 @@
+using Lucene.Net.Search;
+using Serilog;
 using System.Globalization;
+using System.Windows.Forms.Design;
 
 namespace GenerateTestData
 {
     public partial class GenerateTestData : Form
     {
+        #region Constants
+        private readonly string InsertTestDataGraph =
+            """
+            PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
+            PREFIX express: <https://w3id.org/express#>
+            PREFIX vng:     <http://vng.nl/geometry-ext.ttl#>
+            PREFIX dso:     <http://vng.nl/areas/>
+
+            DROP SILENT GRAPH <test-data-living-areas.ttl> ;
+
+            INSERT {
+                GRAPH <test-data-living-areas.ttl> {
+                    ?areaUri	a	dso:area ;
+            			            dso:id       ?id ;
+            			            dso:name     ?name ;
+            			            dso:group    ?group ;
+            			            dso:type     ?type ;
+            			            dso:geometry ?geometry .
+                }
+            }
+            WHERE {    
+                (###X### ###Y### ###BBOX-SIZE### 'wonen') vng:dsoArea (?id ?name ?group ?type ?geometry) .
+                BIND(IRI(CONCAT(STR(dso:), ?id)) AS ?areaUri)
+            }
+            """;
+        #endregion // Constants
+
         #region Fields
+        private readonly ILogger _logger = Log.ForContext<GenerateTestData>();
         private List<Location> _locations = new List<Location>();
         #endregion // Fields
 
@@ -14,14 +45,60 @@ namespace GenerateTestData
             InitializeComponent();
         }
 
-        private void _buttonRun_Click(object sender, EventArgs e)
+        private async void _buttonRun_Click(object sender, EventArgs e)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(_textBoxIFCFile.Text) || !File.Exists(_textBoxIFCFile.Text))
+                {
+                    throw new Exception("Please select a valid IFC file.");
+                }
+
+                if (string.IsNullOrWhiteSpace(_textBoxLocationsFile.Text) || !File.Exists(_textBoxLocationsFile.Text))
+                {
+                    throw new Exception("Please select a valid locations file.");
+                }
+
+                if (!int.TryParse(_textBoxBBoxSize.Text, out int bboxSize) || (bboxSize <= 0))
+                {
+                    throw new Exception("Please enter a valid number of BBox Size.");
+                }
+
+                if (!int.TryParse(_textBoxRandomLocations.Text, out int randomLocations) || (randomLocations <= 0))
+                {
+                    throw new Exception("Please enter a valid number of test data to generate.");
+                }
+
                 _locations = LoadLocations(_textBoxLocationsFile.Text);
+                if (_locations.Count == 0)
+                {
+                    throw new Exception("No locations found in the specified file.");
+                }
+
+                SPARQLServer = new SPARQL.Server(_logger);
+                DatasetName = "test1"; //#todo
+
+                foreach (var location in _locations)
+                {
+                    _logger.Information("Generating test data for location: {LocationName} (X: {X}, Y: {Y})", location.Name, location.X, location.Y);
+                    // Replace placeholders in the SPARQL query with actual values
+                    string query = InsertTestDataGraph
+                        .Replace("###X###", location.X.ToString(CultureInfo.InvariantCulture))
+                        .Replace("###Y###", location.Y.ToString(CultureInfo.InvariantCulture))
+                        .Replace("###BBOX-SIZE###", bboxSize.ToString());
+                    if (await SPARQLServer.ExecuteInsertAsync(DatasetName, query))
+                    {
+                        _logger.Information("Successfully inserted test data for location: {LocationName}", location.Name);
+                    }
+                    else
+                    {
+                        throw new Exception($"Failed to insert test data for location: {location.Name}");
+                    }
+                }
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "An error occurred while generating test data.");
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -78,5 +155,10 @@ namespace GenerateTestData
             return result;
         }
         #endregion // Methods
+
+        #region Properties
+        private SPARQL.Server? SPARQLServer { get; set; } = null;
+        private string DatasetName { get; set; } = string.Empty;
+        #endregion // Properties
     }
 }

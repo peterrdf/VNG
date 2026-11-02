@@ -331,6 +331,44 @@ namespace GenerateTestData.SPARQL
             }
         }
 
+        public List<string> RetrieveGeometries(SparqlResultSet resultSet, string geometryField)
+        {
+            var geometries = new List<string>();
+
+            if (resultSet.Count == 0)
+            {
+                return geometries;
+            }
+
+            try
+            {
+                var resultId = Guid.NewGuid().ToString();
+                foreach (SparqlResult result in resultSet)
+                {
+                    var base64Data = result[geometryField]?.ToString();
+                    if (string.IsNullOrEmpty(base64Data))
+                    {
+                        continue;
+                    }
+
+                    var typeIndex = base64Data.LastIndexOf("^^");
+                    if (typeIndex > 0)
+                    {
+                        base64Data = base64Data.Substring(0, typeIndex);
+                    }
+
+                    geometries.Add(base64Data);
+                }
+
+                return geometries;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error processing results from SPARQL query.");
+                throw;
+            }
+        }
+
         public async Task<string?> RetrieveValue(SparqlResultSet resultSet, string valueField, long owlModel)
         {
             ArgumentNullException.ThrowIfNull(resultSet);

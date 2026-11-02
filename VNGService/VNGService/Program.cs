@@ -77,7 +77,7 @@ namespace VNGService
             });
 
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddHttpClient();
+            builder.Services.AddHttpClient("vng", c => c.Timeout = TimeSpan.FromMinutes(10));
 
             var app = builder.Build();
 

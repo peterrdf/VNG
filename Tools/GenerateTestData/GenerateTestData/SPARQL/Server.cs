@@ -1,4 +1,5 @@
 ﻿using RDF;
+using Serilog;
 using System.Net;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
@@ -68,18 +69,18 @@ namespace GenerateTestData.SPARQL
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("Dataset '{DatasetName}' created successfully with SHACL support.", datasetName);
+                    _logger.Information("Dataset '{DatasetName}' created successfully with SHACL support.", datasetName);
                     return true;
                 }
                 else
                 {
-                    _logger.LogError("Failed to create dataset '{DatasetName}'. Status code: {StatusCode}", datasetName, response.StatusCode);
+                    _logger.Error("Failed to create dataset '{DatasetName}'. Status code: {StatusCode}", datasetName, response.StatusCode);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while creating dataset '{DatasetName}'", datasetName);
+                _logger.Error(ex, "Exception occurred while creating dataset '{DatasetName}'", datasetName);
                 return false;
             }
         }
@@ -100,11 +101,11 @@ namespace GenerateTestData.SPARQL
                 var dropResponse = client.PostAsync(updateUri, updateContent).Result;
                 if (dropResponse.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("All graphs dropped from dataset '{DatasetName}'.", datasetName);
+                    _logger.Information("All graphs dropped from dataset '{DatasetName}'.", datasetName);
                 }
                 else
                 {
-                    _logger.LogWarning("Failed to drop graphs from dataset '{DatasetName}'. Status code: {StatusCode}", datasetName, dropResponse.StatusCode);
+                    _logger.Warning("Failed to drop graphs from dataset '{DatasetName}'. Status code: {StatusCode}", datasetName, dropResponse.StatusCode);
                 }
 
                 // Then delete the dataset from Fuseki
@@ -113,18 +114,18 @@ namespace GenerateTestData.SPARQL
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("Dataset '{DatasetName}' deleted from Fuseki server.", datasetName);
+                    _logger.Information("Dataset '{DatasetName}' deleted from Fuseki server.", datasetName);
                     return true;
                 }
                 else
                 {
-                    _logger.LogError("Failed to delete dataset '{DatasetName}'. Status code: {StatusCode}", datasetName, response.StatusCode);
+                    _logger.Error("Failed to delete dataset '{DatasetName}'. Status code: {StatusCode}", datasetName, response.StatusCode);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while deleting dataset '{DatasetName}'", datasetName);
+                _logger.Error(ex, "Exception occurred while deleting dataset '{DatasetName}'", datasetName);
                 return false;
             }
         }
@@ -137,7 +138,7 @@ namespace GenerateTestData.SPARQL
                 {
                     if (!File.Exists(ttlFile))
                     {
-                        _logger.LogWarning("TTL file '{TTLFile}' not found. Skipping.", ttlFile);
+                        _logger.Warning("TTL file '{TTLFile}' not found. Skipping.", ttlFile);
                         continue;
                     }
 
@@ -163,12 +164,12 @@ namespace GenerateTestData.SPARQL
                     var response = client.PostAsync(requestUri, content).Result;
                     if (response.IsSuccessStatusCode)
                     {
-                        _logger.LogInformation("Data from file '{TTLFile}' added to dataset '{DatasetName}' successfully.", ttlFile, datasetName);
+                        _logger.Information("Data from file '{TTLFile}' added to dataset '{DatasetName}' successfully.", ttlFile, datasetName);
                     }
                     else
                     {
                         var responseBody = response.Content.ReadAsStringAsync().Result;
-                        _logger.LogError("Failed to add data from file '{TTLFile}' to dataset '{DatasetName}'. Status code: {StatusCode}, Response: {Response}", ttlFile, datasetName, response.StatusCode, responseBody);
+                        _logger.Error("Failed to add data from file '{TTLFile}' to dataset '{DatasetName}'. Status code: {StatusCode}, Response: {Response}", ttlFile, datasetName, response.StatusCode, responseBody);
                         return false;
                     }
                 }
@@ -176,7 +177,7 @@ namespace GenerateTestData.SPARQL
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while adding data to dataset '{DatasetName}'.", datasetName);
+                _logger.Error(ex, "Exception occurred while adding data to dataset '{DatasetName}'.", datasetName);
                 return false;
             }
         }
@@ -185,7 +186,7 @@ namespace GenerateTestData.SPARQL
         {
             try
             {
-                _logger.LogInformation("Executing insert into dataset '{DatasetName}' with query: {Query}", datasetName, query);
+                _logger.Information("Executing insert into dataset '{DatasetName}' with query: {Query}", datasetName, query);
 
                 var updateUri = $"{_sparqlEndpoint}{datasetName}";
 
@@ -202,7 +203,7 @@ namespace GenerateTestData.SPARQL
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("Insert executed successfully.");
+                    _logger.Information("Insert executed successfully.");
                     return true;
                 }
                 else
@@ -213,7 +214,7 @@ namespace GenerateTestData.SPARQL
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while insetting into dataset '{DatasetName}'", datasetName);
+                _logger.Error(ex, "Exception occurred while insetting into dataset '{DatasetName}'", datasetName);
                 throw;
             }
         }
@@ -222,7 +223,7 @@ namespace GenerateTestData.SPARQL
         {
             try
             {
-                _logger.LogInformation("Executing SHACL validation on dataset '{DatasetName}' for graph '{Graph}'", datasetName, graph);
+                _logger.Information("Executing SHACL validation on dataset '{DatasetName}' for graph '{Graph}'", datasetName, graph);
 
                 var shaclUri = $"{_sparqlEndpoint}{datasetName}/shacl?graph={Uri.EscapeDataString(graph)}";
 
@@ -240,7 +241,7 @@ namespace GenerateTestData.SPARQL
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("Validation executed successfully.");
+                    _logger.Information("Validation executed successfully.");
                     return responseBody;
                 }
                 else
@@ -250,7 +251,7 @@ namespace GenerateTestData.SPARQL
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while validating dataset '{DatasetName}'", datasetName);
+                _logger.Error(ex, "Exception occurred while validating dataset '{DatasetName}'", datasetName);
                 throw;
             }
         }
@@ -259,7 +260,7 @@ namespace GenerateTestData.SPARQL
         {
             try
             {
-                _logger.LogInformation("Executing query on dataset '{DatasetName}': {Query}", datasetName, query);
+                _logger.Information("Executing query on dataset '{DatasetName}': {Query}", datasetName, query);
 
                 var queryUri = $"{_sparqlEndpoint}{datasetName}?query={Uri.EscapeDataString(query)}";
                 using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
@@ -286,7 +287,7 @@ namespace GenerateTestData.SPARQL
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while querying dataset '{DatasetName}'", datasetName);
+                _logger.Error(ex, "Exception occurred while querying dataset '{DatasetName}'", datasetName);
                 throw;
             }
         }
@@ -325,7 +326,7 @@ namespace GenerateTestData.SPARQL
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing results from SPARQL query.");
+                _logger.Error(ex, "Error processing results from SPARQL query.");
                 throw;
             }
         }
@@ -353,7 +354,7 @@ namespace GenerateTestData.SPARQL
                     };
                 }
 
-                _logger.LogWarning("Field '{ValueField}' not found in result set for OWL model {OwlModel}.", valueField, owlModel);
+                _logger.Warning("Field '{ValueField}' not found in result set for OWL model {OwlModel}.", valueField, owlModel);
 
                 return null;
             });

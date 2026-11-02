@@ -1,14 +1,14 @@
 ﻿namespace GenerateTestData
 {
-    partial class GenerateTestDataForm
+    partial class GenerateTestData
     {
         /// <summary>
-        /// Required designer variable.
+        ///  Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
         /// <summary>
-        /// Clean up any resources being used.
+        ///  Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
@@ -23,192 +23,190 @@
         #region Windows Form Designer generated code
 
         /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
+        ///  Required method for Designer support - do not modify
+        ///  the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
         {
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this._buttonSelectIFCModel = new System.Windows.Forms.Button();
-            this._textBoxIFCModel = new System.Windows.Forms.TextBox();
-            this._buttonRun = new System.Windows.Forms.Button();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this._textBoxBBoxSize = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this._textBoxLabel = new System.Windows.Forms.TextBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this._textBoxLog = new System.Windows.Forms.TextBox();
-            this._buttonSelectLocationFile = new System.Windows.Forms.Button();
-            this._textBoxLocationsFile = new System.Windows.Forms.TextBox();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.SuspendLayout();
+            groupBox1 = new GroupBox();
+            _buttonSelectIFCFile = new Button();
+            _textBoxIFCFile = new TextBox();
+            groupBox2 = new GroupBox();
+            textBox1 = new TextBox();
+            label2 = new Label();
+            _textBoxBBoxSize = new TextBox();
+            label1 = new Label();
+            _buttonSelectLocationsFile = new Button();
+            _textBoxLocationsFile = new TextBox();
+            groupBox3 = new GroupBox();
+            _textBoxLog = new TextBox();
+            _buttonRun = new Button();
+            groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
+            groupBox3.SuspendLayout();
+            SuspendLayout();
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this._buttonSelectIFCModel);
-            this.groupBox1.Controls.Add(this._textBoxIFCModel);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(545, 50);
-            this.groupBox1.TabIndex = 0;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "IFC Model";
+            groupBox1.Controls.Add(_buttonSelectIFCFile);
+            groupBox1.Controls.Add(_textBoxIFCFile);
+            groupBox1.Location = new Point(8, 7);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(516, 55);
+            groupBox1.TabIndex = 0;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "IFC Model";
             // 
-            // _buttonSelectIFCModel
+            // _buttonSelectIFCFile
             // 
-            this._buttonSelectIFCModel.Location = new System.Drawing.Point(501, 17);
-            this._buttonSelectIFCModel.Name = "_buttonSelectIFCModel";
-            this._buttonSelectIFCModel.Size = new System.Drawing.Size(37, 23);
-            this._buttonSelectIFCModel.TabIndex = 1;
-            this._buttonSelectIFCModel.Text = "...";
-            this._buttonSelectIFCModel.UseVisualStyleBackColor = true;
-            this._buttonSelectIFCModel.Click += new System.EventHandler(this._buttonSelectIFCModel_Click);
+            _buttonSelectIFCFile.Location = new Point(456, 19);
+            _buttonSelectIFCFile.Name = "_buttonSelectIFCFile";
+            _buttonSelectIFCFile.Size = new Size(51, 25);
+            _buttonSelectIFCFile.TabIndex = 1;
+            _buttonSelectIFCFile.Text = "...";
+            _buttonSelectIFCFile.UseVisualStyleBackColor = true;
+            _buttonSelectIFCFile.Click += _buttonSelectIFCFile_Click;
             // 
-            // _textBoxIFCModel
+            // _textBoxIFCFile
             // 
-            this._textBoxIFCModel.Location = new System.Drawing.Point(8, 18);
-            this._textBoxIFCModel.Name = "_textBoxIFCModel";
-            this._textBoxIFCModel.ReadOnly = true;
-            this._textBoxIFCModel.Size = new System.Drawing.Size(486, 20);
-            this._textBoxIFCModel.TabIndex = 0;
-            // 
-            // _buttonRun
-            // 
-            this._buttonRun.Location = new System.Drawing.Point(482, 395);
-            this._buttonRun.Name = "_buttonRun";
-            this._buttonRun.Size = new System.Drawing.Size(75, 23);
-            this._buttonRun.TabIndex = 2;
-            this._buttonRun.Text = "Run";
-            this._buttonRun.UseVisualStyleBackColor = true;
-            this._buttonRun.Click += new System.EventHandler(this._buttonRun_Click);
+            _textBoxIFCFile.Location = new Point(9, 19);
+            _textBoxIFCFile.Name = "_textBoxIFCFile";
+            _textBoxIFCFile.ReadOnly = true;
+            _textBoxIFCFile.Size = new Size(441, 23);
+            _textBoxIFCFile.TabIndex = 0;
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this._buttonSelectLocationFile);
-            this.groupBox2.Controls.Add(this._textBoxLocationsFile);
-            this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Controls.Add(this._textBoxLabel);
-            this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Controls.Add(this._textBoxBBoxSize);
-            this.groupBox2.Location = new System.Drawing.Point(12, 70);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(545, 81);
-            this.groupBox2.TabIndex = 3;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Input";
+            groupBox2.Controls.Add(textBox1);
+            groupBox2.Controls.Add(label2);
+            groupBox2.Controls.Add(_textBoxBBoxSize);
+            groupBox2.Controls.Add(label1);
+            groupBox2.Controls.Add(_buttonSelectLocationsFile);
+            groupBox2.Controls.Add(_textBoxLocationsFile);
+            groupBox2.Location = new Point(8, 68);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(516, 86);
+            groupBox2.TabIndex = 2;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Input";
             // 
-            // label3
+            // textBox1
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 52);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(58, 13);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "BBox Size:";
+            textBox1.Location = new Point(374, 51);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(76, 23);
+            textBox1.TabIndex = 5;
+            textBox1.Text = "400";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(214, 55);
+            label2.Name = "label2";
+            label2.Size = new Size(154, 15);
+            label2.TabIndex = 4;
+            label2.Text = "Select randonly N locations:";
             // 
             // _textBoxBBoxSize
             // 
-            this._textBoxBBoxSize.Location = new System.Drawing.Point(67, 48);
-            this._textBoxBBoxSize.Name = "_textBoxBBoxSize";
-            this._textBoxBBoxSize.Size = new System.Drawing.Size(100, 20);
-            this._textBoxBBoxSize.TabIndex = 4;
-            this._textBoxBBoxSize.Text = "400";
+            _textBoxBBoxSize.Location = new Point(69, 51);
+            _textBoxBBoxSize.Name = "_textBoxBBoxSize";
+            _textBoxBBoxSize.Size = new Size(76, 23);
+            _textBoxBBoxSize.TabIndex = 3;
+            _textBoxBBoxSize.Text = "400";
             // 
-            // label4
+            // label1
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(182, 52);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(145, 13);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Randomly selected locations:";
+            label1.AutoSize = true;
+            label1.Location = new Point(5, 55);
+            label1.Name = "label1";
+            label1.Size = new Size(59, 15);
+            label1.TabIndex = 2;
+            label1.Text = "BBox Size:";
             // 
-            // _textBoxLabel
+            // _buttonSelectLocationsFile
             // 
-            this._textBoxLabel.Location = new System.Drawing.Point(329, 48);
-            this._textBoxLabel.Name = "_textBoxLabel";
-            this._textBoxLabel.Size = new System.Drawing.Size(163, 20);
-            this._textBoxLabel.TabIndex = 6;
+            _buttonSelectLocationsFile.Location = new Point(456, 19);
+            _buttonSelectLocationsFile.Name = "_buttonSelectLocationsFile";
+            _buttonSelectLocationsFile.Size = new Size(51, 25);
+            _buttonSelectLocationsFile.TabIndex = 1;
+            _buttonSelectLocationsFile.Text = "...";
+            _buttonSelectLocationsFile.UseVisualStyleBackColor = true;
+            _buttonSelectLocationsFile.Click += _buttonSelectLocationsFile_Click;
+            // 
+            // _textBoxLocationsFIle
+            // 
+            _textBoxLocationsFile.Location = new Point(9, 19);
+            _textBoxLocationsFile.Name = "_textBoxLocationsFIle";
+            _textBoxLocationsFile.ReadOnly = true;
+            _textBoxLocationsFile.Size = new Size(441, 23);
+            _textBoxLocationsFile.TabIndex = 0;
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this._textBoxLog);
-            this.groupBox3.Location = new System.Drawing.Point(12, 170);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(545, 218);
-            this.groupBox3.TabIndex = 4;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Log";
+            groupBox3.Controls.Add(_textBoxLog);
+            groupBox3.Location = new Point(9, 169);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(514, 228);
+            groupBox3.TabIndex = 3;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Log";
             // 
             // _textBoxLog
             // 
-            this._textBoxLog.Location = new System.Drawing.Point(9, 17);
-            this._textBoxLog.Multiline = true;
-            this._textBoxLog.Name = "_textBoxLog";
-            this._textBoxLog.ReadOnly = true;
-            this._textBoxLog.Size = new System.Drawing.Size(529, 190);
-            this._textBoxLog.TabIndex = 0;
+            _textBoxLog.Location = new Point(12, 20);
+            _textBoxLog.Multiline = true;
+            _textBoxLog.Name = "_textBoxLog";
+            _textBoxLog.ReadOnly = true;
+            _textBoxLog.Size = new Size(490, 196);
+            _textBoxLog.TabIndex = 0;
             // 
-            // _buttonSelectLocationFile
+            // _buttonRun
             // 
-            this._buttonSelectLocationFile.Location = new System.Drawing.Point(499, 18);
-            this._buttonSelectLocationFile.Name = "_buttonSelectLocationFile";
-            this._buttonSelectLocationFile.Size = new System.Drawing.Size(37, 23);
-            this._buttonSelectLocationFile.TabIndex = 9;
-            this._buttonSelectLocationFile.Text = "...";
-            this._buttonSelectLocationFile.UseVisualStyleBackColor = true;
-            this._buttonSelectLocationFile.Click += new System.EventHandler(this._buttonSelectLocationFile_Click);
+            _buttonRun.Location = new Point(407, 403);
+            _buttonRun.Name = "_buttonRun";
+            _buttonRun.Size = new Size(115, 25);
+            _buttonRun.TabIndex = 4;
+            _buttonRun.Text = "Run";
+            _buttonRun.UseVisualStyleBackColor = true;
+            _buttonRun.Click += _buttonRun_Click;
             // 
-            // _textBoxLocationsFile
+            // GenerateTestData
             // 
-            this._textBoxLocationsFile.Location = new System.Drawing.Point(6, 19);
-            this._textBoxLocationsFile.Name = "_textBoxLocationsFile";
-            this._textBoxLocationsFile.ReadOnly = true;
-            this._textBoxLocationsFile.Size = new System.Drawing.Size(486, 20);
-            this._textBoxLocationsFile.TabIndex = 8;
-            // 
-            // GenerateTestDataForm
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(569, 424);
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this._buttonRun);
-            this.Controls.Add(this.groupBox1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "GenerateTestDataForm";
-            this.Text = "Generate Test Data";
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(534, 436);
+            Controls.Add(_buttonRun);
+            Controls.Add(groupBox3);
+            Controls.Add(groupBox2);
+            Controls.Add(groupBox1);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "GenerateTestData";
+            Text = "Generate Test Data";
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
+            ResumeLayout(false);
         }
 
         #endregion
 
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button _buttonSelectIFCModel;
-        private System.Windows.Forms.TextBox _textBoxIFCModel;
-        private System.Windows.Forms.Button _buttonRun;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox _textBoxBBoxSize;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox _textBoxLabel;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.TextBox _textBoxLog;
-        private System.Windows.Forms.Button _buttonSelectLocationFile;
-        private System.Windows.Forms.TextBox _textBoxLocationsFile;
+        private GroupBox groupBox1;
+        private TextBox _textBoxIFCFile;
+        private Button _buttonSelectIFCFile;
+        private GroupBox groupBox2;
+        private Button _buttonSelectLocationsFile;
+        private TextBox _textBoxLocationsFile;
+        private Label label1;
+        private TextBox _textBoxBBoxSize;
+        private TextBox textBox1;
+        private Label label2;
+        private GroupBox groupBox3;
+        private TextBox _textBoxLog;
+        private Button _buttonRun;
     }
 }
-

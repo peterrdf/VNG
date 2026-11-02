@@ -1,33 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace GenerateTestData
 {
-    public partial class GenerateTestDataForm : Form
+    public partial class GenerateTestData : Form
     {
         #region Fields
-        private string _ifcModelPath;
         private List<Location> _locations = new List<Location>();
         #endregion // Fields
 
         #region Methods
-        public GenerateTestDataForm()
+        public GenerateTestData()
         {
             InitializeComponent();
         }
 
-        private void _buttonSelectIFCModel_Click(object sender, EventArgs e)
+        private void _buttonRun_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _locations = LoadLocations(_textBoxLocationsFile.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void _buttonSelectIFCFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "IFC Files (*.ifc)|*.ifc|All Files (*.*)|*.*||";
@@ -35,7 +34,19 @@ namespace GenerateTestData
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                _textBoxIFCModel.Text = openFileDialog.FileName;
+                _textBoxIFCFile.Text = openFileDialog.FileName;
+            }
+        }
+
+        private void _buttonSelectLocationsFile_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*||";
+            openFileDialog.Title = "Open";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                _textBoxLocationsFile.Text = openFileDialog.FileName;
             }
         }
 
@@ -67,29 +78,5 @@ namespace GenerateTestData
             return result;
         }
         #endregion // Methods
-
-        private void _buttonRun_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                _locations = LoadLocations(_textBoxLocationsFile.Text);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void _buttonSelectLocationFile_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*||";
-            openFileDialog.Title = "Open";
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                _textBoxLocationsFile.Text = openFileDialog.FileName;
-            }
-        }
     }
 }

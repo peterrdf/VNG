@@ -6,7 +6,7 @@ import org.apache.jena.sys.JenaSubsystemLifecycle;
 public class TopologicalRelationInit implements JenaSubsystemLifecycle {
 
     private static final String FN_URI =
-        "http://vng.nl/geometry-ext.ttl#topologicalRelation";
+        "http://vng.nl/geometry-ext.ttl#gmTopology";
 
     @Override
     public void start() {

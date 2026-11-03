@@ -25,7 +25,6 @@ PREFIX express: <https://w3id.org/express#>
 PREFIX geom:    <https://vng.nl/geometry/>
 PREFIX dso:     <http://vng.nl/areas/>
 PREFIX vng:     <http://vng.nl/geometry-ext.ttl#>
-PREFIX topo:    <http://vng.nl/topology/>
 
 DELETE {
     GRAPH <https://vng.nl/geometries/> {

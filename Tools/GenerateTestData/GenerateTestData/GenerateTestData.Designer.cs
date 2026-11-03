@@ -183,6 +183,7 @@
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "GenerateTestData";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Generate Test Data";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();

@@ -2,6 +2,8 @@ using Lucene.Net.Search;
 using RDF;
 using Serilog;
 using System.Globalization;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms.Design;
@@ -76,6 +78,11 @@ namespace GenerateTestData
                     throw new Exception("Please select a valid IFC file.");
                 }
 
+                if (!await IsGeoReferenced(_textBoxIFCFile.Text))
+                {
+                    throw new Exception("The selected IFC file is not geo-referenced. Please select a valid geo-referenced IFC file.");
+                }
+
                 if (string.IsNullOrWhiteSpace(_textBoxLocationsFile.Text) || !File.Exists(_textBoxLocationsFile.Text))
                 {
                     throw new Exception("Please select a valid locations file.");
@@ -100,6 +107,13 @@ namespace GenerateTestData
                 SPARQLServer = new SPARQL.Server(_logger);
                 DatasetName = "test1"; //#todo
 
+                var outputFolder = Path.Combine(Path.GetDirectoryName(_textBoxIFCFile.Text)!, Path.GetFileNameWithoutExtension(_textBoxIFCFile.Text));
+                if (Directory.Exists(outputFolder))
+                {
+                    Directory.Delete(outputFolder, true);
+                }
+                Directory.CreateDirectory(outputFolder);
+
                 foreach (var location in _locations)
                 {
                     _logger.Information("Generating test data for location: {LocationName} (X: {X}, Y: {Y})", location.Name, location.X, location.Y);
@@ -119,8 +133,13 @@ namespace GenerateTestData
                         }
 
                         var geomtries = SPARQLServer.RetrieveGeometries(queryResult, "geometry");
-                        for (int i = 0; i < geomtries.Count; i++)
+                        int[] indices = Enumerable.Range(0, geomtries.Count).ToArray();
+                        Random.Shared.Shuffle(indices);
+                        int selectedCount = Math.Min(randomLocations, indices.Length);
+
+                        for (int n = 0; n < selectedCount; n++)
                         {
+                            int i = indices[n];
                             var geometry = geomtries[i];
                             _logger.Information("Geometry for location {LocationName} (ID: {ID}, Group: {Group}): {Geometry}", location.Name, queryResult[i]["id"], queryResult[i]["group"], geometry);
 
@@ -143,13 +162,23 @@ namespace GenerateTestData
                                 continue;
                             }
                             _logger.Information("Address for location {LocationName}: {Address}", location.Name, address);
+
+                            string ifcTestFilePath = Path.Combine(outputFolder, GenerateIFCFileName(location, address));
+                            File.Copy(_textBoxIFCFile.Text, ifcTestFilePath, true);
+                            if (!await UpdateGeoReference(ifcTestFilePath, centerX, centerY))
+                            {
+                                MessageBox.Show($"Failed to set geo-reference for IFC file: {ifcTestFilePath}");
+                                continue;
+                            }
                         }
-                    }
+                    } // if (await SPARQLServer.ExecuteInsertAsync(DatasetName, query))
                     else
                     {
                         throw new Exception($"Failed to insert test data for location: {location.Name}");
                     }
-                }
+                } // foreach (var location in _locations)
+
+                MessageBox.Show("Test data generation completed successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -241,11 +270,184 @@ namespace GenerateTestData
             }
         }
 
-        private static string GenerateIFCFileName(string address)
+        public Task<bool> IsGeoReferenced(string filePath)
+        {
+            // Add null terminator to byte arrays for P/Invoke marshaling
+            var filePathBytes = Encoding.UTF8.GetBytes(filePath + "\0");
+            var schemaBytes = Encoding.UTF8.GetBytes("\0");
+            var sdaiModel = IFCEngine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
+            if (sdaiModel == 0)
+            {
+                _logger.Error("Failed to open IFC model: {FilePath}", filePath);
+                return Task.FromResult(false);
+            }
+
+            double dEastings = 0.0;
+            double dNorthings = 0.0;
+
+            long owlModel = 0;
+            IFCEngine.owlGetModel(sdaiModel, out owlModel);
+
+            long sdaiAggr = IFCEngine.sdaiGetEntityExtentBN(sdaiModel, "IFCMAPCONVERSION");
+            if (sdaiAggr == 0)
+            {
+                _logger.Warning("No IFCMAPCONVERSION entity found in the model.");
+                return Task.FromResult(false);
+            }
+
+            IFCEngine.engiGetAggrElement(sdaiAggr, 0, IFCEngine.sdaiINSTANCE, out long sdaiIfcMapConversionInstance);
+            if (sdaiIfcMapConversionInstance == 0)
+            {
+                _logger.Warning("No instance of IFCMAPCONVERSION found in the model.");
+                return Task.FromResult(false);
+            }
+
+            long sdaiIfcMapConversionEntity = IFCEngine.sdaiGetInstanceType(sdaiIfcMapConversionInstance);
+            if (sdaiIfcMapConversionEntity == 0)
+            {
+                _logger.Warning("Failed to get the entity type of the IFCMAPCONVERSION instance.");
+                return Task.FromResult(false);
+            }
+
+            long iIndex = 0;
+            long sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
+                sdaiIfcMapConversionEntity,
+                iIndex++,
+                false,
+                true);
+
+            while (sdaiAttr != 0)
+            {
+                IFCEngine.engiGetEntityArgumentName(sdaiIfcMapConversionEntity,
+                    iIndex,
+                    IFCEngine.sdaiSTRING,
+                    out IntPtr attributeName);
+                if (attributeName != IntPtr.Zero)
+                {
+                    string? strAttributeName = Marshal.PtrToStringAnsi(attributeName);
+                    if (strAttributeName == "Eastings")
+                    {
+                        if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dEastings) == 0)
+                        {
+                            _logger.Warning("Failed to get Eastings attribute.");
+                            return Task.FromResult(false);
+                        }
+                    }
+                    else if (strAttributeName == "Northings")
+                    {
+                        if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dNorthings) == 0)
+                        {
+                            _logger.Warning("Failed to get Northings attribute.");
+                            return Task.FromResult(false);
+                        }
+                    }
+                }
+
+                sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
+                    sdaiIfcMapConversionEntity,
+                    iIndex++,
+                    false,
+                    true);
+            } // while (sdaiAttr != 0)
+
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> UpdateGeoReference(string filePath, double X, double Y)
+        {
+            // Add null terminator to byte arrays for P/Invoke marshaling
+            var filePathBytes = Encoding.UTF8.GetBytes(filePath + "\0");
+            var schemaBytes = Encoding.UTF8.GetBytes("\0");
+            var sdaiModel = IFCEngine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
+            if (sdaiModel == 0)
+            {
+                _logger.Error("Failed to open IFC model: {FilePath}", filePath);
+                return Task.FromResult(false);
+            }
+
+            double dEastings = 0.0;
+            double dNorthings = 0.0;
+
+            long owlModel = 0;
+            IFCEngine.owlGetModel(sdaiModel, out owlModel);
+
+            long sdaiAggr = IFCEngine.sdaiGetEntityExtentBN(sdaiModel, "IFCMAPCONVERSION");
+            if (sdaiAggr == 0)
+            {
+                _logger.Warning("No IFCMAPCONVERSION entity found in the model.");
+                return Task.FromResult(false);
+            }
+
+            IFCEngine.engiGetAggrElement(sdaiAggr, 0, IFCEngine.sdaiINSTANCE, out long sdaiIfcMapConversionInstance);
+            if (sdaiIfcMapConversionInstance == 0)
+            {
+                _logger.Warning("No instance of IFCMAPCONVERSION found in the model.");
+                return Task.FromResult(false);
+            }
+
+            long sdaiIfcMapConversionEntity = IFCEngine.sdaiGetInstanceType(sdaiIfcMapConversionInstance);
+            if (sdaiIfcMapConversionEntity == 0)
+            {
+                _logger.Warning("Failed to get the entity type of the IFCMAPCONVERSION instance.");
+                return Task.FromResult(false);
+            }
+
+            long iIndex = 0;
+            long sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
+                sdaiIfcMapConversionEntity,
+                iIndex++,
+                false,
+                true);
+
+            while (sdaiAttr != 0)
+            {
+                IFCEngine.engiGetEntityArgumentName(sdaiIfcMapConversionEntity,
+                    iIndex,
+                    IFCEngine.sdaiSTRING,
+                    out IntPtr attributeName);
+                if (attributeName != IntPtr.Zero)
+                {
+                    string? strAttributeName = Marshal.PtrToStringAnsi(attributeName);
+                    if (strAttributeName == "Eastings")
+                    {
+                        if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dEastings) == 0)
+                        {
+                            _logger.Warning("Failed to get Eastings attribute.");
+                            return Task.FromResult(false);
+                        }
+
+                        IFCEngine.sdaiPutAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, ref X);
+                    }
+                    else if (strAttributeName == "Northings")
+                    {
+                        if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dNorthings) == 0)
+                        {
+                            _logger.Warning("Failed to get Northings attribute.");
+                            return Task.FromResult(false);
+                        }
+
+                        IFCEngine.sdaiPutAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, ref Y);
+                    }
+                }
+
+                sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
+                    sdaiIfcMapConversionEntity,
+                    iIndex++,
+                    false,
+                    true);
+            } // while (sdaiAttr != 0)
+
+            IFCEngine.sdaiSaveModelBN(sdaiModel, filePath);
+            IFCEngine.sdaiCloseModel(sdaiModel);
+
+            return Task.FromResult(true);
+        }
+
+        private static string GenerateIFCFileName(Location location, string address)
         {
             if (string.IsNullOrWhiteSpace(address))
             {
-                return "_.ifc";
+                return $"{location.Name} - {Guid.NewGuid}.ifc";
             }
 
             var invalidChars = Path.GetInvalidFileNameChars();
@@ -258,7 +460,7 @@ namespace GenerateTestData
                 sanitized = "_";
             }
 
-            return sanitized + ".ifc";
+            return location.Name + " - " + sanitized + ".ifc";
         }
         #endregion // Methods
 

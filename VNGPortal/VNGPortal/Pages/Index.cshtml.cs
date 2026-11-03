@@ -179,6 +179,8 @@ public class IndexModel : PageModel
                 true);
         } // while (sdaiAttr != 0)
 
+        IFCEngine.sdaiCloseModel(sdaiModel);
+
         return Task.FromResult(true);
     }
 

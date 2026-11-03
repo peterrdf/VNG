@@ -21,7 +21,7 @@ namespace VNGPortal.Workflows
         {
             TaskDescriptor = taskDescriptor;
 
-            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, 0, "Workflow started...", false);
+            await _signalRStatus.SendProgressUpdate(taskDescriptor.GroupName, 0, $"Workflow for model '{taskDescriptor.Model}' started...", false);
 
             var currentStep = 0;
             var stepsCount = _workflow.Steps.Count;
@@ -363,7 +363,7 @@ namespace VNGPortal.Workflows
             await _signalRStatus.SendProgressUpdate(
                 taskDescriptor.GroupName,
                 100,
-                "Workflow executed successfully.",
+                $"Workflow for model '{taskDescriptor.Model}' completed successfully.",
                 false);
 
             return true;

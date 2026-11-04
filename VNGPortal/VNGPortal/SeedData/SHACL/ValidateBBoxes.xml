@@ -119,7 +119,7 @@ WHERE {
                   	dso:id    		?id ;
                   	dso:group  	    ?group ;
                   	dso:geometry  	?geometry .
-    FILTER(?group = "wonen")
+    FILTER(?group = "wonen" || ?group = "gemengd")
   }
 }
 ORDER BY ?id

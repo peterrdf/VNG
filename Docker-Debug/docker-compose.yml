@@ -4,7 +4,7 @@ services:
     depends_on:
        - vngtriplestore
        - vngservice
-    image: vngportal:1.24
+    image: vngportal:1.25
     ports:
       - "1145:8080"
     environment:
@@ -45,7 +45,7 @@ services:
 
   vngservice:
     container_name: vngservice
-    image: vngservice:1.17
+    image: vngservice:1.18
     ports:
       - "1140:8080"
     environment:

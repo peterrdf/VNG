@@ -390,48 +390,50 @@ namespace VNGService.Pages
 
                 for (int j = 0; j < planDetails.Embedded.Bestemmingsvlakken.Count; j++)
                 {
-                    if (planDetails.Embedded.Bestemmingsvlakken[j].Geometrie != null)
+                    if (planDetails.Embedded.Bestemmingsvlakken[j].Geometrie == null)
                     {
-                        if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
-                        {
-                            continue;
-                        }
-
-                        long geometryInstance = RetrieveGeometry(
-                            owlModel,
-                            planDetails.Embedded.Bestemmingsvlakken[j].Naam,
-                            planDetails.Embedded.Bestemmingsvlakken[j].Geometrie!,
-                            owlDefaultMaterialInstance,
-                            0.0);
-                        if (geometryInstance != 0)
-                        {
-                            //Debug.Assert(planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count == 1);
-                            //for (int k = 0; k < planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
-                            //{
-                            //    var verwijzing = planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
-                            //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
-                            //}
-
-                            using var memoryStream = new MemoryStream();
-                            Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
-                            {
-                                byte[] buffer = new byte[size];
-                                Marshal.Copy(value, buffer, 0, (int)size);
-
-                                memoryStream.Write(buffer, 0, (int)size);
-                            }, 20000);
-
-                            zoningAreas.Add(new Area
-                            {
-                                Id = planDetails.Embedded.Bestemmingsvlakken[j].Id,
-                                Name = planDetails.Embedded.Bestemmingsvlakken[j].Naam,
-                                Group = planDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
-                                Type = planDetails.Embedded.Bestemmingsvlakken[j].Type,
-                                Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
-                            });
-                        }
+                        continue;
                     }
-                }
+
+                    if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
+                    {
+                        continue;
+                    }
+
+                    long geometryInstance = RetrieveGeometry(
+                        owlModel,
+                        planDetails.Embedded.Bestemmingsvlakken[j].Naam,
+                        planDetails.Embedded.Bestemmingsvlakken[j].Geometrie!,
+                        owlDefaultMaterialInstance,
+                        0.0);
+                    if (geometryInstance != 0)
+                    {
+                        //Debug.Assert(planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count == 1);
+                        //for (int k = 0; k < planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
+                        //{
+                        //    var verwijzing = planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
+                        //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
+                        //}
+
+                        using var memoryStream = new MemoryStream();
+                        Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
+                        {
+                            byte[] buffer = new byte[size];
+                            Marshal.Copy(value, buffer, 0, (int)size);
+
+                            memoryStream.Write(buffer, 0, (int)size);
+                        }, 20000);
+
+                        zoningAreas.Add(new Area
+                        {
+                            Id = planDetails.Embedded.Bestemmingsvlakken[j].Id,
+                            Name = planDetails.Embedded.Bestemmingsvlakken[j].Naam,
+                            Group = planDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
+                            Type = planDetails.Embedded.Bestemmingsvlakken[j].Type,
+                            Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
+                        });
+                    }
+                } // for (int j = 0; j < planDetails.Embedded.Bestemmingsvlakken.Count; j++)
 
                 var nextPage = planDetails.Links.Next;
                 while (nextPage != null)
@@ -441,51 +443,53 @@ namespace VNGService.Pages
                     {
                         for (int j = 0; j < nextPlanDetails.Embedded.Bestemmingsvlakken.Count; j++)
                         {
-                            if (nextPlanDetails.Embedded.Bestemmingsvlakken[j].Geometrie != null)
+                            if (nextPlanDetails.Embedded.Bestemmingsvlakken[j].Geometrie == null)
                             {
-                                if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
+                                continue;
+                            }
+
+                            if (!await MatchesFilterAsync(httpClient, nextPlanDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
+                            {
+                                continue;
+                            }
+
+                            long geometryInstance = RetrieveGeometry(
+                                owlModel,
+                                nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
+                                nextPlanDetails.Embedded.Bestemmingsvlakken[j].Geometrie!,
+                                owlDefaultMaterialInstance,
+                                0.0);
+                            if (geometryInstance != 0)
+                            {
+                                //for (int k = 0; k < nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
+                                //{
+                                //    var verwijzing = nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
+                                //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
+                                //}
+
+                                using var memoryStream = new MemoryStream();
+                                Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
                                 {
-                                    continue;
-                                }
+                                    byte[] buffer = new byte[size];
+                                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                                long geometryInstance = RetrieveGeometry(
-                                    owlModel,
-                                    nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
-                                    nextPlanDetails.Embedded.Bestemmingsvlakken[j].Geometrie!,
-                                    owlDefaultMaterialInstance,
-                                    0.0);
-                                if (geometryInstance != 0)
+                                    memoryStream.Write(buffer, 0, (int)size);
+                                }, 20000);
+
+                                zoningAreas.Add(new Area
                                 {
-                                    //for (int k = 0; k < nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
-                                    //{
-                                    //    var verwijzing = nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
-                                    //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
-                                    //}
-
-                                    using var memoryStream = new MemoryStream();
-                                    Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
-                                    {
-                                        byte[] buffer = new byte[size];
-                                        Marshal.Copy(value, buffer, 0, (int)size);
-
-                                        memoryStream.Write(buffer, 0, (int)size);
-                                    }, 20000);
-
-                                    zoningAreas.Add(new Area
-                                    {
-                                        Id = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Id,
-                                        Name = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
-                                        Group = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
-                                        Type = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Type,
-                                        Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
-                                    });
-                                }
+                                    Id = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Id,
+                                    Name = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
+                                    Group = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
+                                    Type = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Type,
+                                    Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
+                                });
                             }
                         }
                     }
 
                     nextPage = nextPlanDetails?.Links?.Next;
-                }
+                } // while (nextPage != null)
             }
 
             return zoningAreas;

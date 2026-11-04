@@ -245,7 +245,7 @@ namespace GenerateTestData
 
         public async Task<string?> GetAddressByPointAsync(double pointX, double pointY)
         {
-            using var client = new HttpClient();
+            using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(160) };
             var url = FormattableString.Invariant(
                 $"https://api.pdok.nl/bzk/locatieserver/search/v3_1/reverse?X={pointX}&Y={pointY}&type=adres&rows=1&fl=weergavenaam,nummeraanduiding_id,adresseerbaarobject_id");
 

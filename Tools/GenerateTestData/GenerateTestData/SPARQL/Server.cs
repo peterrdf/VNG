@@ -190,7 +190,7 @@ namespace GenerateTestData.SPARQL
 
                 var updateUri = $"{_sparqlEndpoint}{datasetName}";
 
-                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(160) };
+                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
 
                 // Add basic authentication
                 var byteArray = System.Text.Encoding.ASCII.GetBytes($"{_user}:{_password}");

@@ -355,14 +355,14 @@ namespace VNGService.Services
             return null;
         }
 
-        private static bool MatchesGroup(DsoGebiedsaanwijzing g, string? typeFilter)
+        private static bool MatchesGroup(DsoGebiedsaanwijzing g, string? groupFilter)
         {
-            if (string.IsNullOrWhiteSpace(typeFilter))
+            if (string.IsNullOrWhiteSpace(groupFilter))
             {
                 return true;
             }
 
-            return (g.Groep?.Waarde?.ToLowerInvariant() == typeFilter.ToLowerInvariant());
+            return (g.Groep?.Waarde?.ToLowerInvariant() == groupFilter.ToLowerInvariant());
         }
 
         private static bool MatchesType(DsoGebiedsaanwijzing g, string? typeFilter)

@@ -57,16 +57,16 @@ namespace VNGService.Services
             var apiSettings = settingsManager.LoadAPISettings();
             var APIKey = apiSettings.ContainsKey("dso") ? apiSettings["dso"] : throw new InvalidOperationException("DSO API key is not configured.");
 
-            _presenterenClient = new HttpClient { BaseAddress = new Uri(PresenterenUrl) };
+            _presenterenClient = new HttpClient { BaseAddress = new Uri(PresenterenUrl), Timeout = TimeSpan.FromMinutes(30) };
             _presenterenClient.DefaultRequestHeaders.Add("X-API-Key", APIKey);
             _presenterenClient.DefaultRequestHeaders.Add("Accept", "application/hal+json");
 
-            _toepasbaarClient = new HttpClient { BaseAddress = new Uri(ToepasbaarUrl) };
+            _toepasbaarClient = new HttpClient { BaseAddress = new Uri(ToepasbaarUrl), Timeout = TimeSpan.FromMinutes(30) };
             _toepasbaarClient.DefaultRequestHeaders.Add("X-API-Key", APIKey);
             _toepasbaarClient.DefaultRequestHeaders.Add("Accept", "application/hal+json");
             _toepasbaarClient.DefaultRequestHeaders.Add("Accept-Crs", "epsg:28992");
 
-            _geometrieClient = new HttpClient { BaseAddress = new Uri(GeometrieUrl) };
+            _geometrieClient = new HttpClient { BaseAddress = new Uri(GeometrieUrl), Timeout = TimeSpan.FromMinutes(30) };
             _geometrieClient.DefaultRequestHeaders.Add("X-API-Key", APIKey);
             _geometrieClient.DefaultRequestHeaders.Add("Accept", "application/hal+json");
         }

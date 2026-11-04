@@ -22,7 +22,7 @@ public sealed class BagApiService : IDisposable
         var apiSettings = settingsManager.LoadAPISettings();
         var APIKey = apiSettings.ContainsKey("bag") ? apiSettings["bag"] : throw new InvalidOperationException("BAG API key is not configured.");
 
-        _httpClient = new HttpClient { BaseAddress = new Uri(BaseUrl) };
+        _httpClient = new HttpClient { BaseAddress = new Uri(BaseUrl), Timeout = TimeSpan.FromMinutes(30) };
         _httpClient.DefaultRequestHeaders.Add("X-Api-Key", APIKey);
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/hal+json");
         _httpClient.DefaultRequestHeaders.Add("Content-Crs", "epsg:28992");

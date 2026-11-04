@@ -60,7 +60,7 @@ public sealed class PdokBgtService : IDisposable
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _httpClient = new HttpClient();
+        _httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
     }
 
     public async Task<JsonDocument?> GetCollectionsAsync(CancellationToken ct = default)

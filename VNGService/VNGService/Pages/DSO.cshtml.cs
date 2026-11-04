@@ -31,13 +31,17 @@ namespace VNGService.Pages
 
         public async Task<IActionResult> OnGetAreas(double eastings, double northings, int bboxSize, string type)
         {
+            _logger.LogInformation($"OnGetAreas called with eastings={eastings}, northings={northings}, bboxSize={bboxSize}, type={type}");
             var areas = await GetZoningAreas(eastings, northings, bboxSize, type);
             if (areas?.Count > 0)
             {
+                _logger.LogInformation($"Found {areas.Count} zoning areas.");
                 return new JsonResult(areas);
             }
 
+            _logger.LogInformation("No zoning areas found, checking for regulation text annotations.");
             areas = await GetRegulationTextAnnotations(eastings, northings, bboxSize, type);
+            _logger.LogInformation($"Found {areas.Count} regulation text annotations.");
 
             return new JsonResult(areas);
         }
@@ -167,7 +171,8 @@ namespace VNGService.Pages
 
                 using var httpClient = new HttpClient
                 {
-                    BaseAddress = new Uri("https://ruimte.omgevingswet.overheid.nl/ruimtelijke-plannen/api/opvragen/v4/")
+                    BaseAddress = new Uri("https://ruimte.omgevingswet.overheid.nl/ruimtelijke-plannen/api/opvragen/v4/"),
+                    Timeout = TimeSpan.FromMinutes(30)
                 };
 
                 httpClient.DefaultRequestHeaders.Add("X-API-Key", APIKey);
@@ -323,7 +328,8 @@ namespace VNGService.Pages
 
             using var httpClient = new HttpClient
             {
-                BaseAddress = new Uri("https://ruimte.omgevingswet.overheid.nl/ruimtelijke-plannen/api/opvragen/v4/")
+                BaseAddress = new Uri("https://ruimte.omgevingswet.overheid.nl/ruimtelijke-plannen/api/opvragen/v4/"),
+                Timeout = TimeSpan.FromMinutes(30)
             };
 
             httpClient.DefaultRequestHeaders.Add("X-API-Key", APIKey);
@@ -388,29 +394,9 @@ namespace VNGService.Pages
                 {
                     if (planDetails.Embedded.Bestemmingsvlakken[j].Geometrie != null)
                     {
-                        bool match = false;
-                        if (!string.IsNullOrEmpty(groupFilter))
+                        if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter, typeFilter))
                         {
-                            match = groupFilter.Equals(planDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep, StringComparison.OrdinalIgnoreCase);
-                        }
-
-                        if (!match && !string.IsNullOrEmpty(typeFilter))
-                        {
-                            match = typeFilter.Equals(planDetails.Embedded.Bestemmingsvlakken[j].Type, StringComparison.OrdinalIgnoreCase);
-                        }
-
-                        if (!match)
-                        {
-                            // Mixed use case: check if the description allows living, if the group filter is "wonen" and the main group is "gemengd"
-                            if ((groupFilter?.Equals("wonen", StringComparison.OrdinalIgnoreCase) == true) &&
-                                planDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep.Equals("gemengd", StringComparison.OrdinalIgnoreCase))
-                            {
-                                match = await AllowsLivingAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j]);
-                                if (!match)
-                                {
-                                    continue;
-                                }
-                            }
+                            continue;
                         }
 
                         long geometryInstance = RetrieveGeometry(
@@ -459,18 +445,7 @@ namespace VNGService.Pages
                         {
                             if (nextPlanDetails.Embedded.Bestemmingsvlakken[j].Geometrie != null)
                             {
-                                bool match = true;
-                                if (!string.IsNullOrEmpty(groupFilter))
-                                {
-                                    match = groupFilter.Equals(nextPlanDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep, StringComparison.OrdinalIgnoreCase);
-                                }
-
-                                if (match && !string.IsNullOrEmpty(typeFilter))
-                                {
-                                    match = typeFilter.Equals(nextPlanDetails.Embedded.Bestemmingsvlakken[j].Type, StringComparison.OrdinalIgnoreCase);
-                                }
-
-                                if (!match)
+                                if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter, typeFilter))
                                 {
                                     continue;
                                 }
@@ -516,6 +491,39 @@ namespace VNGService.Pages
             }
 
             return zoningAreas;
+        }
+
+        private async Task<bool> MatchesFilterAsync(
+            HttpClient httpClient,
+            Bestemmingsvlak vlak,
+            string? groupFilter,
+            string? typeFilter)
+        {
+            if (string.IsNullOrEmpty(groupFilter) && string.IsNullOrEmpty(typeFilter))
+            {
+                return true;
+            }
+
+            if (!string.IsNullOrEmpty(groupFilter) &&
+                groupFilter.Equals(vlak.Bestemmingshoofdgroep, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (!string.IsNullOrEmpty(typeFilter) &&
+                typeFilter.Equals(vlak.Type, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // Mixed use: "wonen" is also allowed in "gemengd" if the description permits living
+            if (string.Equals(groupFilter, "wonen", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(vlak.Bestemmingshoofdgroep, "gemengd", StringComparison.OrdinalIgnoreCase))
+            {
+                return await AllowsLivingAsync(httpClient, vlak);
+            }
+
+            return false;
         }
 
         private async Task<BestemmingsvlakkenResponse?> FetchZoningAreas(

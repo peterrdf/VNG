@@ -103,7 +103,7 @@ public sealed class PdokKadastraleKaartService : IDisposable
     public PdokKadastraleKaartService(ILogger logger)
     {
         _logger = logger;
-        _httpClient = new HttpClient();
+        _httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
     }
 
     public async Task<PdokFeatureCollection?> GetFeaturesByBoundingBoxAsync(

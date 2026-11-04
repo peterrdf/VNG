@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using RDF;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Http.Json;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -148,7 +149,7 @@ namespace VNGService.Pages
 
         public async Task<List<Area>> GetZoningAreas(double eastings, double northings, int bboxSize, string type)
         {
-            long owlModel = Engine.CreateModel(); 
+            long owlModel = Engine.CreateModel();
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             // Unicode support for property values
@@ -267,6 +268,7 @@ namespace VNGService.Pages
             {
                 //#test
                 //var responseContent = await response.Content.ReadAsStringAsync();
+
                 var result = await response.Content.ReadFromJsonAsync<PlannenResponse>();
 
                 return result;
@@ -294,6 +296,7 @@ namespace VNGService.Pages
             {
                 //#test
                 //var responseContent = await response.Content.ReadAsStringAsync();
+
                 var result = await response.Content.ReadFromJsonAsync<PlannenResponse>();
 
                 return result;
@@ -355,7 +358,7 @@ namespace VNGService.Pages
             HttpClient httpClient,
             List<KeyValuePair<string, string>> queryParams,
             long owlModel,
-            Plan plan, 
+            Plan plan,
             string? groupFilter,
             string? typeFilter)
         {
@@ -374,10 +377,10 @@ namespace VNGService.Pages
             var planDetails = await FetchZoningAreas(httpClient, queryParams, plan.Id);
             if (planDetails?.Embedded.Bestemmingsvlakken.Count > 0)
             {
-                long verwijzingNaarTekstProperty = Engine.CreateProperty(
-                   owlModel,
-                   DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
-                   "VerwijzingNaarTekst");
+                //long verwijzingNaarTekstProperty = Engine.CreateProperty(
+                //   owlModel,
+                //   DATATYPEPROPERTY_TYPE_WCHAR_T_ARRAY,
+                //   "VerwijzingNaarTekst");
 
                 long owlDefaultMaterialInstance = Material.GetPlanDefaultMaterial(owlModel);
 
@@ -385,20 +388,29 @@ namespace VNGService.Pages
                 {
                     if (planDetails.Embedded.Bestemmingsvlakken[j].Geometrie != null)
                     {
-                        bool match = true;
+                        bool match = false;
                         if (!string.IsNullOrEmpty(groupFilter))
                         {
                             match = groupFilter.Equals(planDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep, StringComparison.OrdinalIgnoreCase);
                         }
 
-                        if (match && !string.IsNullOrEmpty(typeFilter))
+                        if (!match && !string.IsNullOrEmpty(typeFilter))
                         {
                             match = typeFilter.Equals(planDetails.Embedded.Bestemmingsvlakken[j].Type, StringComparison.OrdinalIgnoreCase);
                         }
 
                         if (!match)
                         {
-                            continue;
+                            // Mixed use case: check if the description allows living, if the group filter is "wonen" and the main group is "gemengd"
+                            if ((groupFilter?.Equals("wonen", StringComparison.OrdinalIgnoreCase) == true) &&
+                                planDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep.Equals("gemengd", StringComparison.OrdinalIgnoreCase))
+                            {
+                                match = await AllowsLivingAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j]);
+                                if (!match)
+                                {
+                                    continue;
+                                }
+                            }
                         }
 
                         long geometryInstance = RetrieveGeometry(
@@ -409,12 +421,12 @@ namespace VNGService.Pages
                             0.0);
                         if (geometryInstance != 0)
                         {
-                            Debug.Assert(planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count == 1);
-                            for (int k = 0; k < planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
-                            {
-                                var verwijzing = planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
-                                SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
-                            }
+                            //Debug.Assert(planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count == 1);
+                            //for (int k = 0; k < planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
+                            //{
+                            //    var verwijzing = planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
+                            //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
+                            //}
 
                             using var memoryStream = new MemoryStream();
                             Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
@@ -471,11 +483,11 @@ namespace VNGService.Pages
                                     0.0);
                                 if (geometryInstance != 0)
                                 {
-                                    for (int k = 0; k < nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
-                                    {
-                                        var verwijzing = nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
-                                        SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
-                                    }
+                                    //for (int k = 0; k < nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
+                                    //{
+                                    //    var verwijzing = nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
+                                    //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
+                                    //}
 
                                     using var memoryStream = new MemoryStream();
                                     Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
@@ -519,6 +531,8 @@ namespace VNGService.Pages
             {
                 //#test: log raw response content for debugging
                 //var responseContent = await response.Content.ReadAsStringAsync();
+                //_logger.LogInformation($"Fetched zoning areas for plan {planId}. Response: {responseContent}");
+
                 var result = await response.Content.ReadFromJsonAsync<BestemmingsvlakkenResponse>();
 
                 return result;
@@ -532,6 +546,161 @@ namespace VNGService.Pages
             }
         }
 
+        private async Task<List<Functieaanduiding>> FetchFunctieaanduidingenAsync(
+            HttpClient httpClient,
+            Bestemmingsvlak bestemmingsvlak)
+        {
+            var result = new List<Functieaanduiding>();
+
+            foreach (var link in bestemmingsvlak.Links.Functieaanduidingen)
+            {
+                if (string.IsNullOrEmpty(link.Href))
+                {
+                    continue;
+                }
+
+                var response = await httpClient.GetAsync(link.Href);
+                if (response.IsSuccessStatusCode)
+                {
+                    //#test: log raw response content for debugging
+                    //var responseContent = await response.Content.ReadAsStringAsync();
+                    //_logger.LogInformation($"Fetched functieaanduiding from {link.Href}. Response: {responseContent}");
+
+                    var item = await response.Content.ReadFromJsonAsync<Functieaanduiding>();
+                    if (item != null)
+                    {
+                        result.Add(item);
+                    }
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"Error fetching functieaanduiding {link.Href}. StatusCode: {response.StatusCode}, Content: {errorContent}");
+                }
+            }
+
+            return result;
+        }
+
+        private readonly Dictionary<string, string?> _tekstenCache = new();
+
+        private async Task<Tekst?> FetchTekstAsync(HttpClient httpClient, string href)
+        {
+            var response = await httpClient.GetAsync(href);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError($"Error fetching tekst {href}. StatusCode: {response.StatusCode}, Content: {errorContent}");
+                return null;
+            }
+
+            //#test: log raw response content for debugging
+            //var responseContent = await response.Content.ReadAsStringAsync();
+            //_logger.LogInformation($"Fetched tekst from {href}. Response: {responseContent}");
+
+            return await response.Content.ReadFromJsonAsync<Tekst>();
+        }
+
+        // Matches one list item, for example <li>...</li>, and captures its inner HTML.
+        //   <li[^>]*>   opening tag, with or without attributes
+        //   (.*?)       captured content, non-greedy so it stops at the first </li>
+        //   </li>       closing tag
+        // Single line lets "." match line breaks, because items can span several lines.
+        private static readonly System.Text.RegularExpressions.Regex ListItemRegex =
+            new(@"<li[^>]*>(.*?)</li>",
+                System.Text.RegularExpressions.RegexOptions.Singleline | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        // Matches the list label at the start of an item, for example <span class="lijstnummer">a. </span>.
+        //   lijstnummer = "list number" (the "a.", "b.", ... label)
+        // It is removed so that the item text starts with the function name.
+        private static readonly System.Text.RegularExpressions.Regex ListNumberRegex =
+            new(@"<span[^>]*class=""lijstnummer""[^>]*>.*?</span>",
+                System.Text.RegularExpressions.RegexOptions.Singleline | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        // Matches any HTML or XML tag, such as <span ...> or </li>, so tags can be replaced by spaces.
+        private static readonly System.Text.RegularExpressions.Regex TagRegex = new("<[^>]+>");
+
+        // Checks that the plain text of a list item STARTS with a housing function.
+        //   ^                  start of the text
+        //   wonen              "living" (the verb), the usual wording: "wonen" = housing / residential use
+        //   woningen           "dwellings" (plural of woning = dwelling, home)
+        //   woning             "dwelling", "home"
+        //   woonfunctie        "residential function"
+        //   woongebouw(en)?    "residential building" / "residential buildings"
+        //   \b                 word boundary, so "woningbouw" is not matched by "woning"
+        // Because of ^, a mention later in the item does not count.
+        // For example "kantoren, met uitzondering van wonen" ("offices, excluding housing") does not match.
+        private static readonly System.Text.RegularExpressions.Regex LivingStartRegex =
+            new(@"^(wonen|woningen|woning|woonfunctie|woongebouw(en)?)\b",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        private static string ToPlainText(string html)
+        {
+            // <[^>]+> -> " " : replace tags with spaces, so words in neighboring tags don't merge.
+            var text = TagRegex.Replace(html, " ");
+
+            // Convert entities such as &amp; to characters.
+            text = System.Net.WebUtility.HtmlDecode(text);
+
+            // \s+ -> " " : collapse runs of spaces, tabs and line breaks into one space.
+            return System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ").Trim();
+        }
+
+        private static bool DescriptionAllowsLiving(string html)
+        {
+            var items = ListItemRegex.Matches(html);
+            if (items.Count > 0)
+            {
+                foreach (System.Text.RegularExpressions.Match item in items)
+                {
+                    var content = ListNumberRegex.Replace(item.Groups[1].Value, string.Empty);
+                    if (LivingStartRegex.IsMatch(ToPlainText(content)))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            // Fallback for plans without a list.
+            //   (?<!uitzondering van\s)  negative lookbehind: not directly after "uitzondering van"
+            //                            ("exception of"; "met uitzondering van" = "with the exception of", "excluding")
+            //   \b(wonen|woningen|woonfunctie)\b  whole words: "living/housing", "dwellings", "residential function"
+            var plain = ToPlainText(html);
+            return System.Text.RegularExpressions.Regex.IsMatch(
+                plain,
+                @"(?<!uitzondering van\s)\b(wonen|woningen|woonfunctie)\b",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        private async Task<bool> AllowsLivingAsync(HttpClient httpClient, Bestemmingsvlak bestemmingsvlak)
+        {
+            foreach (var link in bestemmingsvlak.Links.Teksten)
+            {
+                var article = await FetchTekstAsync(httpClient, link.Href);
+                if (article == null)
+                {
+                    continue;
+                }
+
+                var description = article.Links.Children
+                    .FirstOrDefault(c => c.Href.Contains("Bestemmingsomschrijving", StringComparison.OrdinalIgnoreCase));
+
+                // Use the child if present, otherwise the article's own text.
+                var tekst = description != null
+                    ? await FetchTekstAsync(httpClient, description.Href)
+                    : article;
+
+                if (!string.IsNullOrEmpty(tekst?.Inhoud) && DescriptionAllowsLiving(tekst.Inhoud))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private async Task<BestemmingsvlakkenResponse?> FetchNextZoningAreas(
             HttpClient httpClient,
             string requestUrl)
@@ -542,6 +711,7 @@ namespace VNGService.Pages
             {
                 //#test: log raw response content for debugging
                 //var responseContent = await response.Content.ReadAsStringAsync();
+
                 var result = await response.Content.ReadFromJsonAsync<BestemmingsvlakkenResponse>();
 
                 return result;

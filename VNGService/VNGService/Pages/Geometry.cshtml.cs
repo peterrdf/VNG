@@ -86,7 +86,7 @@ namespace VNGService.Pages
                 memoryStream.Write(buffer, 0, (int)size);
             }, 20000);
 
-            Engine.CloseModel(owlModel);            
+            Engine.CloseModel(owlModel);
 
             return new JsonResult(new { Projection = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
         }
@@ -102,7 +102,7 @@ namespace VNGService.Pages
 
             string topologicalRelation = "DISJOINT";
 
-            long owlModel = Engine.CreateModel(); 
+            long owlModel = Engine.CreateModel();
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
@@ -120,11 +120,25 @@ namespace VNGService.Pages
             {
                 _logger.LogError(ex, "Error during topological relation calculation.");
                 return new JsonResult(new { TopologicalRelation = "error" });
-            }            
+            }
         }
 
         public IActionResult OnPostTopologicalRelation2([FromForm] string base64Content1, [FromForm] string base64Content2)
         {
+            if (string.IsNullOrEmpty(base64Content1))
+            {
+                _logger.LogError("Base64 content 1 is null or empty.");
+                _logger.LogError($"Base64 Content 1: {base64Content1}");
+                return new JsonResult(new { TopologicalRelation = "error" });
+            }
+
+            if (string.IsNullOrEmpty(base64Content2))
+            {
+                _logger.LogError("Base64 content 2 is null or empty.");
+                _logger.LogError($"Base64 Content 2: {base64Content2}");
+                return new JsonResult(new { TopologicalRelation = "error" });
+            }
+
             var modelsDir = GetModelsDir();
             if (string.IsNullOrEmpty(modelsDir))
             {
@@ -134,12 +148,18 @@ namespace VNGService.Pages
 
             string topologicalRelation = "DISJOINT";
 
-            long owlModel = Engine.CreateModel(); 
+            long owlModel = Engine.CreateModel();
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
             try
             {
                 long owlInstanceInputOne = ImportBase64Model(owlModel, modelsDir, base64Content1);
+                if (owlInstanceInputOne == 0)
+                {
+                    _logger.LogError("Failed to import the first model.");
+                    _logger.LogError($"Base64 Content 1: {base64Content1}");
+                    return new JsonResult(new { TopologicalRelation = "error" });
+                }
 
                 var base64Datas = base64Content2.Split('|');
                 if (base64Datas.Length > 1)
@@ -147,6 +167,12 @@ namespace VNGService.Pages
                     for (int i = 0; i < base64Datas.Length; i++)
                     {
                         long owlInstanceInputTwo = ImportBase64Model(owlModel, modelsDir, base64Content2);
+                        if (owlInstanceInputTwo == 0)
+                        {
+                            _logger.LogError($"Failed to import the second model at index {i}.");
+                            _logger.LogError($"Base64 Content 2: {base64Datas[i]}");
+                            continue; // Skip this iteration and try the next one
+                        }
 
                         topologicalRelation = GetTopologicalRelation(owlModel, owlInstanceInputOne, owlInstanceInputTwo);
                         if (topologicalRelation != "DISJOINT")
@@ -160,7 +186,7 @@ namespace VNGService.Pages
                     long owlInstanceInputTwo = ImportBase64Model(owlModel, modelsDir, base64Content2);
 
                     topologicalRelation = GetTopologicalRelation(owlModel, owlInstanceInputOne, owlInstanceInputTwo);
-                }                
+                }
 
                 Engine.CloseModel(owlModel);
 
@@ -180,7 +206,7 @@ namespace VNGService.Pages
             // Intersection
             long owlInstanceBooleanOperation2D_A_and_B = Engine.CreateInstance(Engine.GetClassByName(owlModel, "BooleanOperation2D"));
             Engine.SetObjectProperty(owlInstanceBooleanOperation2D_A_and_B, Engine.GetPropertyByName(owlModel, "firstObject"), owlInstanceInputOne);
-            Engine.SetObjectProperty(owlInstanceBooleanOperation2D_A_and_B, Engine.GetPropertyByName(owlModel, "secondObject"), owlInstanceInputTwo);            
+            Engine.SetObjectProperty(owlInstanceBooleanOperation2D_A_and_B, Engine.GetPropertyByName(owlModel, "secondObject"), owlInstanceInputTwo);
             Engine.SetDatatypeProperty(owlInstanceBooleanOperation2D_A_and_B, Engine.GetPropertyByName(owlModel, "type"), (long)3);
 
             Engine.CalculateInstance(owlInstanceBooleanOperation2D_A_and_B, out long vertexBufferSize1, out long indexBufferSize1);
@@ -189,7 +215,7 @@ namespace VNGService.Pages
                 // Difference
                 long owlInstanceBooleanOperation2D_A_min_B = Engine.CreateInstance(Engine.GetClassByName(owlModel, "BooleanOperation2D"));
                 Engine.SetObjectProperty(owlInstanceBooleanOperation2D_A_min_B, Engine.GetPropertyByName(owlModel, "firstObject"), owlInstanceInputOne);
-                Engine.SetObjectProperty(owlInstanceBooleanOperation2D_A_min_B, Engine.GetPropertyByName(owlModel, "secondObject"), owlInstanceInputTwo);                
+                Engine.SetObjectProperty(owlInstanceBooleanOperation2D_A_min_B, Engine.GetPropertyByName(owlModel, "secondObject"), owlInstanceInputTwo);
                 Engine.SetDatatypeProperty(owlInstanceBooleanOperation2D_A_min_B, Engine.GetPropertyByName(owlModel, "type"), (long)1);
 
                 Engine.CalculateInstance(owlInstanceBooleanOperation2D_A_min_B, out long vertexBufferSize2, out long indexBufferSize2);
@@ -198,7 +224,7 @@ namespace VNGService.Pages
                     // Inverse Difference
                     long owlInstanceBooleanOperation2D_B_min_A = Engine.CreateInstance(Engine.GetClassByName(owlModel, "BooleanOperation2D"));
                     Engine.SetObjectProperty(owlInstanceBooleanOperation2D_B_min_A, Engine.GetPropertyByName(owlModel, "firstObject"), owlInstanceInputTwo);
-                    Engine.SetObjectProperty(owlInstanceBooleanOperation2D_B_min_A, Engine.GetPropertyByName(owlModel, "secondObject"), owlInstanceInputOne);                    
+                    Engine.SetObjectProperty(owlInstanceBooleanOperation2D_B_min_A, Engine.GetPropertyByName(owlModel, "secondObject"), owlInstanceInputOne);
                     Engine.SetDatatypeProperty(owlInstanceBooleanOperation2D_B_min_A, Engine.GetPropertyByName(owlModel, "type"), (long)2);
 
                     Engine.CalculateInstance(owlInstanceBooleanOperation2D_B_min_A, out long vertexBufferSize3, out long indexBufferSize3);
@@ -296,7 +322,7 @@ namespace VNGService.Pages
             {
                 long owlInstance = ImportBase64Model(owlModel, modelsDir, base64Content);
                 double[] length = Engine.GetDatatypeProperty_inDouble(owlInstance, Engine.GetPropertyByName(owlModel, "length"));
-                
+
                 return new JsonResult(new { Length = length.Length == 1 ? length[0] : 0.0 });
             }
             catch (Exception ex)

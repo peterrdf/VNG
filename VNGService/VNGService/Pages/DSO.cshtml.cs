@@ -151,7 +151,7 @@ namespace VNGService.Pages
             return new JsonResult(zoningAreas);
         }
 
-        public async Task<List<Area>> GetZoningAreas(double eastings, double northings, int bboxSize, string type)
+        public async Task<List<Area>> GetZoningAreas(double eastings, double northings, int bboxSize, string function)
         {
             long owlModel = Engine.CreateModel();
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
@@ -239,7 +239,7 @@ namespace VNGService.Pages
                     _logger.LogInformation("No plans found for the given coordinates.");
                 }
 
-                return await CreateZoningAreas(owlModel, plans, bboxSize, type);
+                return await CreateZoningAreas(owlModel, plans, bboxSize, function);
             }
             catch (Exception ex)
             {
@@ -315,7 +315,7 @@ namespace VNGService.Pages
             }
         }
 
-        private async Task<List<Area>> CreateZoningAreas(long owlModel, List<Plan> plans, int bboxSize, string type)
+        private async Task<List<Area>> CreateZoningAreas(long owlModel, List<Plan> plans, int bboxSize, string function)
         {
             if (plans.Count == 0)
             {
@@ -349,8 +349,7 @@ namespace VNGService.Pages
 
                 var planZoningAreas = await CreatePlanZoningAreas(
                     httpClient, queryParams, owlModel, plan,
-                    groupFilter: type,
-                    typeFilter: null);
+                    groupFilter: function);
                 if (planZoningAreas.Count > 0)
                 {
                     zoningAreas.AddRange(planZoningAreas);
@@ -365,8 +364,7 @@ namespace VNGService.Pages
             List<KeyValuePair<string, string>> queryParams,
             long owlModel,
             Plan plan,
-            string? groupFilter,
-            string? typeFilter)
+            string? groupFilter)
         {
             List<Area> zoningAreas = new();
 
@@ -394,7 +392,7 @@ namespace VNGService.Pages
                 {
                     if (planDetails.Embedded.Bestemmingsvlakken[j].Geometrie != null)
                     {
-                        if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter, typeFilter))
+                        if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
                         {
                             continue;
                         }
@@ -445,7 +443,7 @@ namespace VNGService.Pages
                         {
                             if (nextPlanDetails.Embedded.Bestemmingsvlakken[j].Geometrie != null)
                             {
-                                if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter, typeFilter))
+                                if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
                                 {
                                     continue;
                                 }
@@ -495,32 +493,23 @@ namespace VNGService.Pages
 
         private async Task<bool> MatchesFilterAsync(
             HttpClient httpClient,
-            Bestemmingsvlak vlak,
-            string? groupFilter,
-            string? typeFilter)
+            Bestemmingsvlak zoningArea,
+            string? groupFilter)
         {
-            if (string.IsNullOrEmpty(groupFilter) && string.IsNullOrEmpty(typeFilter))
+            if (string.IsNullOrEmpty(groupFilter))
             {
                 return true;
             }
 
-            if (!string.IsNullOrEmpty(groupFilter) &&
-                groupFilter.Equals(vlak.Bestemmingshoofdgroep, StringComparison.OrdinalIgnoreCase))
+            if (groupFilter.Equals(zoningArea.Bestemmingshoofdgroep, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            if (!string.IsNullOrEmpty(typeFilter) &&
-                typeFilter.Equals(vlak.Type, StringComparison.OrdinalIgnoreCase))
+            // Mixed use
+            if (string.Equals(zoningArea.Bestemmingshoofdgroep, "gemengd", StringComparison.OrdinalIgnoreCase))
             {
-                return true;
-            }
-
-            // Mixed use: "wonen" is also allowed in "gemengd" if the description permits living
-            if (string.Equals(groupFilter, "wonen", StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(vlak.Bestemmingshoofdgroep, "gemengd", StringComparison.OrdinalIgnoreCase))
-            {
-                return await AllowsLivingAsync(httpClient, vlak);
+                return await AllowsFunctionAsync(httpClient, zoningArea, groupFilter);
             }
 
             return false;
@@ -628,20 +617,6 @@ namespace VNGService.Pages
         // Matches any HTML or XML tag, such as <span ...> or </li>, so tags can be replaced by spaces.
         private static readonly System.Text.RegularExpressions.Regex TagRegex = new("<[^>]+>");
 
-        // Checks that the plain text of a list item STARTS with a housing function.
-        //   ^                  start of the text
-        //   wonen              "living" (the verb), the usual wording: "wonen" = housing / residential use
-        //   woningen           "dwellings" (plural of woning = dwelling, home)
-        //   woning             "dwelling", "home"
-        //   woonfunctie        "residential function"
-        //   woongebouw(en)?    "residential building" / "residential buildings"
-        //   \b                 word boundary, so "woningbouw" is not matched by "woning"
-        // Because of ^, a mention later in the item does not count.
-        // For example "kantoren, met uitzondering van wonen" ("offices, excluding housing") does not match.
-        private static readonly System.Text.RegularExpressions.Regex LivingStartRegex =
-            new(@"^(wonen|woningen|woning|woonfunctie|woongebouw(en)?)\b",
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
         private static string ToPlainText(string html)
         {
             // <[^>]+> -> " " : replace tags with spaces, so words in neighboring tags don't merge.
@@ -654,7 +629,7 @@ namespace VNGService.Pages
             return System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ").Trim();
         }
 
-        private static bool DescriptionAllowsLiving(string html)
+        private static bool DescriptionAllowsFunction(string html, string function)
         {
             var items = ListItemRegex.Matches(html);
             if (items.Count > 0)
@@ -662,7 +637,7 @@ namespace VNGService.Pages
                 foreach (System.Text.RegularExpressions.Match item in items)
                 {
                     var content = ListNumberRegex.Replace(item.Groups[1].Value, string.Empty);
-                    if (LivingStartRegex.IsMatch(ToPlainText(content)))
+                    if (ToPlainText(content).Contains(function, StringComparison.OrdinalIgnoreCase))
                     {
                         return true;
                     }
@@ -671,20 +646,12 @@ namespace VNGService.Pages
                 return false;
             }
 
-            // Fallback for plans without a list.
-            //   (?<!uitzondering van\s)  negative lookbehind: not directly after "uitzondering van"
-            //                            ("exception of"; "met uitzondering van" = "with the exception of", "excluding")
-            //   \b(wonen|woningen|woonfunctie)\b  whole words: "living/housing", "dwellings", "residential function"
-            var plain = ToPlainText(html);
-            return System.Text.RegularExpressions.Regex.IsMatch(
-                plain,
-                @"(?<!uitzondering van\s)\b(wonen|woningen|woonfunctie)\b",
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            return ToPlainText(html).Contains(function, StringComparison.OrdinalIgnoreCase);
         }
 
-        private async Task<bool> AllowsLivingAsync(HttpClient httpClient, Bestemmingsvlak bestemmingsvlak)
+        private async Task<bool> AllowsFunctionAsync(HttpClient httpClient, Bestemmingsvlak zoningArea, string function)
         {
-            foreach (var link in bestemmingsvlak.Links.Teksten)
+            foreach (var link in zoningArea.Links.Teksten)
             {
                 var article = await FetchTekstAsync(httpClient, link.Href);
                 if (article == null)
@@ -700,7 +667,7 @@ namespace VNGService.Pages
                     ? await FetchTekstAsync(httpClient, description.Href)
                     : article;
 
-                if (!string.IsNullOrEmpty(tekst?.Inhoud) && DescriptionAllowsLiving(tekst.Inhoud))
+                if (!string.IsNullOrEmpty(tekst?.Inhoud) && DescriptionAllowsFunction(tekst.Inhoud, function))
                 {
                     return true;
                 }

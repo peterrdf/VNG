@@ -87,8 +87,7 @@ namespace VNGService.Pages
                         eastings,
                         northings,
                         bboxSize,
-                        groupFilter: type,
-                        typeFilter: null);
+                        groupFilter: type);
 
                     foreach (var item in regulationTextAnnotations)
                     {
@@ -153,6 +152,8 @@ namespace VNGService.Pages
 
         public async Task<List<Area>> GetZoningAreas(double eastings, double northings, int bboxSize, string function)
         {
+            var functions = function.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            
             long owlModel = Engine.CreateModel();
             Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
 
@@ -239,7 +240,7 @@ namespace VNGService.Pages
                     _logger.LogInformation("No plans found for the given coordinates.");
                 }
 
-                return await CreateZoningAreas(owlModel, plans, bboxSize, function);
+                return await CreateZoningAreas(owlModel, plans, bboxSize, functions);
             }
             catch (Exception ex)
             {
@@ -315,7 +316,7 @@ namespace VNGService.Pages
             }
         }
 
-        private async Task<List<Area>> CreateZoningAreas(long owlModel, List<Plan> plans, int bboxSize, string function)
+        private async Task<List<Area>> CreateZoningAreas(long owlModel, List<Plan> plans, int bboxSize, string[] functions)
         {
             if (plans.Count == 0)
             {
@@ -349,7 +350,7 @@ namespace VNGService.Pages
 
                 var planZoningAreas = await CreatePlanZoningAreas(
                     httpClient, queryParams, owlModel, plan,
-                    groupFilter: function);
+                    functions);
                 if (planZoningAreas.Count > 0)
                 {
                     zoningAreas.AddRange(planZoningAreas);
@@ -364,7 +365,7 @@ namespace VNGService.Pages
             List<KeyValuePair<string, string>> queryParams,
             long owlModel,
             Plan plan,
-            string? groupFilter)
+            string[] groupFilters)
         {
             List<Area> zoningAreas = new();
 
@@ -395,44 +396,48 @@ namespace VNGService.Pages
                         continue;
                     }
 
-                    if (!await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
+                    for (int k = 0; k < groupFilters.Length; k++)
                     {
-                        continue;
-                    }
-
-                    long geometryInstance = RetrieveGeometry(
-                        owlModel,
-                        planDetails.Embedded.Bestemmingsvlakken[j].Naam,
-                        planDetails.Embedded.Bestemmingsvlakken[j].Geometrie!,
-                        owlDefaultMaterialInstance,
-                        0.0);
-                    if (geometryInstance != 0)
-                    {
-                        //Debug.Assert(planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count == 1);
-                        //for (int k = 0; k < planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
-                        //{
-                        //    var verwijzing = planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
-                        //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
-                        //}
-
-                        using var memoryStream = new MemoryStream();
-                        Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
+                        var groupFilter = groupFilters[k];
+                        if (await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
                         {
-                            byte[] buffer = new byte[size];
-                            Marshal.Copy(value, buffer, 0, (int)size);
+                            long geometryInstance = RetrieveGeometry(
+                                owlModel,
+                                planDetails.Embedded.Bestemmingsvlakken[j].Naam,
+                                planDetails.Embedded.Bestemmingsvlakken[j].Geometrie!,
+                                owlDefaultMaterialInstance,
+                                0.0);
+                            if (geometryInstance != 0)
+                            {
+                                //Debug.Assert(planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count == 1);
+                                //for (int k = 0; k < planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
+                                //{
+                                //    var verwijzing = planDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
+                                //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
+                                //}
 
-                            memoryStream.Write(buffer, 0, (int)size);
-                        }, 20000);
+                                using var memoryStream = new MemoryStream();
+                                Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
+                                {
+                                    byte[] buffer = new byte[size];
+                                    Marshal.Copy(value, buffer, 0, (int)size);
 
-                        zoningAreas.Add(new Area
-                        {
-                            Id = planDetails.Embedded.Bestemmingsvlakken[j].Id,
-                            Name = planDetails.Embedded.Bestemmingsvlakken[j].Naam,
-                            Group = planDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
-                            Type = planDetails.Embedded.Bestemmingsvlakken[j].Type,
-                            Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
-                        });
-                    }
+                                    memoryStream.Write(buffer, 0, (int)size);
+                                }, 20000);
+
+                                zoningAreas.Add(new Area
+                                {
+                                    Id = planDetails.Embedded.Bestemmingsvlakken[j].Id,
+                                    Name = planDetails.Embedded.Bestemmingsvlakken[j].Naam,
+                                    Group = planDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
+                                    Type = planDetails.Embedded.Bestemmingsvlakken[j].Type,
+                                    Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
+                                });
+                            }
+
+                            break;
+                        } // if (await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
+                    } // for (int k = 0; k < groupFilters.Length; k++)
                 } // for (int j = 0; j < planDetails.Embedded.Bestemmingsvlakken.Count; j++)
 
                 var nextPage = planDetails.Links.Next;
@@ -448,49 +453,53 @@ namespace VNGService.Pages
                                 continue;
                             }
 
-                            if (!await MatchesFilterAsync(httpClient, nextPlanDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
+                            for (int k = 0; k < groupFilters.Length; k++)
                             {
-                                continue;
-                            }
-
-                            long geometryInstance = RetrieveGeometry(
-                                owlModel,
-                                nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
-                                nextPlanDetails.Embedded.Bestemmingsvlakken[j].Geometrie!,
-                                owlDefaultMaterialInstance,
-                                0.0);
-                            if (geometryInstance != 0)
-                            {
-                                //for (int k = 0; k < nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
-                                //{
-                                //    var verwijzing = nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
-                                //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
-                                //}
-
-                                using var memoryStream = new MemoryStream();
-                                Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
+                                var groupFilter = groupFilters[k];
+                                if (await MatchesFilterAsync(httpClient, nextPlanDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
                                 {
-                                    byte[] buffer = new byte[size];
-                                    Marshal.Copy(value, buffer, 0, (int)size);
+                                    long geometryInstance = RetrieveGeometry(
+                                    owlModel,
+                                    nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
+                                    nextPlanDetails.Embedded.Bestemmingsvlakken[j].Geometrie!,
+                                    owlDefaultMaterialInstance,
+                                    0.0);
+                                    if (geometryInstance != 0)
+                                    {
+                                        //for (int k = 0; k < nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst.Count; k++)
+                                        //{
+                                        //    var verwijzing = nextPlanDetails.Embedded.Bestemmingsvlakken[j].VerwijzingNaarTekst[k];
+                                        //    SetStringPropertyW(geometryInstance, verwijzingNaarTekstProperty, verwijzing);
+                                        //}
 
-                                    memoryStream.Write(buffer, 0, (int)size);
-                                }, 20000);
+                                        using var memoryStream = new MemoryStream();
+                                        Engine.SaveInstanceTreeS(geometryInstance, (value, size) =>
+                                        {
+                                            byte[] buffer = new byte[size];
+                                            Marshal.Copy(value, buffer, 0, (int)size);
 
-                                zoningAreas.Add(new Area
-                                {
-                                    Id = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Id,
-                                    Name = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
-                                    Group = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
-                                    Type = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Type,
-                                    Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
-                                });
-                            }
-                        }
-                    }
+                                            memoryStream.Write(buffer, 0, (int)size);
+                                        }, 20000);
+
+                                        zoningAreas.Add(new Area
+                                        {
+                                            Id = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Id,
+                                            Name = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Naam,
+                                            Group = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Bestemmingshoofdgroep,
+                                            Type = nextPlanDetails.Embedded.Bestemmingsvlakken[j].Type,
+                                            Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length)
+                                        });
+                                    }
+
+                                    break;
+                                } // if (await MatchesFilterAsync(httpClient, nextPlanDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
+                            } // for (int k = 0; k < groupFilters.Length; k++)
+                        } // for (int j = 0; j < nextPlanDetails.Embedded.Bestemmingsvlakken.Count; j++)
+                    } // if (nextPlanDetails?.Embedded.Bestemmingsvlakken.Count > 0)
 
                     nextPage = nextPlanDetails?.Links?.Next;
                 } // while (nextPage != null)
-            }
+            } // if (planDetails?.Embedded.Bestemmingsvlakken.Count > 0)
 
             return zoningAreas;
         }

@@ -119,8 +119,7 @@ namespace VNGService.Services
             double pointX,
             double pointY,
             int bboxSize,
-            string? groupFilter,
-            string? typeFilter)
+            string? groupFilter)
         {
             var regulationTextAnnotations = await FetchRegulationTextAnnotationsAsync(regelingId);
             if ((regulationTextAnnotations == null) || (regulationTextAnnotations.Gebiedsaanwijzingen == null))
@@ -132,8 +131,7 @@ namespace VNGService.Services
             foreach (var itemGebiedsaanwijzingen in regulationTextAnnotations.Gebiedsaanwijzingen)
             {
                 if ((itemGebiedsaanwijzingen.LocatieRefs == null) ||
-                    !MatchesGroup(itemGebiedsaanwijzingen, groupFilter) ||
-                    !MatchesType(itemGebiedsaanwijzingen, typeFilter))
+                    !MatchesGroup(itemGebiedsaanwijzingen, groupFilter))
                 {
                     continue;
                 }

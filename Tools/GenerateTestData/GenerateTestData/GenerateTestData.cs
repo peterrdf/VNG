@@ -35,7 +35,7 @@ namespace GenerateTestData
                 }
             }
             WHERE {    
-                (###X### ###Y### ###BBOX-SIZE### 'wonen') vng:dsoArea (?id ?name ?group ?type ?geometry) .
+                (###X### ###Y### ###BBOX-SIZE### 'wonen, gemengd') vng:dsoArea (?id ?name ?group ?type ?geometry) .
                 BIND(IRI(CONCAT(STR(dso:), ?id)) AS ?areaUri)
             }
             """;

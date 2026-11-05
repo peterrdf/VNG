@@ -46,7 +46,7 @@ namespace VNGService.Pages
             return new JsonResult(areas);
         }
 
-        public async Task<List<Area>> GetRegulationTextAnnotations(double eastings, double northings, int bboxSize, string type)
+        public async Task<List<Area>> GetRegulationTextAnnotations(double eastings, double northings, int bboxSize, string function)
         {
             List<Area> areas = new();
 
@@ -87,7 +87,7 @@ namespace VNGService.Pages
                         eastings,
                         northings,
                         bboxSize,
-                        groupFilter: type);
+                        function);
 
                     foreach (var item in regulationTextAnnotations)
                     {
@@ -435,7 +435,7 @@ namespace VNGService.Pages
                                 });
                             }
 
-                            break;
+                            // Exit the groupFilter loop if a match is found
                         } // if (await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
                     } // for (int k = 0; k < groupFilters.Length; k++)
                 } // for (int j = 0; j < planDetails.Embedded.Bestemmingsvlakken.Count; j++)
@@ -519,11 +519,12 @@ namespace VNGService.Pages
                 return true;
             }
 
+            // TBD
             // Mixed use
-            if (string.Equals(zoningArea.Bestemmingshoofdgroep, "gemengd", StringComparison.OrdinalIgnoreCase))
-            {
-                return await AllowsFunctionAsync(httpClient, zoningArea, groupFilter);
-            }
+            //if (string.Equals(zoningArea.Bestemmingshoofdgroep, "gemengd", StringComparison.OrdinalIgnoreCase))
+            //{
+            //    return await AllowsFunctionAsync(httpClient, zoningArea, groupFilter);
+            //}
 
             return false;
         }

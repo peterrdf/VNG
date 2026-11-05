@@ -119,8 +119,10 @@ namespace VNGService.Services
             double pointX,
             double pointY,
             int bboxSize,
-            string? groupFilter)
+            string? function)
         {
+            var functions = function.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
             var regulationTextAnnotations = await FetchRegulationTextAnnotationsAsync(regelingId);
             if ((regulationTextAnnotations == null) || (regulationTextAnnotations.Gebiedsaanwijzingen == null))
             {
@@ -130,59 +132,18 @@ namespace VNGService.Services
             var results = new List<DsoGebiedsaanwijzing>();
             foreach (var itemGebiedsaanwijzingen in regulationTextAnnotations.Gebiedsaanwijzingen)
             {
-                if ((itemGebiedsaanwijzingen.LocatieRefs == null) ||
-                    !MatchesGroup(itemGebiedsaanwijzingen, groupFilter))
+                foreach (var groupFilter in functions)
                 {
-                    continue;
-                }
-
-                foreach (var locationRef in itemGebiedsaanwijzingen.LocatieRefs)
-                {
-                    var locationDetails = await FetchLocationDetailsAsync(locationRef);
-                    if (locationDetails == null)
+                    if (itemGebiedsaanwijzingen.LocatieRefs == null)
                     {
                         continue;
                     }
 
-                    // Single Geometry
-                    if ((locationDetails.GeometrieIdentificatie != null) &&
-                        (locationDetails.BoundingBox != null))
+                    if (MatchesGroup(itemGebiedsaanwijzingen, groupFilter))
                     {
-                        if (!GeometryHelper.BoundingBoxesIntersect(
-                            locationDetails.BoundingBox.MinX, locationDetails.BoundingBox.MinY,
-                            locationDetails.BoundingBox.MaxX, locationDetails.BoundingBox.MaxY,
-                            pointX - bboxSize / 2, pointY - bboxSize / 2, pointX + bboxSize / 2, pointY + bboxSize / 2))
+                        foreach (var locationRef in itemGebiedsaanwijzingen.LocatieRefs)
                         {
-                            continue;
-                        }
-
-                        var geometry = await FetchGeometryAsync(locationDetails.GeometrieIdentificatie);
-                        if (geometry != null)
-                        {
-                            var gebiedsaanwijzingItem = new DsoGebiedsaanwijzing
-                            {
-                                Identificatie = itemGebiedsaanwijzingen.Identificatie,
-                                Naam = itemGebiedsaanwijzingen.Naam ?? itemGebiedsaanwijzingen.Identificatie,
-                                Groep = itemGebiedsaanwijzingen.Groep,
-                                Type = itemGebiedsaanwijzingen.Type,
-                                Geometrie = geometry
-                            };
-                            results.Add(gebiedsaanwijzingItem);
-                        }
-                    } // if ((locationDetails.GeometrieIdentificatie != null) && ...
-
-                    // Multiple Geometries
-                    if (locationDetails?.Embedded?.Omvat?.Count > 0)
-                    {
-                        foreach (var itemOmvat in locationDetails.Embedded.Omvat)
-                        {
-                            if ((itemOmvat.GeometrieIdentificatie == null) ||
-                                (itemOmvat.Identificatie == null))
-                            {
-                                continue;
-                            }
-
-                            locationDetails = await FetchLocationDetailsAsync(itemOmvat.Identificatie);
+                            var locationDetails = await FetchLocationDetailsAsync(locationRef);
                             if (locationDetails == null)
                             {
                                 continue;
@@ -193,9 +154,9 @@ namespace VNGService.Services
                                 (locationDetails.BoundingBox != null))
                             {
                                 if (!GeometryHelper.BoundingBoxesIntersect(
-                                        locationDetails.BoundingBox.MinX, locationDetails.BoundingBox.MinY,
-                                        locationDetails.BoundingBox.MaxX, locationDetails.BoundingBox.MaxY,
-                                        pointX - bboxSize / 2, pointY - bboxSize / 2, pointX + bboxSize / 2, pointY + bboxSize / 2))
+                                    locationDetails.BoundingBox.MinX, locationDetails.BoundingBox.MinY,
+                                    locationDetails.BoundingBox.MaxX, locationDetails.BoundingBox.MaxY,
+                                    pointX - bboxSize / 2, pointY - bboxSize / 2, pointX + bboxSize / 2, pointY + bboxSize / 2))
                                 {
                                     continue;
                                 }
@@ -214,9 +175,57 @@ namespace VNGService.Services
                                     results.Add(gebiedsaanwijzingItem);
                                 }
                             } // if ((locationDetails.GeometrieIdentificatie != null) && ...
-                        } // foreach (var itemOmvat in locationDetails.Embedded.Omvat)
-                    } // if (locationDetails?.Embedded?.Omvat?.Count > 0)
-                } // foreach (var locationRef in item.LocatieRefs)                
+
+                            // Multiple Geometries
+                            if (locationDetails?.Embedded?.Omvat?.Count > 0)
+                            {
+                                foreach (var itemOmvat in locationDetails.Embedded.Omvat)
+                                {
+                                    if ((itemOmvat.GeometrieIdentificatie == null) ||
+                                        (itemOmvat.Identificatie == null))
+                                    {
+                                        continue;
+                                    }
+
+                                    locationDetails = await FetchLocationDetailsAsync(itemOmvat.Identificatie);
+                                    if (locationDetails == null)
+                                    {
+                                        continue;
+                                    }
+
+                                    // Single Geometry
+                                    if ((locationDetails.GeometrieIdentificatie != null) &&
+                                        (locationDetails.BoundingBox != null))
+                                    {
+                                        if (!GeometryHelper.BoundingBoxesIntersect(
+                                                locationDetails.BoundingBox.MinX, locationDetails.BoundingBox.MinY,
+                                                locationDetails.BoundingBox.MaxX, locationDetails.BoundingBox.MaxY,
+                                                pointX - bboxSize / 2, pointY - bboxSize / 2, pointX + bboxSize / 2, pointY + bboxSize / 2))
+                                        {
+                                            continue;
+                                        }
+
+                                        var geometry = await FetchGeometryAsync(locationDetails.GeometrieIdentificatie);
+                                        if (geometry != null)
+                                        {
+                                            var gebiedsaanwijzingItem = new DsoGebiedsaanwijzing
+                                            {
+                                                Identificatie = itemGebiedsaanwijzingen.Identificatie,
+                                                Naam = itemGebiedsaanwijzingen.Naam ?? itemGebiedsaanwijzingen.Identificatie,
+                                                Groep = itemGebiedsaanwijzingen.Groep,
+                                                Type = itemGebiedsaanwijzingen.Type,
+                                                Geometrie = geometry
+                                            };
+                                            results.Add(gebiedsaanwijzingItem);
+                                        }
+                                    } // if ((locationDetails.GeometrieIdentificatie != null) && ...
+                                } // foreach (var itemOmvat in locationDetails.Embedded.Omvat)
+                            } // if (locationDetails?.Embedded?.Omvat?.Count > 0)
+                        } // foreach (var locationRef in item.LocatieRefs)
+
+                        break; // Exit the groupFilter loop if a match is found
+                    } // if (MatchesGroup(itemGebiedsaanwijzingen, groupFilter))
+                } // foreach(var groupFilter in functions)
             } // foreach (var itemGebiedsaanwijzingen in annotations.Gebiedsaanwijzingen)
 
             return results;
@@ -297,7 +306,7 @@ namespace VNGService.Services
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogError($"Error fetching location details for locationId: {locationId}. StatusCode: {response.StatusCode}, Content: {errorContent}");                
+                _logger.LogError($"Error fetching location details for locationId: {locationId}. StatusCode: {response.StatusCode}, Content: {errorContent}");
             }
 
             return null;

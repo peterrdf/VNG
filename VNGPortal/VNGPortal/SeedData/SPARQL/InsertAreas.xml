@@ -43,7 +43,7 @@ WHERE {
         ?ln express:hasDouble                 ?n .
     } LIMIT 1
     }
-    (?e ?n 400 'wonen') vng:dsoArea (?id ?name ?group ?type ?geometry) .
+    (?e ?n 400 'wonen, gemengd') vng:dsoArea (?id ?name ?group ?type ?geometry) .
     BIND(IRI(CONCAT(STR(dso:), ?id)) AS ?areaUri)
 }
 	    ]]>

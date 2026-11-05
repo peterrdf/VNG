@@ -145,7 +145,7 @@ namespace GenerateTestData
                             var id = queryResult[i]["id"];
                             var group = queryResult[i]["group"];
                             var geometry = geomtries[i];
-                            LogInformation($"Geometry for location {location.Name} (ID: {id}, Group: {group}): {geometry}");
+                            //LogInformation($"Geometry for location {location.Name} (ID: {id}, Group: {group}): {geometry}");
 
                             long owlInstanceInput = ImportBase64Model(owlModel, Path.GetTempPath(), geometry);
 

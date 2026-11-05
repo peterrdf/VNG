@@ -158,6 +158,7 @@
             _textBoxLog.Multiline = true;
             _textBoxLog.Name = "_textBoxLog";
             _textBoxLog.ReadOnly = true;
+            _textBoxLog.ScrollBars = ScrollBars.Both;
             _textBoxLog.Size = new Size(490, 196);
             _textBoxLog.TabIndex = 0;
             // 

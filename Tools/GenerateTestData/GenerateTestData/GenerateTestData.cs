@@ -10,7 +10,9 @@ using System.Windows.Forms.Design;
 
 namespace GenerateTestData
 {
-    public partial class GenerateTestData : Form
+    public partial class GenerateTestData 
+        : Form
+        , ILogView
     {
         #region Constants
         private readonly string InsertTestDataGraphQuery =
@@ -104,7 +106,7 @@ namespace GenerateTestData
                     throw new Exception("No locations found in the specified file.");
                 }
 
-                SPARQLServer = new SPARQL.Server(_logger);
+                SPARQLServer = new SPARQL.Server(this);
                 DatasetName = "test1"; //#todo
 
                 var outputFolder = Path.Combine(Path.GetDirectoryName(_textBoxIFCFile.Text)!, Path.GetFileNameWithoutExtension(_textBoxIFCFile.Text));
@@ -116,19 +118,19 @@ namespace GenerateTestData
 
                 foreach (var location in _locations)
                 {
-                    _logger.Information("Generating test data for location: {LocationName} (X: {X}, Y: {Y})", location.Name, location.X, location.Y);
+                    LogInformation($"Generating test data for location: {location.Name} (X: {location.X}, Y: {location.Y})");
                     string query = InsertTestDataGraphQuery
                         .Replace("###X###", location.X.ToString(CultureInfo.InvariantCulture))
                         .Replace("###Y###", location.Y.ToString(CultureInfo.InvariantCulture))
                         .Replace("###BBOX-SIZE###", bboxSize.ToString());
                     if (await SPARQLServer.ExecuteInsertAsync(DatasetName, query))
                     {
-                        _logger.Information("Successfully inserted test data for location: {LocationName}", location.Name);
+                        LogInformation($"Successfully inserted test data for location: {location.Name}");
 
                         var queryResult = await SPARQLServer.ExecuteQueryAsync(DatasetName, SelectGeometryQuery);
                         if (queryResult.Count == 0)
                         {
-                            MessageBox.Show($"No geometry data found for location: {location.Name}");
+                            LogWarning($"No geometry data found for location: {location.Name}");
                             continue;
                         }
 
@@ -140,8 +142,10 @@ namespace GenerateTestData
                         for (int n = 0; n < selectedCount; n++)
                         {
                             int i = indices[n];
+                            var id = queryResult[i]["id"];
+                            var group = queryResult[i]["group"];
                             var geometry = geomtries[i];
-                            _logger.Information("Geometry for location {LocationName} (ID: {ID}, Group: {Group}): {Geometry}", location.Name, queryResult[i]["id"], queryResult[i]["group"], geometry);
+                            LogInformation($"Geometry for location {location.Name} (ID: {id}, Group: {group}): {geometry}");
 
                             long owlInstanceInput = ImportBase64Model(owlModel, Path.GetTempPath(), geometry);
 
@@ -158,16 +162,16 @@ namespace GenerateTestData
                             string? address = await GetAddressByPointAsync(centerX, centerY);
                             if (string.IsNullOrEmpty(address))
                             {
-                                MessageBox.Show($"No address found for location: {location.Name} (X: {centerX}, Y: {centerY})");
+                                LogError($"No address found for location: {location.Name} (X: {centerX}, Y: {centerY})");
                                 continue;
                             }
-                            _logger.Information("Address for location {LocationName}: {Address}", location.Name, address);
+                            LogInformation($"Address for location {location.Name}: {address}");
 
                             string ifcTestFilePath = Path.Combine(outputFolder, GenerateIFCFileName(location, address));
                             File.Copy(_textBoxIFCFile.Text, ifcTestFilePath, true);
                             if (!await UpdateGeoReference(ifcTestFilePath, centerX, centerY))
                             {
-                                MessageBox.Show($"Failed to set geo-reference for IFC file: {ifcTestFilePath}");
+                                LogError($"Failed to set geo-reference for IFC file: {ifcTestFilePath}");
                                 continue;
                             }
                         }
@@ -178,12 +182,12 @@ namespace GenerateTestData
                     }
                 } // foreach (var location in _locations)
 
+                LogInformation("Test data generation completed successfully.");
                 MessageBox.Show("Test data generation completed successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An error occurred while generating test data.");
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogError(ex, "An error occurred while generating test data.");
             }
             finally
             {
@@ -245,7 +249,7 @@ namespace GenerateTestData
 
         public async Task<string?> GetAddressByPointAsync(double pointX, double pointY)
         {
-            using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(160) };
+            using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(30) };
             var url = FormattableString.Invariant(
                 $"https://api.pdok.nl/bzk/locatieserver/search/v3_1/reverse?X={pointX}&Y={pointY}&type=adres&rows=1&fl=weergavenaam,nummeraanduiding_id,adresseerbaarobject_id");
 
@@ -278,7 +282,7 @@ namespace GenerateTestData
             var sdaiModel = IFCEngine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
             if (sdaiModel == 0)
             {
-                _logger.Error("Failed to open IFC model: {FilePath}", filePath);
+                LogInformation($"Successfully inserted test data for location: {filePath}");
                 return Task.FromResult(false);
             }
 
@@ -291,21 +295,21 @@ namespace GenerateTestData
             long sdaiAggr = IFCEngine.sdaiGetEntityExtentBN(sdaiModel, "IFCMAPCONVERSION");
             if (sdaiAggr == 0)
             {
-                _logger.Warning("No IFCMAPCONVERSION entity found in the model.");
+                LogWarning("No IFCMAPCONVERSION entity found in the model.");
                 return Task.FromResult(false);
             }
 
             IFCEngine.engiGetAggrElement(sdaiAggr, 0, IFCEngine.sdaiINSTANCE, out long sdaiIfcMapConversionInstance);
             if (sdaiIfcMapConversionInstance == 0)
             {
-                _logger.Warning("No instance of IFCMAPCONVERSION found in the model.");
+                LogWarning("No instance of IFCMAPCONVERSION found in the model.");
                 return Task.FromResult(false);
             }
 
             long sdaiIfcMapConversionEntity = IFCEngine.sdaiGetInstanceType(sdaiIfcMapConversionInstance);
             if (sdaiIfcMapConversionEntity == 0)
             {
-                _logger.Warning("Failed to get the entity type of the IFCMAPCONVERSION instance.");
+                LogWarning("Failed to get the entity type of the IFCMAPCONVERSION instance.");
                 return Task.FromResult(false);
             }
 
@@ -329,7 +333,7 @@ namespace GenerateTestData
                     {
                         if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dEastings) == 0)
                         {
-                            _logger.Warning("Failed to get Eastings attribute.");
+                            LogWarning("Failed to get Eastings attribute.");
                             return Task.FromResult(false);
                         }
                     }
@@ -337,7 +341,7 @@ namespace GenerateTestData
                     {
                         if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dNorthings) == 0)
                         {
-                            _logger.Warning("Failed to get Northings attribute.");
+                            LogWarning("Failed to get Northings attribute.");
                             return Task.FromResult(false);
                         }
                     }
@@ -361,7 +365,7 @@ namespace GenerateTestData
             var sdaiModel = IFCEngine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
             if (sdaiModel == 0)
             {
-                _logger.Error("Failed to open IFC model: {FilePath}", filePath);
+                LogInformation($"Successfully inserted test data for location: {filePath}");
                 return Task.FromResult(false);
             }
 
@@ -374,21 +378,21 @@ namespace GenerateTestData
             long sdaiAggr = IFCEngine.sdaiGetEntityExtentBN(sdaiModel, "IFCMAPCONVERSION");
             if (sdaiAggr == 0)
             {
-                _logger.Warning("No IFCMAPCONVERSION entity found in the model.");
+                LogWarning("No IFCMAPCONVERSION entity found in the model.");
                 return Task.FromResult(false);
             }
 
             IFCEngine.engiGetAggrElement(sdaiAggr, 0, IFCEngine.sdaiINSTANCE, out long sdaiIfcMapConversionInstance);
             if (sdaiIfcMapConversionInstance == 0)
             {
-                _logger.Warning("No instance of IFCMAPCONVERSION found in the model.");
+                LogWarning("No instance of IFCMAPCONVERSION found in the model.");
                 return Task.FromResult(false);
             }
 
             long sdaiIfcMapConversionEntity = IFCEngine.sdaiGetInstanceType(sdaiIfcMapConversionInstance);
             if (sdaiIfcMapConversionEntity == 0)
             {
-                _logger.Warning("Failed to get the entity type of the IFCMAPCONVERSION instance.");
+                LogWarning("Failed to get the entity type of the IFCMAPCONVERSION instance.");
                 return Task.FromResult(false);
             }
 
@@ -412,7 +416,7 @@ namespace GenerateTestData
                     {
                         if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dEastings) == 0)
                         {
-                            _logger.Warning("Failed to get Eastings attribute.");
+                            LogWarning("Failed to get Eastings attribute.");
                             return Task.FromResult(false);
                         }
 
@@ -422,7 +426,7 @@ namespace GenerateTestData
                     {
                         if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dNorthings) == 0)
                         {
-                            _logger.Warning("Failed to get Northings attribute.");
+                            LogWarning("Failed to get Northings attribute.");
                             return Task.FromResult(false);
                         }
 
@@ -462,6 +466,32 @@ namespace GenerateTestData
 
             return location.Name + " - " + sanitized + ".ifc";
         }
+
+        #region ILogView
+        public void LogInformation(string message)
+        {
+            _logger.Information(message);
+            _textBoxLog.AppendText("[INF] "+ message + Environment.NewLine);
+        }
+
+        public void LogWarning(string message)
+        {
+            _logger.Warning(message);
+            _textBoxLog.AppendText("[WARN] " + message + Environment.NewLine);
+        }
+
+        public void LogError(string message)
+        {
+            _logger.Error(message);
+            _textBoxLog.AppendText("[ERR] " + message + Environment.NewLine);
+        }
+
+        public void LogError(Exception exception, string message)
+        {
+            _logger.Error(exception, message);
+            _textBoxLog.AppendText("[INF] " + exception.Message + Environment.NewLine + message + Environment.NewLine);
+        }
+        #endregion // ILogView
         #endregion // Methods
 
         #region Properties

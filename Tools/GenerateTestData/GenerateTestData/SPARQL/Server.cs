@@ -21,7 +21,7 @@ namespace GenerateTestData.SPARQL
 
         public Server(ILogView logView)
         {
-            _logView = _logView ?? throw new ArgumentNullException(nameof(logView));
+            _logView = logView ?? throw new ArgumentNullException(nameof(logView));
         }
 
         public bool CreateDataset(string datasetName)

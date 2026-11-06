@@ -54,7 +54,6 @@ public sealed class VngStatusClient : IAsyncDisposable
 
         _connection.Reconnected += async connectionId =>
         {
-            // Group membership is lost on reconnect; rejoin.
             if (_groupName != null)
             {
                 await _connection.InvokeAsync("JoinGroup", _groupName);
@@ -91,7 +90,6 @@ public sealed class VngStatusClient : IAsyncDisposable
         }
     }
 
-    /// <summary>Subscribes to updates for the task (taskId returned by the upload is the group name).</summary>
     public async Task JoinTaskAsync(string taskId, CancellationToken cancellationToken = default)
     {
         _groupName = taskId;

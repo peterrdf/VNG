@@ -33,13 +33,15 @@ namespace TestVNGPortal
 
             _api?.Dispose();
 
+            _textBoxLog.Clear();
+
             _api = new VngPortalClient("http://localhost:1145");
             _status = new VngStatusClient("http://localhost:1145");
 
-            _status.ProgressUpdateReceived += p => Debug.WriteLine($"{(p.Error ? "ERR" : "INFO")}: {p.Message}");
             _status.StatusUpdateReceived += Status_StatusUpdateReceived;
-            _status.QueryUpdateReceived += q => Debug.WriteLine($"{q.Type}: {q.Query}{q.Result}");
-            _status.View3DUpdateReceived += v => Debug.WriteLine($"3D view: {v.Title} ({v.Model})");
+            _status.ProgressUpdateReceived += p => Progess_UpdateReceived(p.Progress, p.Message, p.Error);
+            _status.QueryUpdateReceived += q => Query_UpdateReceived(q.Type, q.Query, q.Result, q.Error);
+            _status.View3DUpdateReceived += v => View3D_UpdateRecieved(v.Title, v.WorkflowId, v.Model, v.Error);
 
             await _status.StartAsync();
 
@@ -60,12 +62,40 @@ namespace TestVNGPortal
                 update.TryGetProperty("Status", out var statusElement))
             {
                 status = statusElement.GetString();
+                Invoke(() => 
+                { 
+                    _textBoxLog.AppendText($"Task status: {status}\r\n"); 
+                });
             }
 
-            if (status != "Running")
+            Invoke(() =>
             {
-                //TaskFinished?.Invoke();
-            }
+                _textBoxLog.AppendText($"Task finished with status: {status}\r\n");
+            });
+        }
+
+        private void Progess_UpdateReceived(float progress, string? message, bool error)
+        {
+            Invoke(() =>
+            {
+                _textBoxLog.AppendText($"Progress: {progress * 100:F2}% - {message}\r\n");
+            });
+        }
+
+        private void Query_UpdateReceived(string? type, string? query, string? result, bool error)
+        {
+            Invoke(() => 
+            { 
+                _textBoxLog.AppendText($"Query: {type} - {query} - {result}\r\n"); 
+            });
+        }
+
+        private void View3D_UpdateRecieved(string? title, string? workflowId, string? model, bool error)
+        {
+            Invoke(() => 
+            { 
+                _textBoxLog.AppendText($"3D View: {title} - {workflowId} - {model}\r\n"); 
+            });
         }
     }
 }

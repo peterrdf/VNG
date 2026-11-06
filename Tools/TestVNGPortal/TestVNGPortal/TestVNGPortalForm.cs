@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Reflection.Metadata;
+using System.Text;
 using System.Text.Json;
 using System.Xml;
 
@@ -13,6 +15,8 @@ namespace TestVNGPortal
         private VngStatusClient? _status;
 
         private TaskCompletionSource<string?>? _taskCompletion;
+
+        private StringBuilder _logBuilder = new();
 
         public TestVNGPortalForm()
         {
@@ -60,6 +64,7 @@ namespace TestVNGPortal
             }
 
             _textBoxLog.AppendText($"Found {_ifcFiles.Count} IFC file(s) in '{dialog.SelectedPath}'\r\n");
+            _logBuilder.AppendLine($"Found {_ifcFiles.Count} IFC file(s) in '{dialog.SelectedPath}'");
 
             foreach (var file in _ifcFiles)
             {
@@ -100,6 +105,7 @@ namespace TestVNGPortal
             }
 
             _textBoxLog.AppendText($"Found {_workflowsFiles.Count} XML file(s) in '{dialog.SelectedPath}'\r\n");
+            _logBuilder.AppendLine($"Found {_workflowsFiles.Count} XML file(s) in '{dialog.SelectedPath}'");
 
             foreach (var file in _workflowsFiles)
             {
@@ -114,7 +120,8 @@ namespace TestVNGPortal
             status is not null &&
             (status.Equals("Completed", StringComparison.OrdinalIgnoreCase) ||
              status.Equals("Failed", StringComparison.OrdinalIgnoreCase) ||
-             status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase));
+             status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase) ||
+             status.Equals("Error", StringComparison.OrdinalIgnoreCase));
 
         private async void _buttonRun_Click(object sender, EventArgs e)
         {
@@ -130,11 +137,13 @@ namespace TestVNGPortal
                 _api?.Dispose();
 
                 _textBoxLog.Clear();
+                _logBuilder.Clear();
                 await RunWorkflowsAsync();
             }
             catch (Exception ex)
             {
                 _textBoxLog.AppendText($"Error: {ex.Message}\r\n");
+                _logBuilder.AppendLine($"Error: {ex.Message}");
             }
             finally
             {
@@ -164,6 +173,7 @@ namespace TestVNGPortal
             foreach (var ifcFile in files)
             {
                 _textBoxLog.AppendText($"Running: {ifcFile}\r\n");
+                _logBuilder.AppendLine($"Running: {ifcFile}");
 
                 _taskCompletion = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -171,11 +181,13 @@ namespace TestVNGPortal
                 if (string.IsNullOrEmpty(workflowId))
                 {
                     _textBoxLog.AppendText($"Error: Could not extract workflow ID from {_workflowsFiles[_comboBoxWorkflows.SelectedIndex]!}\r\n");
+                    _logBuilder.AppendLine($"Error: Could not extract workflow ID from {_workflowsFiles[_comboBoxWorkflows.SelectedIndex]!}");
                     return;
                 }
 
                 var result = await _api.UploadIfcAsync(ifcFile, workflowId);
                 _textBoxLog.AppendText($"Upload result: TaskId={result.TaskId}, Error={result.Error ?? "NA"}\r\n");
+                _logBuilder.AppendLine($"Upload result: TaskId={result.TaskId}, Error={result.Error ?? "NA"}");
 
                 if (!string.IsNullOrEmpty(result.Error) || string.IsNullOrEmpty(result.TaskId))
                 {
@@ -187,9 +199,15 @@ namespace TestVNGPortal
                 // Wait until the server reports a terminal status for this task
                 var finalStatus = await _taskCompletion.Task;
                 _textBoxLog.AppendText($"Task finished with status: {finalStatus}\r\n");
+                _logBuilder.AppendLine($"Task finished with status: {finalStatus}");
             }
 
             _textBoxLog.AppendText("All tasks finished.\r\n");
+            _logBuilder.AppendLine("All tasks finished.");
+
+            // Save the log to a file
+            var logFilePath = Path.Combine(_textBoxIFCModelsFolder.Text, $"VNGPortalTestLog-{DateTime.Now:yyyyMMdd-HHmmss}.txt");
+            await File.WriteAllTextAsync(logFilePath, _logBuilder.ToString());
         }
 
         private static string? GetWorkflowId(string xmlFilePath)
@@ -242,6 +260,7 @@ namespace TestVNGPortal
                 var status = statusElement.GetString();
 
                 Invoke(() => _textBoxLog.AppendText($"Task status: {status}\r\n"));
+                _logBuilder.AppendLine($"Task status: {status}");
 
                 if (IsTerminalStatus(status))
                 {
@@ -255,6 +274,7 @@ namespace TestVNGPortal
             Invoke(() =>
             {
                 _textBoxLog.AppendText($"Progress: {progress * 100:F2}% - {message}\r\n");
+                _logBuilder.AppendLine($"Progress: {progress * 100:F2}% - {message}");
             });
         }
 
@@ -263,6 +283,22 @@ namespace TestVNGPortal
             Invoke(() =>
             {
                 _textBoxLog.AppendText($"Query: {type} - {query} - {result}\r\n");
+                if (type == "SHACL Validation Report")
+                {
+                    if (result?.IndexOf("sh:Violation") != -1)
+                    {
+                        _textBoxLog.AppendText($"SHACL Validation Report:\r\n{result}\r\n");
+                        _logBuilder.AppendLine($"SHACL Validation Report:\r\n{result}\r\n");
+                    }
+                }
+                else if (type == "IDS Validation Report")
+                {
+                    if (result?.IndexOf("ERROR") != -1)
+                    {
+                        _textBoxLog.AppendText($"IDS Validation Report:\r\n{result}\r\n");
+                        _logBuilder.AppendLine($"IDS Validation Report:\r\n{result}\r\n");
+                    }
+                }
             });
         }
 
@@ -271,6 +307,7 @@ namespace TestVNGPortal
             Invoke(() =>
             {
                 _textBoxLog.AppendText($"3D View: {title} - {workflowId} - {model}\r\n");
+                //_logBuilder.AppendLine($"3D View: {title} - {workflowId} - {model}");
             });
         }
 

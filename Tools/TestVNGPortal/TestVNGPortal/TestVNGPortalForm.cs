@@ -173,6 +173,7 @@ namespace TestVNGPortal
             foreach (var ifcFile in files)
             {
                 _textBoxLog.AppendText($"Running: {ifcFile}\r\n");
+                _logBuilder.AppendLine("***************************************************************************************************");
                 _logBuilder.AppendLine($"Running: {ifcFile}");
 
                 _taskCompletion = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -199,7 +200,7 @@ namespace TestVNGPortal
                 // Wait until the server reports a terminal status for this task
                 var finalStatus = await _taskCompletion.Task;
                 _textBoxLog.AppendText($"Task finished with status: {finalStatus}\r\n");
-                _logBuilder.AppendLine($"Task finished with status: {finalStatus}");
+                _logBuilder.AppendLine($"Task finished with status: {finalStatus}\n\n");
             }
 
             _textBoxLog.AppendText("All tasks finished.\r\n");

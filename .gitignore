@@ -22,3 +22,6 @@
 /Tools/GenerateTestData/GenerateTestData/obj
 /Tools/GenerateTestData/.vs/ProjectEvaluation
 /Tools/GenerateTestData/GenerateTestData/bin/Release/net9.0-windows
+/Tools/TestVNGPortal/.vs/TestVNGPortal
+/Tools/TestVNGPortal/TestVNGPortal/bin
+/Tools/TestVNGPortal/TestVNGPortal/obj

@@ -11,6 +11,7 @@ using VNGPortal.Workflows;
 
 namespace VNGPortal.Pages;
 
+[IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {
     private readonly IConfiguration _configuration;

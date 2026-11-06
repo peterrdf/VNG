@@ -397,5 +397,72 @@ namespace GenerateTestData.SPARQL
                 return null;
             });
         }
+
+        /// <summary>
+        /// Asynchronously executes a SPARQL query against a dataset and saves the result in Turtle format to a
+        /// specified file.
+        /// </summary>
+        /// <param name="datasetName">The name of the dataset to query.</param>
+        /// <param name="query">The SPARQL query to execute.</param>
+        /// <param name="outputFile">The file path where the query result in Turtle format will be saved.</param>
+        /// <returns>True if the query result is successfully saved; otherwise, false.</returns>
+        /// <example>
+        /// await server.SaveQueryResultAsTtlAsync(
+        ///     "mydataset",
+        ///     "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }",
+        /// @"C:\temp\result.ttl");
+        /// </example>
+        public async Task<bool> SaveQueryResultAsTtlAsync(string datasetName, string query, string outputFile)
+        {
+            try
+            {
+                using var handler = new HttpClientHandler
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                };
+                using var client = new HttpClient(handler) { Timeout = TimeSpan.FromMinutes(30) };
+
+                var byteArray = System.Text.Encoding.ASCII.GetBytes($"{_user}:{_password}");
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/turtle"));
+
+                var requestUri = $"{_sparqlEndpoint}{datasetName}/query";
+
+                // POST the query as a form to avoid URL length limits
+                using var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("query", query)
+                });
+
+                // ResponseHeadersRead lets us stream large results to disk
+                using var request = new HttpRequestMessage(HttpMethod.Post, requestUri) { Content = content };
+                using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    _logView.LogError($"Failed to execute query on dataset '{datasetName}'. Status code: {response.StatusCode}. {error}");
+                    return false;
+                }
+
+                var directory = Path.GetDirectoryName(outputFile);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                await using var responseStream = await response.Content.ReadAsStreamAsync();
+                await using var fileStream = File.Create(outputFile);
+                await responseStream.CopyToAsync(fileStream);
+
+                _logView.LogInformation($"Query result saved to '{outputFile}'.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logView.LogError(ex, $"Exception occurred while saving query result to '{outputFile}'");
+                return false;
+            }
+        }
     }
 }

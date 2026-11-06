@@ -11,6 +11,8 @@ namespace TestVNGPortal
         private VngPortalClient? _api;
         private VngStatusClient? _status;
 
+        private TaskCompletionSource<string?>? _taskCompletion;
+
         public TestVNGPortalForm()
         {
             InitializeComponent();
@@ -105,16 +107,45 @@ namespace TestVNGPortal
             _buttonRun.Enabled = _ifcFiles.Count > 0 && _workflowsFiles.Count > 0;
         }
 
+        private static bool IsTerminalStatus(string? status) =>
+            status is not null &&
+            (status.Equals("Completed", StringComparison.OrdinalIgnoreCase) ||
+             status.Equals("Failed", StringComparison.OrdinalIgnoreCase) ||
+             status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase));
+
         private async void _buttonRun_Click(object sender, EventArgs e)
         {
-            if (_status != null)
+            _buttonRun.Enabled = false;
+            try
             {
-                await _status.DisposeAsync();
+                if (_status != null)
+                {
+                    await _status.DisposeAsync();
+                    _status = null;
+                }
+
+                _api?.Dispose();
+
+                _textBoxLog.Clear();
+                await RunWorkflowsAsync();
             }
+            catch (Exception ex)
+            {
+                _textBoxLog.AppendText($"Error: {ex.Message}\r\n");
+            }
+            finally
+            {
+                _buttonRun.Enabled = _ifcFiles.Count > 0 && _workflowsFiles.Count > 0;
+            }
+        }
 
-            _api?.Dispose();
-
-            _textBoxLog.Clear();
+        private async Task RunWorkflowsAsync()
+        {
+            if (_ifcFiles.Count == 0 || _workflowsFiles.Count == 0)
+            {
+                MessageBox.Show(this, "Please select both IFC models and workflows folders.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             _api = new VngPortalClient("http://localhost:1145");
             _status = new VngStatusClient("http://localhost:1145");
@@ -126,33 +157,48 @@ namespace TestVNGPortal
 
             await _status.StartAsync();
 
-            var result = await _api.UploadIfcAsync(@"D:\Temp\TestData\IFC\VNG\IFC Data\Kievitsweg_R23_ILS Spaces update.ifc", "1");
-            if (result.Error == null && result.TaskId != null)
+            var files = _ifcFiles.ToList();
+            foreach (var ifcFile in files)
             {
+                _textBoxLog.AppendText($"Running: {ifcFile}\r\n");
+
+                _taskCompletion = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+                var result = await _api.UploadIfcAsync(ifcFile, "1"); //#todo: select workflow from _workflowsFiles
+                _textBoxLog.AppendText($"Upload result: TaskId={result.TaskId}, Error={result.Error}\r\n");
+
+                if (!string.IsNullOrEmpty(result.Error) || string.IsNullOrEmpty(result.TaskId))
+                {
+                    continue;
+                }
+
                 await _status.JoinTaskAsync(result.TaskId);
+
+                // Wait until the server reports a terminal status for this task
+                var finalStatus = await _taskCompletion.Task;
+                _textBoxLog.AppendText($"Task finished with status: {finalStatus}\r\n");
             }
+
+            _textBoxLog.AppendText("All tasks finished.\r\n");
         }
 
         private void Status_StatusUpdateReceived(string json)
         {
-            var doc = JsonDocument.Parse(json);
+            using var doc = JsonDocument.Parse(json);
             Debug.WriteLine($"Status update: {doc.RootElement.GetProperty("status").GetString()}");
 
-            string? status = null;
             if (doc.RootElement.TryGetProperty("taskDescriptorUpdate", out var update) &&
                 update.TryGetProperty("Status", out var statusElement))
             {
-                status = statusElement.GetString();
-                Invoke(() =>
-                {
-                    _textBoxLog.AppendText($"Task status: {status}\r\n");
-                });
-            }
+                var status = statusElement.GetString();
 
-            Invoke(() =>
-            {
-                _textBoxLog.AppendText($"Task finished with status: {status}\r\n");
-            });
+                Invoke(() => _textBoxLog.AppendText($"Task status: {status}\r\n"));
+
+                if (IsTerminalStatus(status))
+                {
+                    _taskCompletion?.TrySetResult(status);
+                }
+            }
         }
 
         private void Progess_UpdateReceived(float progress, string? message, bool error)

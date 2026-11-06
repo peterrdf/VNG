@@ -362,7 +362,7 @@ namespace VNGPortal.Workflows
 
             await _signalRStatus.SendProgressUpdate(
                 taskDescriptor.GroupName,
-                100,
+                1,
                 $"Workflow for model '{taskDescriptor.Model}' completed successfully.",
                 false);
 

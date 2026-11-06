@@ -19,6 +19,8 @@ namespace VNGService.Pages
         private readonly IConfiguration _configuration;
         private readonly ILogger<DSOModel> _logger;
 
+        private readonly Dictionary<string, string?> _tekstenCache = new();
+
         public DSOModel(IConfiguration configuration, ILogger<DSOModel> logger)
         {
             _configuration = configuration;
@@ -592,8 +594,6 @@ namespace VNGService.Pages
 
             return result;
         }
-
-        private readonly Dictionary<string, string?> _tekstenCache = new();
 
         private async Task<Tekst?> FetchTekstAsync(HttpClient httpClient, string href)
         {

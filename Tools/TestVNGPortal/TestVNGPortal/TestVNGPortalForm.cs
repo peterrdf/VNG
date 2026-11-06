@@ -5,6 +5,9 @@ namespace TestVNGPortal
 {
     public partial class TestVNGPortalForm : Form
     {
+        private List<string> _ifcFiles = new();
+        private List<string> _workflowsFiles = new();
+
         private VngPortalClient? _api;
         private VngStatusClient? _status;
 
@@ -22,6 +25,84 @@ namespace TestVNGPortal
                 _api?.Dispose();
                 _api = null;
             };
+        }
+
+        private void _buttonSelectIFCModelsFolder_Click(object sender, EventArgs e)
+        {
+            using var dialog = new FolderBrowserDialog
+            {
+                Description = "Select the folder containing IFC models",
+                UseDescriptionForTitle = true,
+                ShowNewFolderButton = false
+            };
+
+            if (dialog.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            _textBoxIFCModelsFolder.Text = dialog.SelectedPath;
+
+            try
+            {
+                _ifcFiles = Directory
+                    .EnumerateFiles(dialog.SelectedPath, "*.ifc", SearchOption.AllDirectories)
+                    .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+            {
+                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            _textBoxLog.AppendText($"Found {_ifcFiles.Count} IFC file(s) in '{dialog.SelectedPath}'\r\n");
+
+            foreach (var file in _ifcFiles)
+            {
+                _textBoxLog.AppendText($"  {file}\r\n");
+            }
+
+            _buttonRun.Enabled = _ifcFiles.Count > 0 && _workflowsFiles.Count > 0;
+        }
+
+        private void _buttonSelectWorkflowsFolder_Click(object sender, EventArgs e)
+        {
+            using var dialog = new FolderBrowserDialog
+            {
+                Description = "Select the folder containing XML-s (workflows)",
+                UseDescriptionForTitle = true,
+                ShowNewFolderButton = false
+            };
+
+            if (dialog.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            _textBoxWorkflowsFolder.Text = dialog.SelectedPath;
+
+            try
+            {
+                _workflowsFiles = Directory
+                    .EnumerateFiles(dialog.SelectedPath, "*.xml", SearchOption.AllDirectories)
+                    .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+            {
+                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            _textBoxLog.AppendText($"Found {_workflowsFiles.Count} XML file(s) in '{dialog.SelectedPath}'\r\n");
+
+            foreach (var file in _workflowsFiles)
+            {
+                _textBoxLog.AppendText($"  {file}\r\n");
+            }
+
+            _buttonRun.Enabled = _ifcFiles.Count > 0 && _workflowsFiles.Count > 0;
         }
 
         private async void _buttonRun_Click(object sender, EventArgs e)
@@ -62,9 +143,9 @@ namespace TestVNGPortal
                 update.TryGetProperty("Status", out var statusElement))
             {
                 status = statusElement.GetString();
-                Invoke(() => 
-                { 
-                    _textBoxLog.AppendText($"Task status: {status}\r\n"); 
+                Invoke(() =>
+                {
+                    _textBoxLog.AppendText($"Task status: {status}\r\n");
                 });
             }
 
@@ -84,17 +165,17 @@ namespace TestVNGPortal
 
         private void Query_UpdateReceived(string? type, string? query, string? result, bool error)
         {
-            Invoke(() => 
-            { 
-                _textBoxLog.AppendText($"Query: {type} - {query} - {result}\r\n"); 
+            Invoke(() =>
+            {
+                _textBoxLog.AppendText($"Query: {type} - {query} - {result}\r\n");
             });
         }
 
         private void View3D_UpdateRecieved(string? title, string? workflowId, string? model, bool error)
         {
-            Invoke(() => 
-            { 
-                _textBoxLog.AppendText($"3D View: {title} - {workflowId} - {model}\r\n"); 
+            Invoke(() =>
+            {
+                _textBoxLog.AppendText($"3D View: {title} - {workflowId} - {model}\r\n");
             });
         }
     }

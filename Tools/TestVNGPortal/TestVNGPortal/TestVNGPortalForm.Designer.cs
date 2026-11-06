@@ -31,11 +31,20 @@
             _buttonRun = new Button();
             groupBox1 = new GroupBox();
             _textBoxLog = new TextBox();
+            groupBox2 = new GroupBox();
+            _buttonSelectIFCModelsFolder = new Button();
+            _textBoxIFCModelsFolder = new TextBox();
+            _textBoxWorkflowsFolder = new TextBox();
+            groupBox3 = new GroupBox();
+            _buttonSelectWorkflowsFolder = new Button();
             groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
+            groupBox3.SuspendLayout();
             SuspendLayout();
             // 
             // _buttonRun
             // 
+            _buttonRun.Enabled = false;
             _buttonRun.Location = new Point(620, 402);
             _buttonRun.Name = "_buttonRun";
             _buttonRun.Size = new Size(75, 23);
@@ -64,21 +73,85 @@
             _textBoxLog.Size = new Size(669, 237);
             _textBoxLog.TabIndex = 0;
             // 
-            // TestVNGProtalForm
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(_buttonSelectIFCModelsFolder);
+            groupBox2.Controls.Add(_textBoxIFCModelsFolder);
+            groupBox2.Location = new Point(12, 11);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(681, 54);
+            groupBox2.TabIndex = 2;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "IFC Models folder";
+            // 
+            // _buttonSelectIFCModelsFolder
+            // 
+            _buttonSelectIFCModelsFolder.Location = new Point(646, 19);
+            _buttonSelectIFCModelsFolder.Name = "_buttonSelectIFCModelsFolder";
+            _buttonSelectIFCModelsFolder.Size = new Size(29, 23);
+            _buttonSelectIFCModelsFolder.TabIndex = 1;
+            _buttonSelectIFCModelsFolder.Text = "...";
+            _buttonSelectIFCModelsFolder.UseVisualStyleBackColor = true;
+            _buttonSelectIFCModelsFolder.Click += _buttonSelectIFCModelsFolder_Click;
+            // 
+            // _textBoxIFCModelsFolder
+            // 
+            _textBoxIFCModelsFolder.Location = new Point(9, 19);
+            _textBoxIFCModelsFolder.Name = "_textBoxIFCModelsFolder";
+            _textBoxIFCModelsFolder.ReadOnly = true;
+            _textBoxIFCModelsFolder.Size = new Size(631, 23);
+            _textBoxIFCModelsFolder.TabIndex = 0;
+            // 
+            // _textBoxWorkflowsFolder
+            // 
+            _textBoxWorkflowsFolder.Location = new Point(9, 19);
+            _textBoxWorkflowsFolder.Name = "_textBoxWorkflowsFolder";
+            _textBoxWorkflowsFolder.ReadOnly = true;
+            _textBoxWorkflowsFolder.Size = new Size(631, 23);
+            _textBoxWorkflowsFolder.TabIndex = 0;
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(_buttonSelectWorkflowsFolder);
+            groupBox3.Controls.Add(_textBoxWorkflowsFolder);
+            groupBox3.Location = new Point(12, 69);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(681, 54);
+            groupBox3.TabIndex = 3;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Workflows folder";
+            // 
+            // _buttonSelectWorkflowsFolder
+            // 
+            _buttonSelectWorkflowsFolder.Location = new Point(646, 19);
+            _buttonSelectWorkflowsFolder.Name = "_buttonSelectWorkflowsFolder";
+            _buttonSelectWorkflowsFolder.Size = new Size(29, 23);
+            _buttonSelectWorkflowsFolder.TabIndex = 1;
+            _buttonSelectWorkflowsFolder.Text = "...";
+            _buttonSelectWorkflowsFolder.UseVisualStyleBackColor = true;
+            _buttonSelectWorkflowsFolder.Click += _buttonSelectWorkflowsFolder_Click;
+            // 
+            // TestVNGPortalForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(705, 428);
+            Controls.Add(groupBox3);
+            Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Controls.Add(_buttonRun);
             FormBorderStyle = FormBorderStyle.Fixed3D;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "TestVNGProtalForm";
+            Name = "TestVNGPortalForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Test VNG Portal Tool";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -87,5 +160,11 @@
         private Button _buttonRun;
         private GroupBox groupBox1;
         private TextBox _textBoxLog;
+        private GroupBox groupBox2;
+        private TextBox _textBoxIFCModelsFolder;
+        private Button _buttonSelectIFCModelsFolder;
+        private TextBox _textBoxWorkflowsFolder;
+        private GroupBox groupBox3;
+        private Button _buttonSelectWorkflowsFolder;
     }
 }

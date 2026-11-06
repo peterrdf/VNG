@@ -103,7 +103,6 @@ namespace VNGPortal.Workflows
                     return true;
                 });
 
-                List<TaskStatus> xmlTasks = new();
                 foreach (var sparqlXML in sparqlXMLs)
                 {
                     if (sparqlXML?.PhysicalPath != null)
@@ -164,7 +163,7 @@ namespace VNGPortal.Workflows
                         return false;
                     return true;
                 });
-                List<TaskStatus> xmlTasks = new();
+
                 foreach (var shaclXML in shaclXMLs)
                 {
                     if (shaclXML?.PhysicalPath != null)

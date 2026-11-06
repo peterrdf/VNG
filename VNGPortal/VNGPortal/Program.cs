@@ -68,6 +68,12 @@ namespace VNGPortal
                     var destFile = Path.Combine(sparqlDir, Path.GetFileName(sourceFile));
                     File.Copy(sourceFile, destFile, true);
                 }
+
+                foreach (var sourceFile in Directory.EnumerateFiles(seedSPARQLDir, "*.ttl"))
+                {
+                    var destFile = Path.Combine(sparqlDir, Path.GetFileName(sourceFile));
+                    File.Copy(sourceFile, destFile, true);
+                }
             }
 
             var shaclDir = builder.Configuration[$"{FileStorage}:SHACLDir"];
@@ -82,6 +88,12 @@ namespace VNGPortal
             if (Directory.Exists(seedSHACLDir))
             {
                 foreach (var sourceFile in Directory.EnumerateFiles(seedSHACLDir, "*.xml"))
+                {
+                    var destFile = Path.Combine(shaclDir, Path.GetFileName(sourceFile));
+                    File.Copy(sourceFile, destFile, true);
+                }
+
+                foreach (var sourceFile in Directory.EnumerateFiles(seedSHACLDir, "*.ttl"))
                 {
                     var destFile = Path.Combine(shaclDir, Path.GetFileName(sourceFile));
                     File.Copy(sourceFile, destFile, true);

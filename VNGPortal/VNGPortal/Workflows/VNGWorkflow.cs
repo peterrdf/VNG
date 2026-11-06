@@ -31,6 +31,7 @@ namespace VNGPortal.Workflows
 
             var modelsDir = _configuration[$"{fileStorage}:ModelsDir"]!;
             var idsDir = _configuration[$"{fileStorage}:IDSDir"]!;
+            var sparqlDir = _configuration[$"{fileStorage}:SPARQLDir"]!;
 
             ModelDir = Path.Combine(modelsDir, taskDescriptor.TaskId);
             var modelPath = Path.Combine(ModelDir, taskDescriptor.Model);
@@ -139,7 +140,19 @@ namespace VNGPortal.Workflows
                                     query = step.Parameters["query"];
                                 }
 
-                                if (string.IsNullOrEmpty(query) && step.Parameters.ContainsKey("queryRef"))
+                                if (string.IsNullOrEmpty(query) && step.Parameters.ContainsKey("uri"))
+                                {
+                                    string uri = step.Parameters["uri"];
+                                    if (!string.IsNullOrEmpty(uri))
+                                    {
+                                        // #todo: use http source instead of local file
+                                        var queryFilePath = Path.Combine(sparqlDir, uri);
+                                        _logger.LogInformation("Loading SPARQL query from file: '{QueryFilePath}'", queryFilePath);
+                                        query = await File.ReadAllTextAsync(queryFilePath);
+                                        _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
+                                    }
+                                }
+                                else if (string.IsNullOrEmpty(query) && step.Parameters.ContainsKey("queryRef"))
                                 {
                                     string queryRef = step.Parameters["queryRef"];
                                     if (!string.IsNullOrEmpty(queryRef) &&

@@ -278,7 +278,7 @@
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<queryRef><![CDATA[InsertAreas]]></queryRef>
+				<uri><![CDATA[insert-areas.ttl]]></uri> <!--#todo: use http source instead of local file-->
 			</parameters>
 		</step>
 		<step>

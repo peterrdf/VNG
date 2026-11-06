@@ -37,15 +37,18 @@
             _textBoxWorkflowsFolder = new TextBox();
             groupBox3 = new GroupBox();
             _buttonSelectWorkflowsFolder = new Button();
+            groupBox4 = new GroupBox();
+            _comboBoxWorkflows = new ComboBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
+            groupBox4.SuspendLayout();
             SuspendLayout();
             // 
             // _buttonRun
             // 
             _buttonRun.Enabled = false;
-            _buttonRun.Location = new Point(620, 402);
+            _buttonRun.Location = new Point(620, 463);
             _buttonRun.Name = "_buttonRun";
             _buttonRun.Size = new Size(75, 23);
             _buttonRun.TabIndex = 0;
@@ -56,7 +59,7 @@
             // groupBox1
             // 
             groupBox1.Controls.Add(_textBoxLog);
-            groupBox1.Location = new Point(12, 127);
+            groupBox1.Location = new Point(12, 188);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(681, 268);
             groupBox1.TabIndex = 1;
@@ -131,11 +134,32 @@
             _buttonSelectWorkflowsFolder.UseVisualStyleBackColor = true;
             _buttonSelectWorkflowsFolder.Click += _buttonSelectWorkflowsFolder_Click;
             // 
+            // groupBox4
+            // 
+            groupBox4.Controls.Add(_comboBoxWorkflows);
+            groupBox4.Location = new Point(12, 128);
+            groupBox4.Name = "groupBox4";
+            groupBox4.Size = new Size(681, 54);
+            groupBox4.TabIndex = 4;
+            groupBox4.TabStop = false;
+            groupBox4.Text = "Workflow";
+            // 
+            // _comboBoxWorkflows
+            // 
+            _comboBoxWorkflows.DropDownStyle = ComboBoxStyle.DropDownList;
+            _comboBoxWorkflows.FormattingEnabled = true;
+            _comboBoxWorkflows.Location = new Point(9, 19);
+            _comboBoxWorkflows.Name = "_comboBoxWorkflows";
+            _comboBoxWorkflows.Size = new Size(661, 23);
+            _comboBoxWorkflows.TabIndex = 0;
+            _comboBoxWorkflows.SelectedIndexChanged += _comboBoxWorkflows_SelectedIndexChanged;
+            // 
             // TestVNGPortalForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(705, 428);
+            ClientSize = new Size(705, 492);
+            Controls.Add(groupBox4);
             Controls.Add(groupBox3);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
@@ -152,6 +176,7 @@
             groupBox2.PerformLayout();
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
+            groupBox4.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -166,5 +191,7 @@
         private TextBox _textBoxWorkflowsFolder;
         private GroupBox groupBox3;
         private Button _buttonSelectWorkflowsFolder;
+        private GroupBox groupBox4;
+        private ComboBox _comboBoxWorkflows;
     }
 }

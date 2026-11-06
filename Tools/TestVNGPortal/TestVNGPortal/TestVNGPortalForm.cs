@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Xml;
 
 namespace TestVNGPortal
 {
@@ -65,7 +66,7 @@ namespace TestVNGPortal
                 _textBoxLog.AppendText($"  {file}\r\n");
             }
 
-            _buttonRun.Enabled = _ifcFiles.Count > 0 && _workflowsFiles.Count > 0;
+            _buttonRun.Enabled = _ifcFiles.Count > 0 && !string.IsNullOrEmpty(_comboBoxWorkflows.SelectedItem?.ToString());
         }
 
         private void _buttonSelectWorkflowsFolder_Click(object sender, EventArgs e)
@@ -83,6 +84,7 @@ namespace TestVNGPortal
             }
 
             _textBoxWorkflowsFolder.Text = dialog.SelectedPath;
+            _comboBoxWorkflows.Items.Clear();
 
             try
             {
@@ -101,10 +103,11 @@ namespace TestVNGPortal
 
             foreach (var file in _workflowsFiles)
             {
+                _comboBoxWorkflows.Items.Add(Path.GetFileName(file));
                 _textBoxLog.AppendText($"  {file}\r\n");
             }
 
-            _buttonRun.Enabled = _ifcFiles.Count > 0 && _workflowsFiles.Count > 0;
+            _buttonRun.Enabled = _ifcFiles.Count > 0 && !string.IsNullOrEmpty(_comboBoxWorkflows.SelectedItem?.ToString());
         }
 
         private static bool IsTerminalStatus(string? status) =>
@@ -135,7 +138,7 @@ namespace TestVNGPortal
             }
             finally
             {
-                _buttonRun.Enabled = _ifcFiles.Count > 0 && _workflowsFiles.Count > 0;
+                _buttonRun.Enabled = _ifcFiles.Count > 0 && !string.IsNullOrEmpty(_comboBoxWorkflows.SelectedItem?.ToString());
             }
         }
 
@@ -164,8 +167,15 @@ namespace TestVNGPortal
 
                 _taskCompletion = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-                var result = await _api.UploadIfcAsync(ifcFile, "1"); //#todo: select workflow from _workflowsFiles
-                _textBoxLog.AppendText($"Upload result: TaskId={result.TaskId}, Error={result.Error}\r\n");
+                string? workflowId = GetWorkflowId(_workflowsFiles[_comboBoxWorkflows!.SelectedIndex]!);
+                if (string.IsNullOrEmpty(workflowId))
+                {
+                    _textBoxLog.AppendText($"Error: Could not extract workflow ID from {_workflowsFiles[_comboBoxWorkflows.SelectedIndex]!}\r\n");
+                    return;
+                }
+
+                var result = await _api.UploadIfcAsync(ifcFile, workflowId);
+                _textBoxLog.AppendText($"Upload result: TaskId={result.TaskId}, Error={result.Error ?? "NA"}\r\n");
 
                 if (!string.IsNullOrEmpty(result.Error) || string.IsNullOrEmpty(result.TaskId))
                 {
@@ -180,6 +190,45 @@ namespace TestVNGPortal
             }
 
             _textBoxLog.AppendText("All tasks finished.\r\n");
+        }
+
+        private static string? GetWorkflowId(string xmlFilePath)
+        {
+            var settings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Prohibit,
+                IgnoreComments = true,
+                IgnoreWhitespace = true
+            };
+
+            using var reader = XmlReader.Create(xmlFilePath, settings);
+
+            // Move to the root element (<workflow>)
+            if (!reader.ReadToFollowing("workflow"))
+            {
+                return null;
+            }
+
+            // Look only at direct children of <workflow>, so <id> tags nested deeper are ignored
+            int rootDepth = reader.Depth;
+            if (!reader.Read())
+            {
+                return null;
+            }
+
+            while (reader.Depth > rootDepth)
+            {
+                if (reader.NodeType == XmlNodeType.Element &&
+                    reader.Depth == rootDepth + 1 &&
+                    reader.Name == "id")
+                {
+                    return reader.ReadElementContentAsString().Trim();
+                }
+
+                reader.Skip();
+            }
+
+            return null;
         }
 
         private void Status_StatusUpdateReceived(string json)
@@ -223,6 +272,11 @@ namespace TestVNGPortal
             {
                 _textBoxLog.AppendText($"3D View: {title} - {workflowId} - {model}\r\n");
             });
+        }
+
+        private void _comboBoxWorkflows_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _buttonRun.Enabled = _ifcFiles.Count > 0 && !string.IsNullOrEmpty(_comboBoxWorkflows.SelectedItem?.ToString());
         }
     }
 }

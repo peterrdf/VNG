@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace VNGPortalClient;
+namespace TestVNGPortal;
 
 public sealed record UploadResult(
     [property: JsonPropertyName("taskId")] string? TaskId,

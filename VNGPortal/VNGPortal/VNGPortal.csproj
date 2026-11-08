@@ -199,6 +199,18 @@
 		<None Update="SeedData\SPARQL\insert-areas.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SPARQL\insert-bboxes.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SPARQL\insert-projections.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SPARQL\insert-topological-relations.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SPARQL\insert-ifc4-add2-ontology.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\SPARQL\RetrieveBuildingElements.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

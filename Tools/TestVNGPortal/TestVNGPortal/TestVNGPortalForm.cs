@@ -16,7 +16,9 @@ namespace TestVNGPortal
 
         private TaskCompletionSource<string?>? _taskCompletion;
 
+        private string _currentTestName = string.Empty;
         private StringBuilder _logBuilder = new();
+        private Dictionary<string, int> _testErrors = new();
 
         public TestVNGPortalForm()
         {
@@ -138,6 +140,7 @@ namespace TestVNGPortal
 
                 _textBoxLog.Clear();
                 _logBuilder.Clear();
+                _testErrors.Clear();  
                 await RunWorkflowsAsync();
             }
             catch (Exception ex)
@@ -172,6 +175,7 @@ namespace TestVNGPortal
             var files = _ifcFiles.ToList();
             foreach (var ifcFile in files)
             {
+                _currentTestName = Path.GetFileName(ifcFile);
                 _textBoxLog.AppendText($"Running: {ifcFile}\r\n");
                 _logBuilder.AppendLine("***************************************************************************************************");
                 _logBuilder.AppendLine($"Running: {ifcFile}");
@@ -207,8 +211,23 @@ namespace TestVNGPortal
             _logBuilder.AppendLine("All tasks finished.");
 
             // Save the log to a file
-            var logFilePath = Path.Combine(_textBoxIFCModelsFolder.Text, $"VNGPortalTestLog-{DateTime.Now:yyyyMMdd-HHmmss}.txt");
+            var dateTimeString = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+            var logFilePath = Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Log-{dateTimeString}.txt");
             await File.WriteAllTextAsync(logFilePath, _logBuilder.ToString());
+
+            var logOKFilePath = Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Log-OK-{dateTimeString}.txt");
+            var logFailedFilePath = Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Log-Failed-{dateTimeString}.txt");
+            foreach (var kvp in _testErrors)
+            {
+                if (kvp.Value > 0)
+                {
+                    await File.AppendAllTextAsync(logFailedFilePath, $"{kvp.Key}: {kvp.Value} error(s)\r\n");
+                }
+                else
+                {
+                    await File.AppendAllTextAsync(logOKFilePath, $"{kvp.Key}: OK\r\n");
+                }
+            }
         }
 
         private static string? GetWorkflowId(string xmlFilePath)
@@ -284,10 +303,13 @@ namespace TestVNGPortal
             Invoke(() =>
             {
                 _textBoxLog.AppendText($"Query: {type} - {query} - {result}\r\n");
+
+                bool hasError = false;
                 if (type == "SHACL Validation Report")
                 {
                     if (result?.IndexOf("sh:Violation") != -1)
                     {
+                        hasError = true;
                         _textBoxLog.AppendText($"SHACL Validation Report:\r\n{result}\r\n");
                         _logBuilder.AppendLine($"SHACL Validation Report:\r\n{result}\r\n");
                     }
@@ -296,8 +318,21 @@ namespace TestVNGPortal
                 {
                     if (result?.IndexOf("ERROR") != -1)
                     {
+                        hasError = true;
                         _textBoxLog.AppendText($"IDS Validation Report:\r\n{result}\r\n");
                         _logBuilder.AppendLine($"IDS Validation Report:\r\n{result}\r\n");
+                    }
+                }
+
+                if (hasError)
+                {
+                    if (_testErrors.ContainsKey(_currentTestName))
+                    {
+                        _testErrors[_currentTestName]++;
+                    }
+                    else
+                    {
+                        _testErrors[_currentTestName] = 1;
                     }
                 }
             });

@@ -1,4 +1,5 @@
-﻿using Lucene.Net.Search;
+﻿using AngleSharp.Dom;
+using Lucene.Net.Search;
 using Microsoft.Extensions.Logging;
 using RDF;
 using System;
@@ -144,25 +145,24 @@ namespace VNGPortal.Workflows
 
                                 if (string.IsNullOrEmpty(query))
                                 {
-                                    if (step.Parameters.ContainsKey("uri"))
-                                    {
-                                        string uri = step.Parameters["uri"];
-                                        if (!string.IsNullOrEmpty(uri))
-                                        {
-                                            // #todo: use http source instead of local file
-                                            var queryFilePath = Path.Combine(sparqlDir, uri);
-                                            _logger.LogInformation("Loading SPARQL query from file: '{QueryFilePath}'", queryFilePath);
-                                            query = await File.ReadAllTextAsync(queryFilePath);
-                                            _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
-                                        }
-                                    }
-                                    else if (step.Parameters.ContainsKey("queryRef"))
+                                    if (step.Parameters.ContainsKey("queryRef"))
                                     {
                                         string queryRef = step.Parameters["queryRef"];
                                         if (!string.IsNullOrEmpty(queryRef) &&
                                             SPARQLQueries.TryGetValue(queryRef, out var sparqlQuery))
                                         {
-                                            query = sparqlQuery.Query;
+                                            if (!string.IsNullOrEmpty(sparqlQuery.QueryUri))
+                                            {
+                                                // #todo: use http source instead of local file
+                                                var queryFilePath = Path.Combine(sparqlDir, sparqlQuery.QueryUri);
+                                                _logger.LogInformation("Loading SPARQL query from file: '{QueryFilePath}'", queryFilePath);
+                                                query = await File.ReadAllTextAsync(queryFilePath);
+                                                _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
+                                            }
+                                            else
+                                            {
+                                                query = sparqlQuery.Query;
+                                            }
                                         }
                                     }
                                 }

@@ -13,23 +13,6 @@
 		   onto that plane (a top-down projection).
 		4. Inserts the result into the same graph as geom:projectionBase64Data on the instance.
 	-->
-	<query>
-		<![CDATA[
-PREFIX geom:    <https://vng.nl/geometry/>
-PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
-
-INSERT {
-    GRAPH <https://vng.nl/geometries/> {
-        ?instance geom:projectionBase64Data ?projection .
-    }
-}
-WHERE {
-    GRAPH <https://vng.nl/geometries/> {
-        ?instance   geom:base64Data ?base64Data .
-        BIND(vng:gmProjection(?base64Data, vng:gmPlane(0.0, 0.0, 1.0, 0.0)) AS ?projection)
-        FILTER NOT EXISTS { ?instance geom:projectionBase64Data ?any }
-    }
-}
-		]]>
+	<query uri="insert-projections.ttl">
 	</query>
 </sparql>

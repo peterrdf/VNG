@@ -181,16 +181,31 @@
 		<None Update="SeedData\IDS\VDCbase-KEU-ZZ-ZZZ-RG-TOTAL-XX-0001-InformationDeliverySpecification.ids">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SHACL\validate-bboxes.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\validate-bboxes-ifcwall.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\SHACL\ValidateBBoxes-IfcWall.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SHACL\validate-height.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\SHACL\ValidateHeight.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\validate-model-bboxes.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SHACL\ValidateModelBBoxes.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SHACL\ValidateBBoxes.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\validate-topological-relations.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SHACL\ValidateTopologicalRelations.xml">

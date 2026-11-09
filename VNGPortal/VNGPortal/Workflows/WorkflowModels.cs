@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Collections.Generic;
+using System.Xml;
 
 namespace VNGPortal.Workflows;
 
@@ -36,6 +38,41 @@ public class Step
     public ParameterDictionary Parameters { get; set; } = new ParameterDictionary();
 }
 
+public class SPARQLQueryElement
+{
+    /// <summary>Attributes of the &lt;query&gt; element, e.g. uri.</summary>
+    [XmlIgnore]
+    public AttributeDictionary Attributes { get; set; } = new AttributeDictionary();
+
+    [XmlAnyAttribute]
+    public XmlAttribute[] XmlAttributes
+    {
+        get => Attributes.ToXmlAttributes();
+        set => Attributes = AttributeDictionary.FromXmlAttributes(value);
+    }
+
+    /// <summary>Inline query (text/CDATA), if any.</summary>
+    [XmlText]
+    public string Text { get; set; } = string.Empty;
+
+    public static SPARQLQueryElement FromXml(XElement? e)
+    {
+        var result = new SPARQLQueryElement();
+        if (e == null)
+        {
+            return result;
+        }
+
+        result.Text = e.Value;
+        foreach (var attribute in e.Attributes().Where(a => !a.IsNamespaceDeclaration))
+        {
+            result.Attributes[attribute.Name.LocalName] = attribute.Value;
+        }
+
+        return result;
+    }
+}
+
 [XmlRoot("sparql")]
 public class SPARQLQuery
 {
@@ -43,10 +80,51 @@ public class SPARQLQuery
     public string Id { get; set; } = string.Empty;
 
     [XmlElement("query")]
-    public string Query { get; set; } = string.Empty;
+    public SPARQLQueryElement QueryElement { get; set; } = new SPARQLQueryElement();
+
+    /// <summary>Inline query text.</summary>
+    [XmlIgnore]
+    public string Query
+    {
+        get => QueryElement.Text.Trim();
+        set => QueryElement.Text = value;
+    }
+
+    /// <summary>Value of &lt;query uri="..."&gt;, if any.</summary>
+    [XmlIgnore]
+    public string? QueryUri => QueryElement.Attributes.GetValueOrDefault("uri");
 
     [XmlElement("parameters")]
     public ParameterDictionary Parameters { get; set; } = new ParameterDictionary();
+
+    /// <summary>Attributes of the &lt;sparql&gt; element.</summary>
+    [XmlIgnore]
+    public AttributeDictionary Attributes { get; set; } = new AttributeDictionary();
+
+    [XmlAnyAttribute]
+    public XmlAttribute[] XmlAttributes
+    {
+        get => Attributes.ToXmlAttributes();
+        set => Attributes = AttributeDictionary.FromXmlAttributes(value);
+    }
+}
+
+public class SHACLShapeElement
+{
+    /// <summary>Attributes of the &lt;shape&gt; element, e.g. uri.</summary>
+    [XmlIgnore]
+    public AttributeDictionary Attributes { get; set; } = new AttributeDictionary();
+
+    [XmlAnyAttribute]
+    public XmlAttribute[] XmlAttributes
+    {
+        get => Attributes.ToXmlAttributes();
+        set => Attributes = AttributeDictionary.FromXmlAttributes(value);
+    }
+
+    /// <summary>Inline shape (text/CDATA), if any.</summary>
+    [XmlText]
+    public string Text { get; set; } = string.Empty;
 }
 
 [XmlRoot("shacl")]
@@ -56,7 +134,31 @@ public class SHACLShape
     public string Id { get; set; } = string.Empty;
 
     [XmlElement("shape")]
-    public string Shape { get; set; } = string.Empty;
+    public SHACLShapeElement ShapeElement { get; set; } = new SHACLShapeElement();
+
+    [XmlIgnore]
+    public string Shape
+    {
+        get => ShapeElement.Text.Trim();
+        set => ShapeElement.Text = value;
+    }
+
+    [XmlIgnore]
+    public string? ShapeUri => ShapeElement.Attributes.GetValueOrDefault("uri");
+
+    [XmlElement("parameters")]
+    public ParameterDictionary Parameters { get; set; } = new ParameterDictionary();
+
+    /// <summary>Attributes of the &lt;shacl&gt; element.</summary>
+    [XmlIgnore]
+    public AttributeDictionary Attributes { get; set; } = new AttributeDictionary();
+
+    [XmlAnyAttribute]
+    public XmlAttribute[] XmlAttributes
+    {
+        get => Attributes.ToXmlAttributes();
+        set => Attributes = AttributeDictionary.FromXmlAttributes(value);
+    }
 
     [XmlArray("views")]
     [XmlArrayItem("view")]
@@ -84,9 +186,10 @@ public class SPARQLGeometryQuery : SPARQLQuery
         return new SPARQLGeometryQuery
         {
             Id = e.Element("id")?.Value.Trim() ?? "",
-            Query = e.Element("query")?.Value.Trim() ?? "",
+            QueryElement = SPARQLQueryElement.FromXml(e.Element("query")),
             GeometryVariable = e.Element("geometryVariable")?.Value.Trim() ?? "",
-            Parameters = parameters
+            Parameters = parameters,
+            Attributes = AttributeDictionary.FromXElement(e)
         };
     }
 }
@@ -115,10 +218,11 @@ public class SPARQLVariableQuery : SPARQLQuery
         return new SPARQLVariableQuery
         {
             Id = e.Element("id")?.Value.Trim() ?? "",
-            Query = e.Element("query")?.Value.Trim() ?? "",
+            QueryElement = SPARQLQueryElement.FromXml(e.Element("query")),
             ValueVariable = e.Element("valueVariable")?.Value.Trim() ?? "",
             ValueVariableLabel = e.Element("valueVariableLabel")?.Value.Trim() ?? "",
-            Parameters = parameters
+            Parameters = parameters,
+            Attributes = AttributeDictionary.FromXElement(e)
         };
     }
 }

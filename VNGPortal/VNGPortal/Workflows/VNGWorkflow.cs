@@ -1,6 +1,7 @@
 ﻿using Lucene.Net.Search;
 using Microsoft.Extensions.Logging;
 using RDF;
+using System;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using VNGPortal.IFC2RDF;
@@ -32,6 +33,7 @@ namespace VNGPortal.Workflows
             var modelsDir = _configuration[$"{fileStorage}:ModelsDir"]!;
             var idsDir = _configuration[$"{fileStorage}:IDSDir"]!;
             var sparqlDir = _configuration[$"{fileStorage}:SPARQLDir"]!;
+            var shaclDir = _configuration[$"{fileStorage}:SHACLDir"]!;
 
             ModelDir = Path.Combine(modelsDir, taskDescriptor.TaskId);
             var modelPath = Path.Combine(ModelDir, taskDescriptor.Model);
@@ -140,25 +142,28 @@ namespace VNGPortal.Workflows
                                     query = step.Parameters["query"];
                                 }
 
-                                if (string.IsNullOrEmpty(query) && step.Parameters.ContainsKey("uri"))
+                                if (string.IsNullOrEmpty(query))
                                 {
-                                    string uri = step.Parameters["uri"];
-                                    if (!string.IsNullOrEmpty(uri))
+                                    if (step.Parameters.ContainsKey("uri"))
                                     {
-                                        // #todo: use http source instead of local file
-                                        var queryFilePath = Path.Combine(sparqlDir, uri);
-                                        _logger.LogInformation("Loading SPARQL query from file: '{QueryFilePath}'", queryFilePath);
-                                        query = await File.ReadAllTextAsync(queryFilePath);
-                                        _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
+                                        string uri = step.Parameters["uri"];
+                                        if (!string.IsNullOrEmpty(uri))
+                                        {
+                                            // #todo: use http source instead of local file
+                                            var queryFilePath = Path.Combine(sparqlDir, uri);
+                                            _logger.LogInformation("Loading SPARQL query from file: '{QueryFilePath}'", queryFilePath);
+                                            query = await File.ReadAllTextAsync(queryFilePath);
+                                            _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
+                                        }
                                     }
-                                }
-                                else if (string.IsNullOrEmpty(query) && step.Parameters.ContainsKey("queryRef"))
-                                {
-                                    string queryRef = step.Parameters["queryRef"];
-                                    if (!string.IsNullOrEmpty(queryRef) &&
-                                        SPARQLQueries.TryGetValue(queryRef, out var sparqlQuery))
+                                    else if (step.Parameters.ContainsKey("queryRef"))
                                     {
-                                        query = sparqlQuery.Query;
+                                        string queryRef = step.Parameters["queryRef"];
+                                        if (!string.IsNullOrEmpty(queryRef) &&
+                                            SPARQLQueries.TryGetValue(queryRef, out var sparqlQuery))
+                                        {
+                                            query = sparqlQuery.Query;
+                                        }
                                     }
                                 }
 
@@ -294,13 +299,27 @@ namespace VNGPortal.Workflows
                                 }
 
                                 SHACLShape? shaclShape = null;
-                                if (string.IsNullOrEmpty(shape) && step.Parameters.ContainsKey("shapeRef"))
+                                if (string.IsNullOrEmpty(shape))
                                 {
-                                    var shapeRef = step.Parameters["shapeRef"];
-                                    if (!string.IsNullOrEmpty(shapeRef) &&
-                                        shaclShapes.TryGetValue(shapeRef, out shaclShape))
+                                    if (step.Parameters.ContainsKey("shapeRef"))
                                     {
-                                        shape = shaclShape.Shape;
+                                        var shapeRef = step.Parameters["shapeRef"];
+                                        if (!string.IsNullOrEmpty(shapeRef) &&
+                                            shaclShapes.TryGetValue(shapeRef, out shaclShape))
+                                        {
+                                            if (!string.IsNullOrEmpty(shaclShape.ShapeUri))
+                                            {
+                                                // #todo: use http source instead of local file
+                                                var shapeFilePath = Path.Combine(shaclDir, shaclShape.ShapeUri);
+                                                _logger.LogInformation("Loading SHACL shape from file: '{ShapeFilePath}'", shapeFilePath);
+                                                shape = await File.ReadAllTextAsync(shapeFilePath);
+                                                _logger.LogInformation("SHACL shape loaded: '{Shape}'", shape);
+                                            }
+                                            else
+                                            {
+                                                shape = shaclShape.Shape;
+                                            }
+                                        }
                                     }
                                 }
 

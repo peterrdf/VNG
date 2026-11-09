@@ -128,8 +128,7 @@
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<!--#todo: use http source instead of local file-->
-				<uri><![CDATA[insert-ifc4-add2-ontology.ttl]]></uri>
+				<queryRef><![CDATA[InsertIFC4ADD2Ontology]]></queryRef>
 			</parameters>
 		</step>
 		<step>
@@ -141,8 +140,7 @@
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<!--#todo: use http source instead of local file-->
-				<uri><![CDATA[insert-areas.ttl]]></uri> 
+				<queryRef><![CDATA[InsertAreas]]></queryRef>
 			</parameters>
 		</step>
 		<step>
@@ -154,8 +152,7 @@
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<!--#todo: use http source instead of local file-->
-				<uri><![CDATA[insert-bboxes.ttl]]></uri>
+				<queryRef><![CDATA[InsertBBoxes]]></queryRef>
 			</parameters>
 		</step>
 		<step>
@@ -167,7 +164,7 @@
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<uri><![CDATA[insert-projections.ttl]]></uri>
+				<queryRef><![CDATA[InsertProjections]]></queryRef>
 			</parameters>
 		</step>
 		<step>
@@ -179,8 +176,7 @@
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<!--#todo: use http source instead of local file-->
-				<uri><![CDATA[insert-topological-relations.ttl]]></uri>
+				<queryRef><![CDATA[InsertTopologicalRelations]]></queryRef>
 			</parameters>
 		</step>
 		<step>

@@ -16,9 +16,12 @@ namespace TestVNGPortal
 
         private TaskCompletionSource<string?>? _taskCompletion;
 
+        private string _dateTimeStamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+        private int _currentTestIndex = 0;
         private string _currentTestName = string.Empty;
-        private StringBuilder _logBuilder = new();
-        private Dictionary<string, int> _testErrors = new();
+        private Stream _streamFull;
+        private Stream _streamOK;
+        private Stream _streamFailed;
 
         public TestVNGPortalForm()
         {
@@ -66,7 +69,6 @@ namespace TestVNGPortal
             }
 
             _textBoxLog.AppendText($"Found {_ifcFiles.Count} IFC file(s) in '{dialog.SelectedPath}'\r\n");
-            _logBuilder.AppendLine($"Found {_ifcFiles.Count} IFC file(s) in '{dialog.SelectedPath}'");
 
             foreach (var file in _ifcFiles)
             {
@@ -107,7 +109,6 @@ namespace TestVNGPortal
             }
 
             _textBoxLog.AppendText($"Found {_workflowsFiles.Count} XML file(s) in '{dialog.SelectedPath}'\r\n");
-            _logBuilder.AppendLine($"Found {_workflowsFiles.Count} XML file(s) in '{dialog.SelectedPath}'");
 
             foreach (var file in _workflowsFiles)
             {
@@ -139,14 +140,18 @@ namespace TestVNGPortal
                 _api?.Dispose();
 
                 _textBoxLog.Clear();
-                _logBuilder.Clear();
-                _testErrors.Clear();  
+                _dateTimeStamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+                _streamFull = new FileStream(Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Log-Full-{_dateTimeStamp}.txt"), FileMode.Create, FileAccess.Write, FileShare.Read);
+                _streamOK = new FileStream(Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Log-OK-{_dateTimeStamp}.txt"), FileMode.Create, FileAccess.Write, FileShare.Read);
+                _streamFailed = new FileStream(Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Log-Failed-{_dateTimeStamp}.txt"), FileMode.Create, FileAccess.Write, FileShare.Read);
+                _currentTestIndex = 0;
+                _currentTestName = "";
                 await RunWorkflowsAsync();
             }
             catch (Exception ex)
             {
                 _textBoxLog.AppendText($"Error: {ex.Message}\r\n");
-                _logBuilder.AppendLine($"Error: {ex.Message}");
+                _streamFull.Write(Encoding.UTF8.GetBytes($"Error: {ex.Message}\r\n"));
             }
             finally
             {
@@ -173,12 +178,15 @@ namespace TestVNGPortal
             await _status.StartAsync();
 
             var files = _ifcFiles.ToList();
-            foreach (var ifcFile in files)
+            for (int index = 0; index < files.Count; index++)
             {
+                var ifcFile = files[index];
+
+                _currentTestIndex = 0;
                 _currentTestName = Path.GetFileName(ifcFile);
                 _textBoxLog.AppendText($"Running: {ifcFile}\r\n");
-                _logBuilder.AppendLine("***************************************************************************************************");
-                _logBuilder.AppendLine($"Running: {ifcFile}");
+                _streamFull.Write(Encoding.UTF8.GetBytes("***************************************************************************************************\r\n"));
+                _streamFull.Write(Encoding.UTF8.GetBytes($"Running: {ifcFile}\r\n"));
 
                 _taskCompletion = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -186,13 +194,13 @@ namespace TestVNGPortal
                 if (string.IsNullOrEmpty(workflowId))
                 {
                     _textBoxLog.AppendText($"Error: Could not extract workflow ID from {_workflowsFiles[_comboBoxWorkflows.SelectedIndex]!}\r\n");
-                    _logBuilder.AppendLine($"Error: Could not extract workflow ID from {_workflowsFiles[_comboBoxWorkflows.SelectedIndex]!}");
+                    _streamFull.Write(Encoding.UTF8.GetBytes($"Error: Could not extract workflow ID from {_workflowsFiles[_comboBoxWorkflows.SelectedIndex]!}\r\n"));
                     return;
                 }
 
                 var result = await _api.UploadIfcAsync(ifcFile, workflowId);
                 _textBoxLog.AppendText($"Upload result: TaskId={result.TaskId}, Error={result.Error ?? "NA"}\r\n");
-                _logBuilder.AppendLine($"Upload result: TaskId={result.TaskId}, Error={result.Error ?? "NA"}");
+                _streamFull.Write(Encoding.UTF8.GetBytes($"Upload result: TaskId={result.TaskId}, Error={result.Error ?? "NA\r\n"}"));
 
                 if (!string.IsNullOrEmpty(result.Error) || string.IsNullOrEmpty(result.TaskId))
                 {
@@ -204,30 +212,11 @@ namespace TestVNGPortal
                 // Wait until the server reports a terminal status for this task
                 var finalStatus = await _taskCompletion.Task;
                 _textBoxLog.AppendText($"Task finished with status: {finalStatus}\r\n");
-                _logBuilder.AppendLine($"Task finished with status: {finalStatus}\n\n");
-            }
+                _streamFull.Write(Encoding.UTF8.GetBytes($"Task finished with status: {finalStatus}\r\n\r\n"));
+            } // for (int index = 0; index < files.Count; index++)
 
             _textBoxLog.AppendText("All tasks finished.\r\n");
-            _logBuilder.AppendLine("All tasks finished.");
-
-            // Save the log to a file
-            var dateTimeString = DateTime.Now.ToString("yyyyMMdd-HHmmss");
-            var logFilePath = Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Log-{dateTimeString}.txt");
-            await File.WriteAllTextAsync(logFilePath, _logBuilder.ToString());
-
-            var logOKFilePath = Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Log-OK-{dateTimeString}.txt");
-            var logFailedFilePath = Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Log-Failed-{dateTimeString}.txt");
-            foreach (var kvp in _testErrors)
-            {
-                if (kvp.Value > 0)
-                {
-                    await File.AppendAllTextAsync(logFailedFilePath, $"{kvp.Key}: {kvp.Value} error(s)\r\n");
-                }
-                else
-                {
-                    await File.AppendAllTextAsync(logOKFilePath, $"{kvp.Key}: OK\r\n");
-                }
-            }
+            _streamFull.Write(Encoding.UTF8.GetBytes("All tasks finished.\r\n"));
         }
 
         private static string? GetWorkflowId(string xmlFilePath)
@@ -280,7 +269,7 @@ namespace TestVNGPortal
                 var status = statusElement.GetString();
 
                 Invoke(() => _textBoxLog.AppendText($"Task status: {status}\r\n"));
-                _logBuilder.AppendLine($"Task status: {status}");
+                _streamFull.Write(Encoding.UTF8.GetBytes($"Task status: {status}\r\n"));
 
                 if (IsTerminalStatus(status))
                 {
@@ -294,7 +283,7 @@ namespace TestVNGPortal
             Invoke(() =>
             {
                 _textBoxLog.AppendText($"Progress: {progress * 100:F2}% - {message}\r\n");
-                _logBuilder.AppendLine($"Progress: {progress * 100:F2}% - {message}");
+                _streamFull.Write(Encoding.UTF8.GetBytes($"Progress: {progress * 100:F2}% - {message}\r\n"));
             });
         }
 
@@ -311,7 +300,7 @@ namespace TestVNGPortal
                     {
                         hasError = true;
                         _textBoxLog.AppendText($"SHACL Validation Report:\r\n{result}\r\n");
-                        _logBuilder.AppendLine($"SHACL Validation Report:\r\n{result}\r\n");
+                        _streamFull.Write(Encoding.UTF8.GetBytes($"SHACL Validation Report:\r\n{result}\r\n"));
                     }
                 }
                 else if (type == "IDS Validation Report")
@@ -320,20 +309,23 @@ namespace TestVNGPortal
                     {
                         hasError = true;
                         _textBoxLog.AppendText($"IDS Validation Report:\r\n{result}\r\n");
-                        _logBuilder.AppendLine($"IDS Validation Report:\r\n{result}\r\n");
+                        _streamFull.Write(Encoding.UTF8.GetBytes($"IDS Validation Report:\r\n{result}\r\n"));
                     }
                 }
 
                 if (hasError)
                 {
-                    if (_testErrors.ContainsKey(_currentTestName))
-                    {
-                        _testErrors[_currentTestName]++;
-                    }
-                    else
-                    {
-                        _testErrors[_currentTestName] = 1;
-                    }
+                    _streamFull.Write(Encoding.UTF8.GetBytes($"Test ({_currentTestIndex}/{_ifcFiles.Count}): {_currentTestName} FAILED\r\n"));
+                    _streamFull.Flush();
+                    _streamFailed.Write(Encoding.UTF8.GetBytes($"Test ({_currentTestIndex}/{_ifcFiles.Count}): {_currentTestName}\r\n"));
+                    _streamFailed.Flush();
+                }
+                else
+                {
+                    _streamFull.Write(Encoding.UTF8.GetBytes($"Test ({_currentTestIndex}/{_ifcFiles.Count}): {_currentTestName} OK\r\n"));
+                    _streamFull.Flush();
+                    _streamOK.Write(Encoding.UTF8.GetBytes($"Test ({_currentTestIndex}/{_ifcFiles.Count}): {_currentTestName}\r\n"));
+                    _streamOK.Flush();
                 }
             });
         }
@@ -343,7 +335,7 @@ namespace TestVNGPortal
             Invoke(() =>
             {
                 _textBoxLog.AppendText($"3D View: {title} - {workflowId} - {model}\r\n");
-                //_logBuilder.AppendLine($"3D View: {title} - {workflowId} - {model}");
+                //_streamFull.Write(Encoding.UTF8.GetBytes($"3D View: {title} - {workflowId} - {model}\r\n"));
             });
         }
 

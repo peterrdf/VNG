@@ -182,7 +182,7 @@ namespace TestVNGPortal
             {
                 var ifcFile = files[index];
 
-                _currentTestIndex = 0;
+                _currentTestIndex = index;
                 _currentTestName = Path.GetFileName(ifcFile);
                 _textBoxLog.AppendText($"Running: {ifcFile}\r\n");
                 _streamFull.Write(Encoding.UTF8.GetBytes("***************************************************************************************************\r\n"));
@@ -293,40 +293,48 @@ namespace TestVNGPortal
             {
                 _textBoxLog.AppendText($"Query: {type} - {query} - {result}\r\n");
 
+                bool log = false;
                 bool hasError = false;
                 if (type == "SHACL Validation Report")
                 {
+                    log = true;
                     if (result?.IndexOf("sh:Violation") != -1)
-                    {
+                    {                        
                         hasError = true;
                         _textBoxLog.AppendText($"SHACL Validation Report:\r\n{result}\r\n");
                         _streamFull.Write(Encoding.UTF8.GetBytes($"SHACL Validation Report:\r\n{result}\r\n"));
+                        _streamFull.Flush();
                     }
                 }
                 else if (type == "IDS Validation Report")
                 {
+                    log = true;
                     if (result?.IndexOf("ERROR") != -1)
-                    {
+                    {                        
                         hasError = true;
                         _textBoxLog.AppendText($"IDS Validation Report:\r\n{result}\r\n");
                         _streamFull.Write(Encoding.UTF8.GetBytes($"IDS Validation Report:\r\n{result}\r\n"));
+                        _streamFull.Flush();
                     }
                 }
 
-                if (hasError)
+                if (log)
                 {
-                    _streamFull.Write(Encoding.UTF8.GetBytes($"Test ({_currentTestIndex}/{_ifcFiles.Count}): {_currentTestName} FAILED\r\n"));
-                    _streamFull.Flush();
-                    _streamFailed.Write(Encoding.UTF8.GetBytes($"Test ({_currentTestIndex}/{_ifcFiles.Count}): {_currentTestName}\r\n"));
-                    _streamFailed.Flush();
-                }
-                else
-                {
-                    _streamFull.Write(Encoding.UTF8.GetBytes($"Test ({_currentTestIndex}/{_ifcFiles.Count}): {_currentTestName} OK\r\n"));
-                    _streamFull.Flush();
-                    _streamOK.Write(Encoding.UTF8.GetBytes($"Test ({_currentTestIndex}/{_ifcFiles.Count}): {_currentTestName}\r\n"));
-                    _streamOK.Flush();
-                }
+                    if (hasError)
+                    {
+                        _streamFull.Write(Encoding.UTF8.GetBytes($"Model ({_currentTestIndex}/{_ifcFiles.Count}): '{_currentTestName}', Test: '{type}' FAILED\r\n"));
+                        _streamFull.Flush();
+                        _streamFailed.Write(Encoding.UTF8.GetBytes($"Model ({_currentTestIndex}/{_ifcFiles.Count}): '{_currentTestName}', Test: '{type}' FAILED\r\n"));
+                        _streamFailed.Flush();
+                    }
+                    else
+                    {
+                        _streamFull.Write(Encoding.UTF8.GetBytes($"Model ({_currentTestIndex}/{_ifcFiles.Count}): '{_currentTestName}', Test: '{type}' OK\r\n"));
+                        _streamFull.Flush();
+                        _streamOK.Write(Encoding.UTF8.GetBytes($"Model ({_currentTestIndex}/{_ifcFiles.Count}): '{_currentTestName}', Test: '{type}' OK\r\n"));
+                        _streamOK.Flush();
+                    }
+                }                
             });
         }
 

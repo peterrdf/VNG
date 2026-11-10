@@ -1449,7 +1449,7 @@ var Viewer = function () {
             this._eyeVector = vec3.fromValues(x, y, z - distance);
             this._upVector = vec3.fromValues(0, 1, 0);
 
-            window.logInfo(`[Viewer.zoomToViewXY] Point=(${x.toFixed(4)}, ${y}, ${z.toFixed(4).toFixed(4)}), view=${viewName}, distance=${distance.toFixed(4)}`);
+            window.logInfo(`[Viewer.zoomToViewXY] Point=(${x.toFixed(4)}, ${y.toFixed(4)}, ${z.toFixed(4)}), view=${viewName}, distance=${distance.toFixed(4)}`);
 
             PENDING_DRAW_SCENE = true;
         } catch (e) {

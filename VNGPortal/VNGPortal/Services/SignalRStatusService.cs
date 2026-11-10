@@ -13,13 +13,24 @@ namespace VNGPortal.Services
         string TaskId,
         string GroupName,
         string WorkflowId,
-        string Model,       
+        string Model,
         string Status = "Pending",
         string Error = "",
         float Progress = 0, // Progress percentage (0-100)
         DateTime LastUpdated = default)
     {
         public TaskDescriptor() : this(string.Empty, string.Empty, string.Empty, string.Empty) { }
+    }
+
+    public class _3DViewUpdate
+    {
+        public string Title { get; set; } = string.Empty;
+        public string WorkflowId { get; set; } = string.Empty;
+        public string Model { get; set; } = string.Empty;
+        public bool Error { get; set; } = false;
+        public double ZoomToX { get; set; } = 0.0;
+        public double ZoomToY { get; set; } = 0.0;
+        public string View { get; set; } = "top";
     }
 
     public interface ISignalRStatusService
@@ -36,7 +47,7 @@ namespace VNGPortal.Services
         Task SendStatusUpdate(string groupName, string message, object data);
         Task SendProgressUpdate(string groupName, float progress, string message, bool error);
         Task SendQueryUpdate(string groupName, string type, string query, string result, bool error);
-        Task Send3DViewUpdate(string groupName, string title, string workflowId, string model, bool error);
+        Task Send3DViewUpdate(string groupName, _3DViewUpdate viewUpdate);
     }
 
     public class SignalRStatusService : ISignalRStatusService
@@ -57,10 +68,10 @@ namespace VNGPortal.Services
             "Running", "Processing", "Uploading"
         };
 
-        public SignalRStatusService(            
+        public SignalRStatusService(
             IConfiguration configuration,
             ILogger<SignalRStatusService> logger,
-            IHubContext<StatusHub> hubContext, 
+            IHubContext<StatusHub> hubContext,
             IConnectionStateService connectionState)
         {
             _logger = logger;
@@ -96,7 +107,7 @@ namespace VNGPortal.Services
                 throw new ArgumentException("Status cannot be null or empty.");
             }
 
-            var newTask = new TaskDescriptor(taskId, groupName, workflow, model,  status, LastUpdated: DateTime.UtcNow);
+            var newTask = new TaskDescriptor(taskId, groupName, workflow, model, status, LastUpdated: DateTime.UtcNow);
             if (!_tasks.TryAdd(taskId, newTask))
             {
                 throw new InvalidOperationException($"Task with ID '{taskId}' already exists.");
@@ -294,12 +305,15 @@ namespace VNGPortal.Services
             }
         }
 
-        public async Task Send3DViewUpdate(string groupName, string title, string workflowId, string model, bool error)
+        public async Task Send3DViewUpdate(string groupName, _3DViewUpdate viewUpdate)
         {
             var connections = _connectionState.GetConnectionsInGroup(groupName).Result;
             if (connections.Any())
             {
-                await _hubContext.Clients.Group(groupName).SendAsync("Receive3DViewUpdate", new { title, workflowId, model, error });
+                await _hubContext.Clients.Group(groupName).SendAsync("Receive3DViewUpdate", 
+                    new { viewUpdate.Title, viewUpdate.WorkflowId, viewUpdate.Model, 
+                        viewUpdate.ZoomToX, viewUpdate.ZoomToY, viewUpdate.View, 
+                        viewUpdate.Error });
             }
         }
 
@@ -395,7 +409,7 @@ namespace VNGPortal.Services
                 }
 
                 // Check for tasks every 10 seconds
-                await Task.Delay(10 * 1000); 
+                await Task.Delay(10 * 1000);
             }
         }
 

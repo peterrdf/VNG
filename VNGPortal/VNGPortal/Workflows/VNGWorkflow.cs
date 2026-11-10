@@ -3,9 +3,12 @@ using Lucene.Net.Search;
 using Microsoft.Extensions.Logging;
 using RDF;
 using System;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using VNGPortal.IFC2RDF;
+using VNGPortal.Pages;
 using VNGPortal.Services;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -202,6 +205,11 @@ namespace VNGPortal.Workflows
                                     throw new Exception($"3DVIEW workflow step: '{step.Name}' has no valid geometry queries.");
                                 }
 
+                                // Geo-reference
+                                double dX = 0.0;
+                                double dY = 0.0;
+                                GetGeoReference(modelPath, out dX, out dY);
+
                                 long owlModel = Engine.CreateModel();
                                 Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
                                 try
@@ -220,10 +228,16 @@ namespace VNGPortal.Workflows
 
                                     await _signalRStatus.Send3DViewUpdate(
                                         taskDescriptor.GroupName,
-                                        "3D View",
-                                        taskDescriptor.TaskId,
-                                        viewModel,
-                                        false);
+                                        new _3DViewUpdate
+                                        {
+                                            Title = "3D View",
+                                            WorkflowId = taskDescriptor.TaskId,
+                                            Model = viewModel,
+                                            ZoomToX = dX,
+                                            ZoomToY = dY,
+                                            View = "top",
+                                            Error = false
+                                        });
                                 }
                                 catch (Exception ex)
                                 {
@@ -430,6 +444,12 @@ namespace VNGPortal.Workflows
                 return;
             }
 
+            var modelPath = Path.Combine(ModelDir, TaskDescriptor.Model);
+
+            double dX = 0.0;
+            double dY = 0.0;
+            GetGeoReference(modelPath, out dX, out dY);
+
             //
             // Violation Views
             //
@@ -501,10 +521,16 @@ namespace VNGPortal.Workflows
 
                             await _signalRStatus.Send3DViewUpdate(
                                 TaskDescriptor.GroupName,
-                                "SHACL Violations View",
-                                TaskDescriptor.TaskId,
-                                shaclErrorsModel,
-                                true);
+                                new _3DViewUpdate
+                                {
+                                    Title = "SHACL Violations View",
+                                    WorkflowId = TaskDescriptor.TaskId,
+                                    Model = shaclErrorsModel,
+                                    ZoomToX = dX,
+                                    ZoomToY = dY,
+                                    View = "top",
+                                    Error = false
+                                });
                         }
                         finally
                         {
@@ -522,6 +548,98 @@ namespace VNGPortal.Workflows
             {
                 throw new NotImplementedException("Success Views");
             }
+        }
+
+        public bool GetGeoReference(string filePath, out double dX, out double dY)
+        {
+            dX = 0.0;
+            dY = 0.0;
+
+            // Add null terminator to byte arrays for P/Invoke marshaling
+            var filePathBytes = Encoding.UTF8.GetBytes(filePath + "\0");
+            var schemaBytes = Encoding.UTF8.GetBytes("\0");
+            var sdaiModel = IFCEngine.sdaiOpenModelBN(0, filePathBytes, schemaBytes);
+            if (sdaiModel == 0)
+            {
+                _logger.LogError("Failed to open IFC model: {FilePath}", filePath);
+                return false;
+            }
+
+            double dEastings = 0.0;
+            double dNorthings = 0.0;
+
+            long owlModel = 0;
+            IFCEngine.owlGetModel(sdaiModel, out owlModel);
+
+            long sdaiAggr = IFCEngine.sdaiGetEntityExtentBN(sdaiModel, "IFCMAPCONVERSION");
+            if (sdaiAggr == 0)
+            {
+                _logger.LogWarning("No IFCMAPCONVERSION entity found in the model.");
+                return false;
+            }
+
+            IFCEngine.engiGetAggrElement(sdaiAggr, 0, IFCEngine.sdaiINSTANCE, out long sdaiIfcMapConversionInstance);
+            if (sdaiIfcMapConversionInstance == 0)
+            {
+                _logger.LogWarning("No instance of IFCMAPCONVERSION found in the model.");
+                return false;
+            }
+
+            long sdaiIfcMapConversionEntity = IFCEngine.sdaiGetInstanceType(sdaiIfcMapConversionInstance);
+            if (sdaiIfcMapConversionEntity == 0)
+            {
+                _logger.LogWarning("Failed to get the entity type of the IFCMAPCONVERSION instance.");
+                return false;
+            }
+
+            long iIndex = 0;
+            long sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
+                sdaiIfcMapConversionEntity,
+                iIndex++,
+                false,
+                true);
+
+            while (sdaiAttr != 0)
+            {
+                IFCEngine.engiGetEntityArgumentName(sdaiIfcMapConversionEntity,
+                    iIndex,
+                    IFCEngine.sdaiSTRING,
+                    out IntPtr attributeName);
+                if (attributeName != IntPtr.Zero)
+                {
+                    string? strAttributeName = Marshal.PtrToStringAnsi(attributeName);
+                    if (strAttributeName == "Eastings")
+                    {
+                        if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dEastings) == 0)
+                        {
+                            _logger.LogWarning("Failed to get Eastings attribute.");
+                            return false;
+                        }
+
+                        dX = dEastings;
+                    }
+                    else if (strAttributeName == "Northings")
+                    {
+                        if (IFCEngine.sdaiGetAttrBN(sdaiIfcMapConversionInstance, strAttributeName, IFCEngine.sdaiREAL, out dNorthings) == 0)
+                        {
+                            _logger.LogWarning("Failed to get Northings attribute.");
+                            return false;
+                        }
+
+                        dY = dNorthings;
+                    }
+                }
+
+                sdaiAttr = IFCEngine.engiGetEntityAttributeByIndex(
+                    sdaiIfcMapConversionEntity,
+                    iIndex++,
+                    false,
+                    true);
+            } // while (sdaiAttr != 0)
+
+            IFCEngine.sdaiCloseModel(sdaiModel);
+
+            return true;
         }
 
         private string FormatXML(string xml)

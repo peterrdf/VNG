@@ -4,44 +4,44 @@
   // "30.0.0" -> 300000
   function humanReadableVersionToPacked(str) {
     str = str.split('-')[0]; // Remove any trailing part from e.g. "12.53.3-alpha"
-    var vers = str.split('.').slice(0, 3);
+    let vers = str.split('.').slice(0, 3);
     while(vers.length < 3) vers.push('00');
     vers = vers.map((n, i, arr) => n.padStart(2, '0'));
     return vers.join('');
   }
   // 300000 -> "30.0.0"
-  var packedVersionToHumanReadable = n => [n / 10_000 | 0, (n / 100 | 0) % 100, n % 100].join('.');
+  const packedVersionToHumanReadable = n => [n / 10_000 | 0, (n / 100 | 0) % 100, n % 100].join('.');
 
-  var TARGET_NOT_SUPPORTED = 2147483647;
+  const TARGET_NOT_SUPPORTED = 2147483647;
 
   // Note: We use a typeof check here instead of optional chaining using
   // globalThis because older browsers might not have globalThis defined.
 
   // We skip the node version checking when running on Bun/Deno since the node
   // version they report doesn't seem to be useful.
-  if (typeof process !== 'undefined' && !process.versions?.bun && typeof Deno == "undefined") {
-    var currentNodeVersion = process.versions?.node ? humanReadableVersionToPacked(process.versions.node) : TARGET_NOT_SUPPORTED;
+  if (typeof process !== 'undefined' && !process.versions?.bun && typeof Deno === "undefined") {
+    const currentNodeVersion = process.versions?.node ? humanReadableVersionToPacked(process.versions.node) : TARGET_NOT_SUPPORTED;
     if (currentNodeVersion < 180300) {
       throw new Error(`This emscripten-generated code requires node v${ packedVersionToHumanReadable(180300) } (detected v${packedVersionToHumanReadable(currentNodeVersion)})`);
     }
   }
 
-  var userAgent = typeof navigator !== 'undefined' && navigator.userAgent;
+  const userAgent = typeof navigator !== 'undefined' && navigator.userAgent;
   if (!userAgent) {
     return;
   }
 
-  var currentSafariVersion = userAgent.includes("Safari/") && !userAgent.includes("Chrome/") && userAgent.match(/Version\/(\d+\.?\d*\.?\d*)/) ? humanReadableVersionToPacked(userAgent.match(/Version\/(\d+\.?\d*\.?\d*)/)[1]) : TARGET_NOT_SUPPORTED;
-  if (currentSafariVersion < 150200) {
-    throw new Error(`This emscripten-generated code requires Safari v${ packedVersionToHumanReadable(150200) } (detected v${currentSafariVersion})`);
+  const currentSafariVersion = userAgent.includes("Safari/") && !userAgent.includes("Chrome/") && userAgent.match(/Version\/(\d+\.?\d*\.?\d*)/) ? humanReadableVersionToPacked(userAgent.match(/Version\/(\d+\.?\d*\.?\d*)/)[1]) : TARGET_NOT_SUPPORTED;
+  if (currentSafariVersion < 150400) {
+    throw new Error(`This emscripten-generated code requires Safari v${ packedVersionToHumanReadable(150400) } (detected v${currentSafariVersion})`);
   }
 
-  var currentFirefoxVersion = userAgent.match(/Firefox\/(\d+(?:\.\d+)?)/) ? parseFloat(userAgent.match(/Firefox\/(\d+(?:\.\d+)?)/)[1]) : TARGET_NOT_SUPPORTED;
+  const currentFirefoxVersion = userAgent.match(/Firefox\/(\d+(?:\.\d+)?)/) ? parseFloat(userAgent.match(/Firefox\/(\d+(?:\.\d+)?)/)[1]) : TARGET_NOT_SUPPORTED;
   if (currentFirefoxVersion < 100) {
     throw new Error(`This emscripten-generated code requires Firefox v100 (detected v${currentFirefoxVersion})`);
   }
 
-  var currentChromeVersion = userAgent.match(/Chrome\/(\d+(?:\.\d+)?)/) ? parseFloat(userAgent.match(/Chrome\/(\d+(?:\.\d+)?)/)[1]) : TARGET_NOT_SUPPORTED;
+  const currentChromeVersion = userAgent.match(/Chrome\/(\d+(?:\.\d+)?)/) ? parseFloat(userAgent.match(/Chrome\/(\d+(?:\.\d+)?)/)[1]) : TARGET_NOT_SUPPORTED;
   if (currentChromeVersion < 95) {
     throw new Error(`This emscripten-generated code requires Chrome v95 (detected v${currentChromeVersion})`);
   }
@@ -61,7 +61,7 @@
 // after the generated code, you will need to define   var Module = {};
 // before the code. Then that object will be used in the code, and you
 // can continue to use Module afterwards as well.
-var Module = typeof Module != 'undefined' ? Module : {};
+var Module = typeof Module !== 'undefined' ? Module : {};
 
 // Determine the runtime environment we are in. You can customize this by
 // setting the ENVIRONMENT setting at compile time (see settings.js).
@@ -76,14 +76,14 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: C:\Users\svile\AppData\Local\Temp\tmp2pls3i06.js
+// include: C:\Users\svile\AppData\Local\Temp\tmp2818we3c.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
   (() => {
     // Do not attempt to redownload the virtual filesystem data when in a pthread or a Wasm Worker context.
-    var isPthread = typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD;
-    var isWasmWorker = typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER;
+    var isPthread = typeof ENVIRONMENT_IS_PTHREAD !== 'undefined' && ENVIRONMENT_IS_PTHREAD;
+    var isWasmWorker = typeof ENVIRONMENT_IS_WASM_WORKER !== 'undefined' && ENVIRONMENT_IS_WASM_WORKER;
     if (isPthread || isWasmWorker) return;
     var isNode = globalThis.process && globalThis.process.versions && globalThis.process.versions.node && globalThis.process.type != 'renderer';
     async function loadPackage(metadata) {
@@ -204,21 +204,21 @@ Module['FS_createPath']("/", "data", true, true);
 
   })();
 
-// end include: C:\Users\svile\AppData\Local\Temp\tmp2pls3i06.js
-// include: C:\Users\svile\AppData\Local\Temp\tmp6e93oe5y.js
+// end include: C:\Users\svile\AppData\Local\Temp\tmp2818we3c.js
+// include: C:\Users\svile\AppData\Local\Temp\tmpsnpgr8n4.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
-    if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
+    if ((typeof ENVIRONMENT_IS_WASM_WORKER !== 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD !== 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET !== 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: C:\Users\svile\AppData\Local\Temp\tmp6e93oe5y.js
-// include: C:\Users\svile\AppData\Local\Temp\tmpisruawly.js
+  // end include: C:\Users\svile\AppData\Local\Temp\tmpsnpgr8n4.js
+// include: C:\Users\svile\AppData\Local\Temp\tmpkgz3ko4w.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
-      if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
+      if (!Module['preRun'].includes(task)) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: C:\Users\svile\AppData\Local\Temp\tmpisruawly.js
+  // end include: C:\Users\svile\AppData\Local\Temp\tmpkgz3ko4w.js
 
 
 var programArgs = [];
@@ -231,7 +231,7 @@ var quit_ = (status, toThrow) => {
 // before the page load. In non-MODULARIZE modes generate it here.
 var _scriptName = globalThis.document?.currentScript?.src;
 
-if (typeof __filename != 'undefined') { // Node
+if (typeof __filename !== 'undefined') { // Node
   _scriptName = __filename;
 } else
 if (ENVIRONMENT_IS_WORKER) {
@@ -273,7 +273,7 @@ readAsync = async (filename, binary = true) => {
   // See the comment in the `readBinary` function.
   filename = isFileURI(filename) ? new URL(filename) : filename;
   var ret = fs.readFileSync(filename, binary ? undefined : 'utf8');
-  assert(binary ? Buffer.isBuffer(ret) : typeof ret == 'string');
+  assert(binary ? Buffer.isBuffer(ret) : typeof ret === 'string');
   return ret;
 };
 // end include: node_shell_read.js
@@ -284,7 +284,7 @@ readAsync = async (filename, binary = true) => {
   programArgs = process.argv.slice(2);
 
   // MODULARIZE will export the module in the proper place outside, we don't need to export here
-  if (typeof module != 'undefined') {
+  if (typeof module !== 'undefined') {
     module['exports'] = Module;
   }
 
@@ -437,7 +437,7 @@ var runtimeDebug = true; // Switch to false at runtime to disable logging at the
 
 // Used by XXXXX_DEBUG settings to output debug messages.
 function dbg(...args) {
-  if (!runtimeDebug && typeof runtimeDebug != 'undefined') return;
+  if (!runtimeDebug && typeof runtimeDebug !== 'undefined') return;
   // TODO(sbc): Make this configurable somehow.  Its not always convenient for
   // logging to show up as warnings.
   console.warn(...args);
@@ -445,15 +445,15 @@ function dbg(...args) {
 
 // Endianness check
 (() => {
-  var h16 = new Int16Array(1);
-  var h8 = new Int8Array(h16.buffer);
+  const h16 = new Int16Array(1);
+  const h8 = new Int8Array(h16.buffer);
   h16[0] = 0x6373;
   if (h8[0] !== 0x73 || h8[1] !== 0x63) abort('Runtime error: expected the system to be little-endian! (Run with -sSUPPORT_BIG_ENDIAN to bypass)');
 })();
 
 function consumedModuleProp(prop) {
-  var value = Module[prop];
-  var msg = `Attempt to modify \`Module.${prop}\` after it has already been processed.  This can happen, for example, when code is injected via '--post-js' rather than '--pre-js'`;
+  let value = Module[prop];
+  const msg = `Attempt to modify \`Module.${prop}\` after it has already been processed.  This can happen, for example, when code is injected via '--post-js' rather than '--pre-js'`;
   if (Array.isArray(value)) {
     value = new Proxy(value, {
       set(target, key, val) {
@@ -537,11 +537,11 @@ function missingLibrarySymbol(sym) {
   hookGlobalSymbolAccess(sym, () => {
     // Can't `abort()` here because it would break code that does runtime
     // checks.  e.g. `if (typeof SDL === 'undefined')`.
-    var msg = `\`${sym}\` is a library symbol and not included by default; add it to your library.js __deps or to DEFAULT_LIBRARY_FUNCS_TO_INCLUDE on the command line`;
+    let msg = `\`${sym}\` is a library symbol and not included by default; add it to your library.js __deps or to DEFAULT_LIBRARY_FUNCS_TO_INCLUDE on the command line`;
     // DEFAULT_LIBRARY_FUNCS_TO_INCLUDE requires the name as it appears in
     // library.js, which means $name for a JS name with no prefix, or name
     // for a JS name like _name.
-    var librarySymbol = sym;
+    let librarySymbol = sym;
     if (!librarySymbol.startsWith('_')) {
       librarySymbol = '$' + sym;
     }
@@ -562,7 +562,7 @@ function unexportedRuntimeSymbol(sym) {
     Object.defineProperty(Module, sym, {
       configurable: true,
       get() {
-        var msg = `'${sym}' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the Emscripten FAQ)`;
+        let msg = `'${sym}' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the Emscripten FAQ)`;
         if (isExportedByForceFilesystem(sym)) {
           msg += '. Alternatively, forcing filesystem support (-sFORCE_FILESYSTEM) can export this for you';
         }
@@ -572,17 +572,17 @@ function unexportedRuntimeSymbol(sym) {
   }
 }
 
-var MAX_UINT8  = (2 **  8) - 1;
-var MAX_UINT16 = (2 ** 16) - 1;
-var MAX_UINT32 = (2 ** 32) - 1;
-var MAX_UINT53 = (2 ** 53) - 1;
-var MAX_UINT64 = (2 ** 64) - 1;
+const MAX_UINT8  = (2 **  8) - 1;
+const MAX_UINT16 = (2 ** 16) - 1;
+const MAX_UINT32 = (2 ** 32) - 1;
+const MAX_UINT53 = (2 ** 53) - 1;
+const MAX_UINT64 = (2 ** 64) - 1;
 
-var MIN_INT8  = - (2 ** ( 8 - 1));
-var MIN_INT16 = - (2 ** (16 - 1));
-var MIN_INT32 = - (2 ** (32 - 1));
-var MIN_INT53 = - (2 ** (53 - 1));
-var MIN_INT64 = - (2 ** (64 - 1));
+const MIN_INT8  = - (2 ** ( 8 - 1));
+const MIN_INT16 = - (2 ** (16 - 1));
+const MIN_INT32 = - (2 ** (32 - 1));
+const MIN_INT53 = - (2 ** (53 - 1));
+const MIN_INT64 = - (2 ** (64 - 1));
 
 function checkInt(value, bits, min, max) {
   assert(Number.isInteger(Number(value)), `attempt to write non-integer (${value}) into integer heap`);
@@ -590,12 +590,12 @@ function checkInt(value, bits, min, max) {
   assert(value >= min, `value (${value}) too small to write as ${bits}-bit value`);
 }
 
-var checkInt1 = (value) => checkInt(value, 1, 1);
-var checkInt8 = (value) => checkInt(value, 8, MIN_INT8, MAX_UINT8);
-var checkInt16 = (value) => checkInt(value, 16, MIN_INT16, MAX_UINT16);
-var checkInt32 = (value) => checkInt(value, 32, MIN_INT32, MAX_UINT32);
-var checkInt53 = (value) => checkInt(value, 53, MIN_INT53, MAX_UINT53);
-var checkInt64 = (value) => checkInt(value, 64, MIN_INT64, MAX_UINT64);
+const checkInt1 = (value) => checkInt(value, 1, 1);
+const checkInt8 = (value) => checkInt(value, 8, MIN_INT8, MAX_UINT8);
+const checkInt16 = (value) => checkInt(value, 16, MIN_INT16, MAX_UINT16);
+const checkInt32 = (value) => checkInt(value, 32, MIN_INT32, MAX_UINT32);
+const checkInt53 = (value) => checkInt(value, 53, MIN_INT53, MAX_UINT53);
+const checkInt64 = (value) => checkInt(value, 64, MIN_INT64, MAX_UINT64);
 
 // end include: runtime_debug.js
 // include: runtime_stack_check.js
@@ -604,7 +604,7 @@ const stackCookie2 = 0x89BACDFE;
 
 // Initializes the stack cookie. Called at the startup of main and at the startup of each thread in pthreads mode.
 function writeStackCookie() {
-  var max = _emscripten_stack_get_end();
+  let max = _emscripten_stack_get_end();
   assert((max & 3) == 0);
   // If the stack ends at address zero we write our cookies 4 bytes into the
   // stack.  This prevents interference with SAFE_HEAP and ASAN which also
@@ -627,13 +627,13 @@ function u32ToHexString(num) {
 
 function checkStackCookie() {
   if (ABORT) return;
-  var max = _emscripten_stack_get_end();
+  let max = _emscripten_stack_get_end();
   // See writeStackCookie().
   if (max == 0) {
     max += 4;
   }
-  var val1 = HEAPU32[((max)>>2)];
-  var val2 = HEAPU32[(((max)+(4))>>2)];
+  const val1 = HEAPU32[((max)>>2)];
+  const val2 = HEAPU32[(((max)+(4))>>2)];
   if (val1 != stackCookie1 || val2 != stackCookie2) {
     abort(`Stack overflow! Stack cookie has been overwritten at ${ptrToString(max)}, expected hex dwords ${u32ToHexString(stackCookie2)} and ${u32ToHexString(stackCookie1)}, but received ${u32ToHexString(val2)} ${u32ToHexString(val1)}`);
   }
@@ -681,7 +681,7 @@ assert(globalThis.Int32Array && globalThis.Float64Array && Int32Array.prototype.
 function preRun() {
   var preRun = Module['preRun'];
   if (preRun) {
-    if (typeof preRun == 'function') preRun = [preRun];
+    if (typeof preRun === 'function') preRun = [preRun];
     onPreRuns.push(...preRun);
   }
   consumedModuleProp('preRun');
@@ -717,7 +717,7 @@ function postRun() {
 
   var postRun = Module['postRun'];
   if (postRun) {
-    if (typeof postRun == 'function') postRun = [postRun];
+    if (typeof postRun === 'function') postRun = [postRun];
     onPostRuns.push(...postRun);
   }
   consumedModuleProp('postRun');
@@ -748,11 +748,6 @@ function abort(what) {
   // a trap or not based on a hidden field within the object. So at the moment
   // we don't have a way of throwing a wasm trap from JS. TODO Make a JS API that
   // allows this in the wasm spec.
-
-  // Suppress closure compiler warning here. Closure compiler's builtin extern
-  // definition for WebAssembly.RuntimeError claims it takes no arguments even
-  // though it can.
-  // TODO(https://github.com/google/closure-compiler/pull/3913): Remove if/when upstream closure gets fixed.
   // See above, in the meantime, we resort to wasm code for trapping.
   //
   // In case abort() is called before the module is initialized, wasmExports
@@ -766,13 +761,7 @@ function abort(what) {
   if (runtimeInitialized) {
     ___trap();
   }
-  /** @suppress {checkTypes} */
-  var e = new WebAssembly.RuntimeError(what);
-
-  // Throw the error whether or not MODULARIZE is set because abort is used
-  // in code paths apart from instantiation where an exception is expected
-  // to be thrown when abort is called.
-  throw e;
+  throw new WebAssembly.RuntimeError(what);
 }
 
 function createExportWrapper(name, func, nargs) {
@@ -805,8 +794,8 @@ async function getWasmBinary(binaryFile) {
   if (!wasmBinary) {
     // Fetch the binary using readAsync
     try {
-      var response = await readAsync(binaryFile);
-      return new Uint8Array(response);
+      // Await so a rejection is caught and falls back to getBinarySync.
+      return await readAsync(binaryFile);
     } catch {
       // Fall back to getBinarySync below;
     }
@@ -926,7 +915,6 @@ async function createWasm() {
 
 // Begin JS library code
 
-
   class ExitStatus {
       name = 'ExitStatus';
       constructor(status) {
@@ -934,16 +922,12 @@ async function createWasm() {
         this.status = status;
       }
     }
-
   /** @type {!Int32Array} */
   var HEAP32;
-
   /** @type {!Int8Array} */
   var HEAP8;
-
   /** @type {!Uint32Array} */
   var HEAPU32;
-
   var callRuntimeCallbacks = (callbacks) => {
       while (callbacks.length > 0) {
         // Pass the module as the first argument.
@@ -952,26 +936,21 @@ async function createWasm() {
     };
   var onPostRuns = [];
   var addOnPostRun = (cb) => onPostRuns.push(cb);
-
   var onPreRuns = [];
   var addOnPreRun = (cb) => onPreRuns.push(cb);
 
-
   var noExitRuntime = true;
-
   function ptrToString(ptr) {
       assert(typeof ptr === 'number', `ptrToString expects a number, got ${typeof ptr}`);
       // Convert to 32-bit unsigned value
       ptr >>>= 0;
       return '0x' + ptr.toString(16).padStart(8, '0');
     }
-
   var setStackLimits = () => {
       var stackLow = _emscripten_stack_get_base();
       var stackHigh = _emscripten_stack_get_end();
       ___set_stack_limits(stackLow, stackHigh);
     };
-
   var warnOnce = (text) => {
       warnOnce.shown ||= {};
       if (!warnOnce.shown[text]) {
@@ -981,10 +960,9 @@ async function createWasm() {
       }
     };
 
-  
-
+  /** @type {!Uint8Array} */
+  var HEAPU8;
   var UTF8Decoder = globalThis.TextDecoder && new TextDecoder();
-  
   
     /**
    * heapOrArray is either a regular array, or a JavaScript typed array view.
@@ -1003,7 +981,6 @@ async function createWasm() {
       while (heapOrArray[idx] && !(idx >= maxIdx)) ++idx;
       return idx;
     };
-  
   
     /**
    * Given a pointer 'idx' to a null-terminated UTF8-encoded string in the given
@@ -1051,9 +1028,6 @@ async function createWasm() {
       return str;
     };
   
-  /** @type {!Uint8Array} */
-  var HEAPU8;
-  
     /**
    * Given a pointer 'ptr' to a null-terminated UTF8-encoded string in the
    * emscripten HEAP, returns a copy of that string as a Javascript String object.
@@ -1068,14 +1042,11 @@ async function createWasm() {
    * @return {string}
    */
   var UTF8ToString = (ptr, maxBytesToRead, ignoreNul) => {
-      assert(typeof ptr == 'number', `UTF8ToString expects a number (got ${typeof ptr})`);
+      assert(typeof ptr === 'number', `UTF8ToString expects a number (got ${typeof ptr})`);
       return ptr ? UTF8ArrayToString(HEAPU8, ptr, maxBytesToRead, ignoreNul) : '';
     };
   var ___assert_fail = (condition, filename, line, func) =>
       abort(`Assertion failed: ${UTF8ToString(condition)}, at: ` + [filename ? UTF8ToString(filename) : 'unknown filename', line, func ? UTF8ToString(func) : 'unknown function']);
-
-  
-  
   var ___handle_stack_overflow = (requested) => {
       var base = _emscripten_stack_get_base();
       var end = _emscripten_stack_get_end();
@@ -1083,7 +1054,146 @@ async function createWasm() {
             `, with stack limits [${ptrToString(end)} - ${ptrToString(base)}` +
             ']). If you require more stack space build with -sSTACK_SIZE=<bytes>');
     };
-
+  var ERRNO_CODES = {
+      'EPERM': 63,
+      'ENOENT': 44,
+      'ESRCH': 71,
+      'EINTR': 27,
+      'EIO': 29,
+      'ENXIO': 60,
+      'E2BIG': 1,
+      'ENOEXEC': 45,
+      'EBADF': 8,
+      'ECHILD': 12,
+      'EAGAIN': 6,
+      'EWOULDBLOCK': 6,
+      'ENOMEM': 48,
+      'EACCES': 2,
+      'EFAULT': 21,
+      'ENOTBLK': 105,
+      'EBUSY': 10,
+      'EEXIST': 20,
+      'EXDEV': 75,
+      'ENODEV': 43,
+      'ENOTDIR': 54,
+      'EISDIR': 31,
+      'EINVAL': 28,
+      'ENFILE': 41,
+      'EMFILE': 33,
+      'ENOTTY': 59,
+      'ETXTBSY': 74,
+      'EFBIG': 22,
+      'ENOSPC': 51,
+      'ESPIPE': 70,
+      'EROFS': 69,
+      'EMLINK': 34,
+      'EPIPE': 64,
+      'EDOM': 18,
+      'ERANGE': 68,
+      'ENOMSG': 49,
+      'EIDRM': 24,
+      'ECHRNG': 106,
+      'EL2NSYNC': 156,
+      'EL3HLT': 107,
+      'EL3RST': 108,
+      'ELNRNG': 109,
+      'EUNATCH': 110,
+      'ENOCSI': 111,
+      'EL2HLT': 112,
+      'EDEADLK': 16,
+      'ENOLCK': 46,
+      'EBADE': 113,
+      'EBADR': 114,
+      'EXFULL': 115,
+      'ENOANO': 104,
+      'EBADRQC': 103,
+      'EBADSLT': 102,
+      'EDEADLOCK': 16,
+      'EBFONT': 101,
+      'ENOSTR': 100,
+      'ENODATA': 116,
+      'ETIME': 117,
+      'ENOSR': 118,
+      'ENONET': 119,
+      'ENOPKG': 120,
+      'EREMOTE': 121,
+      'ENOLINK': 47,
+      'EADV': 122,
+      'ESRMNT': 123,
+      'ECOMM': 124,
+      'EPROTO': 65,
+      'EMULTIHOP': 36,
+      'EDOTDOT': 125,
+      'EBADMSG': 9,
+      'ENOTUNIQ': 126,
+      'EBADFD': 127,
+      'EREMCHG': 128,
+      'ELIBACC': 129,
+      'ELIBBAD': 130,
+      'ELIBSCN': 131,
+      'ELIBMAX': 132,
+      'ELIBEXEC': 133,
+      'ENOSYS': 52,
+      'ENOTEMPTY': 55,
+      'ENAMETOOLONG': 37,
+      'ELOOP': 32,
+      'EOPNOTSUPP': 138,
+      'EPFNOSUPPORT': 139,
+      'ECONNRESET': 15,
+      'ENOBUFS': 42,
+      'EAFNOSUPPORT': 5,
+      'EPROTOTYPE': 67,
+      'ENOTSOCK': 57,
+      'ENOPROTOOPT': 50,
+      'ESHUTDOWN': 140,
+      'ECONNREFUSED': 14,
+      'EADDRINUSE': 3,
+      'ECONNABORTED': 13,
+      'ENETUNREACH': 40,
+      'ENETDOWN': 38,
+      'ETIMEDOUT': 73,
+      'EHOSTDOWN': 142,
+      'EHOSTUNREACH': 23,
+      'EINPROGRESS': 26,
+      'EALREADY': 7,
+      'EDESTADDRREQ': 17,
+      'EMSGSIZE': 35,
+      'EPROTONOSUPPORT': 66,
+      'ESOCKTNOSUPPORT': 137,
+      'EADDRNOTAVAIL': 4,
+      'ENETRESET': 39,
+      'EISCONN': 30,
+      'ENOTCONN': 53,
+      'ETOOMANYREFS': 141,
+      'EUSERS': 136,
+      'EDQUOT': 19,
+      'ESTALE': 72,
+      'ENOTSUP': 138,
+      'ENOMEDIUM': 148,
+      'EILSEQ': 25,
+      'EOVERFLOW': 61,
+      'ECANCELED': 11,
+      'ENOTRECOVERABLE': 56,
+      'EOWNERDEAD': 62,
+      'ESTRPIPE': 135,
+    };
+  const FS_MAX_OPEN_FDS = 4096;
+  var FS_createDataFile = (...args) => FS.createDataFile(...args);
+  var preloadPlugins = [];
+  var FS_handledByPreloadPlugin = async (byteArray, fullname) => {
+      // Ensure plugins are ready.
+      if (typeof Browser !== 'undefined') Browser.init();
+  
+      for (var plugin of preloadPlugins) {
+        if (plugin['canHandle'](fullname)) {
+          assert(plugin['handle'].constructor.name === 'AsyncFunction', 'Filesystem plugin handlers must be async functions (See #24914)')
+          return plugin['handle'](byteArray, fullname);
+        }
+      }
+      // If no plugin handled this file then return the original/unmodified
+      // byteArray.
+      return byteArray;
+    };
   var PATH = {
   isAbs:(path) => path.charAt(0) === '/',
   splitPath:(filename) => {
@@ -1144,20 +1254,6 @@ async function createWasm() {
 join:(...paths) => PATH.normalize(paths.join('/')),
 join2:(l, r) => PATH.normalize(l + '/' + r),
 };
-
-var initRandomFill = () => {
-    // This block is not needed on v19+ since crypto.getRandomValues is builtin
-    if (ENVIRONMENT_IS_NODE) {
-      var nodeCrypto = require('node:crypto');
-      return (view) => (nodeCrypto.randomFillSync(view), 0);
-    }
-
-    return (view) => (crypto.getRandomValues(view), 0);
-  };
-var randomFill = (view) => (randomFill = initRandomFill())(view);
-
-
-
 var PATH_FS = {
 resolve:(...args) => {
       var resolvedPath = '',
@@ -1165,7 +1261,7 @@ resolve:(...args) => {
       for (var i = args.length - 1; i >= -1 && !resolvedAbsolute; i--) {
         var path = (i >= 0) ? args[i] : FS.cwd();
         // Skip empty and invalid entries
-        if (typeof path != 'string') {
+        if (typeof path !== 'string') {
           throw new TypeError('Arguments to path.resolve must be strings');
         } else if (!path) {
           return ''; // an invalid portion invalidates the whole thing
@@ -1211,32 +1307,121 @@ relative:(from, to) => {
       return outputParts.join('/');
     },
 };
+var dependenciesPromise = null;
+var dependenciesPromiseResolve = null;
+var resolveRunDependencies = async () => dependenciesPromise;
+var runDependencies = 0;
+var runDependencyTracking = {
+};
+var runDependencyWatcher = null;
+var removeRunDependency = (id) => {
+    runDependencies--;
 
+    Module['monitorRunDependencies']?.(runDependencies);
 
+    assert(id, 'removeRunDependency requires an ID');
+    assert(runDependencyTracking[id]);
+    delete runDependencyTracking[id];
+    if (!runDependencies) {
+      if (runDependencyWatcher !== null) {
+        clearInterval(runDependencyWatcher);
+        runDependencyWatcher = null;
+      }
+      dependenciesPromiseResolve();
+    }
+  };
+var addRunDependency = (id) => {
+    if (!runDependencies) {
+      dependenciesPromise = new Promise((resolve) => dependenciesPromiseResolve = resolve);
+    }
+    runDependencies++;
 
-var FS_stdin_getChar_buffer = [];
+    Module['monitorRunDependencies']?.(runDependencies);
 
+    assert(id, 'addRunDependency requires an ID')
+    assert(!runDependencyTracking[id]);
+    runDependencyTracking[id] = 1;
+    if (!runDependencyWatcher && globalThis.setInterval) {
+      // Check for missing dependencies every few seconds
+      runDependencyWatcher = setInterval(() => {
+        if (ABORT) {
+          clearInterval(runDependencyWatcher);
+          runDependencyWatcher = null;
+          return;
+        }
+        var shown = false;
+        for (var dep in runDependencyTracking) {
+          if (!shown) {
+            shown = true;
+            err('still waiting on run dependencies:');
+          }
+          err(`dependency: ${dep}`);
+        }
+        if (shown) {
+          err('(end of list)');
+        }
+      }, 10_000);
+      // Prevent this timer from keeping the runtime alive if nothing
+      // else is.
+      runDependencyWatcher.unref?.()
+    }
+  };
+var asyncLoad = async (url) => {
+    var arrayBuffer = await readAsync(url);
+    assert(arrayBuffer, `Loading data file "${url}" failed (no arrayBuffer).`);
+    return new Uint8Array(arrayBuffer);
+  };
+var getUniqueRunDependency = (id) => {
+    var orig = id;
+    while (1) {
+      if (!runDependencyTracking[id]) return id;
+      id = orig + Math.random();
+    }
+  };
+var FS_preloadFile = async (parent, name, url, canRead = undefined, canWrite = undefined, dontCreateFile = undefined, canOwn = undefined, preFinish = undefined) => {
+    // TODO we should allow people to just pass in a complete filename instead
+    // of parent and name being that we just join them anyways
+    var fullname = name ? PATH_FS.resolve(PATH.join2(parent, name)) : parent;
+    var dep = getUniqueRunDependency(`cp ${fullname}`); // might have several active requests for the same fullname
+    addRunDependency(dep);
+
+    try {
+      var byteArray = url;
+      if (typeof url === 'string') {
+        byteArray = await asyncLoad(url);
+      }
+
+      byteArray = await FS_handledByPreloadPlugin(byteArray, fullname);
+      preFinish?.();
+      if (!dontCreateFile) {
+        FS_createDataFile(parent, name, byteArray, canRead, canWrite, canOwn);
+      }
+    } finally {
+      removeRunDependency(dep);
+    }
+  };
+var FS_createPreloadedFile = (parent, name, url, canRead = undefined, canWrite = undefined, onload = undefined, onerror = undefined, dontCreateFile = undefined, canOwn = undefined, preFinish = undefined) => {
+    FS_preloadFile(parent, name, url, canRead, canWrite, dontCreateFile, canOwn, preFinish).then(onload).catch(onerror);
+  };
 var lengthBytesUTF8 = (str) => {
     var len = 0;
     for (var i = 0; i < str.length; ++i) {
-      // Gotcha: charCodeAt returns a 16-bit word that is a UTF-16 encoded code
-      // unit, not a Unicode code point of the character! So decode
-      // UTF16->UTF32->UTF8.
-      // See http://unicode.org/faq/utf_bom.html#utf16-3
-      var c = str.charCodeAt(i); // possibly a lead surrogate
-      if (c <= 0x7F) {
+      var u = str.codePointAt(i);
+      if (u <= 0x7F) {
         len++;
-      } else if (c <= 0x7FF) {
+      } else if (u <= 0x7FF) {
         len += 2;
-      } else if (c >= 0xD800 && c <= 0xDFFF) {
-        len += 4; ++i;
-      } else {
+      } else if (u <= 0xFFFF) {
         len += 3;
+      } else {
+        len += 4;
+        // Gotcha: if codePoint is over 0xFFFF, it is represented as a surrogate pair in UTF-16.
+        // We need to manually skip over the second code unit for correct iteration.
+        i++;
       }
     }
     return len;
   };
-
 var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
     assert(typeof str === 'string', `stringToUTF8Array expects a string (got ${typeof str})`);
     // Parameter maxBytesToWrite is not optional. Negative values, 0, null,
@@ -1287,6 +1472,335 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       if (dontAddNull) u8array.length = numBytesWritten;
       return u8array;
     };
+  var FS_fileDataToTypedArray = (data) => {
+      if (typeof data === 'string') {
+        data = intArrayFromString(data, true);
+      }
+      if (!data.subarray) {
+        data = new Uint8Array(data);
+      }
+      return data;
+    };
+  var FS_getMode = (canRead, canWrite) => {
+      var mode = 0;
+      if (canRead) mode |= 292 | 73;
+      if (canWrite) mode |= 146;
+      return mode;
+    };
+  var FS_modeStringToFlags = (str) => {
+      if (typeof str !== 'string') return str;
+      var flagModes = {
+        'r': 0,
+        'r+': 2,
+        'w': 512 | 64 | 1,
+        'w+': 512 | 64 | 2,
+        'a': 1024 | 64 | 1,
+        'a+': 1024 | 64 | 2,
+      };
+      var flags = flagModes[str];
+      if (typeof flags === 'undefined') {
+        throw new Error(`Unknown file open mode: ${str}`);
+      }
+      return flags;
+    };
+  var mmapAlloc = (size) => {
+      abort('internal error: mmapAlloc called but `emscripten_builtin_memalign` native symbol not exported');
+    };
+  var MEMFS = {
+  ops_table:null,
+  mount(mount) {
+        return MEMFS.createNode(null, '/', 16895, 0);
+      },
+  createNode(parent, name, mode, dev = undefined) {
+        if (FS.isBlkdev(mode) || FS.isFIFO(mode)) {
+          // not supported
+          throw new FS.ErrnoError(63);
+        }
+        MEMFS.ops_table ||= {
+          dir: {
+            node: {
+              getattr: MEMFS.node_ops.getattr,
+              setattr: MEMFS.node_ops.setattr,
+              lookup: MEMFS.node_ops.lookup,
+              mknod: MEMFS.node_ops.mknod,
+              rename: MEMFS.node_ops.rename,
+              unlink: MEMFS.node_ops.unlink,
+              rmdir: MEMFS.node_ops.rmdir,
+              readdir: MEMFS.node_ops.readdir,
+              symlink: MEMFS.node_ops.symlink
+            },
+            stream: {
+              llseek: MEMFS.stream_ops.llseek
+            }
+          },
+          file: {
+            node: {
+              getattr: MEMFS.node_ops.getattr,
+              setattr: MEMFS.node_ops.setattr
+            },
+            stream: {
+              llseek: MEMFS.stream_ops.llseek,
+              read: MEMFS.stream_ops.read,
+              write: MEMFS.stream_ops.write,
+              mmap: MEMFS.stream_ops.mmap,
+              msync: MEMFS.stream_ops.msync
+            }
+          },
+          link: {
+            node: {
+              getattr: MEMFS.node_ops.getattr,
+              setattr: MEMFS.node_ops.setattr,
+              readlink: MEMFS.node_ops.readlink
+            },
+            stream: {}
+          },
+          chrdev: {
+            node: {
+              getattr: MEMFS.node_ops.getattr,
+              setattr: MEMFS.node_ops.setattr
+            },
+            stream: FS.chrdev_stream_ops
+          }
+        };
+        var node = FS.createNode(parent, name, mode, dev);
+        if (FS.isDir(node.mode)) {
+          node.node_ops = MEMFS.ops_table.dir.node;
+          node.stream_ops = MEMFS.ops_table.dir.stream;
+          node.contents = {};
+        } else if (FS.isFile(node.mode)) {
+          node.node_ops = MEMFS.ops_table.file.node;
+          node.stream_ops = MEMFS.ops_table.file.stream;
+          // The actual number of bytes used in the typed array, as opposed to
+          // contents.length which gives the whole capacity.
+          node.usedBytes = 0;
+          // The byte data of the file is stored in a typed array.
+          // Note: typed arrays are not resizable like normal JS arrays are, so
+          // there is a small penalty involved for appending file writes that
+          // continuously grow a file similar to std::vector capacity vs used.
+          node.contents = MEMFS.emptyFileContents ??= new Uint8Array(0);
+        } else if (FS.isLink(node.mode)) {
+          node.node_ops = MEMFS.ops_table.link.node;
+          node.stream_ops = MEMFS.ops_table.link.stream;
+        } else if (FS.isChrdev(node.mode)) {
+          node.node_ops = MEMFS.ops_table.chrdev.node;
+          node.stream_ops = MEMFS.ops_table.chrdev.stream;
+        }
+        node.atime = node.mtime = node.ctime = Date.now();
+        // add the new node to the parent
+        if (parent) {
+          parent.contents[name] = node;
+          parent.atime = parent.mtime = parent.ctime = node.atime;
+        }
+        return node;
+      },
+  getFileDataAsTypedArray(node) {
+        assert(FS.isFile(node.mode), 'getFileDataAsTypedArray called on non-file');
+        return node.contents.subarray(0, node.usedBytes); // Make sure to not return excess unused bytes.
+      },
+  expandFileStorage(node, newCapacity) {
+        var prevCapacity = node.contents.length;
+        if (prevCapacity >= newCapacity) return; // No need to expand, the storage was already large enough.
+        // Don't expand strictly to the given requested limit if it's only a very
+        // small increase, but instead geometrically grow capacity.
+        // For small filesizes (<1MB), perform size*2 geometric increase, but for
+        // large sizes, do a much more conservative size*1.125 increase to avoid
+        // overshooting the allocation cap by a very large margin.
+        const CAPACITY_DOUBLING_MAX = 1024 * 1024;
+        newCapacity = Math.max(newCapacity, (prevCapacity * (prevCapacity < CAPACITY_DOUBLING_MAX ? 2.0 : 1.125)) >>> 0);
+        if (prevCapacity) newCapacity = Math.max(newCapacity, 256); // At minimum allocate 256b for each file when expanding.
+        var oldContents = MEMFS.getFileDataAsTypedArray(node);
+        node.contents = new Uint8Array(newCapacity); // Allocate new storage.
+        node.contents.set(oldContents);
+      },
+  resizeFileStorage(node, newSize) {
+        if (node.usedBytes == newSize) return;
+        var oldContents = node.contents;
+        node.contents = new Uint8Array(newSize); // Allocate new storage.
+        node.contents.set(oldContents.subarray(0, Math.min(newSize, node.usedBytes))); // Copy old data over to the new storage.
+        node.usedBytes = newSize;
+      },
+  node_ops:{
+  getattr(node) {
+          var attr = {};
+          // device numbers reuse inode numbers.
+          attr.dev = FS.isChrdev(node.mode) ? node.id : 1;
+          attr.ino = node.id;
+          attr.mode = node.mode;
+          attr.nlink = 1;
+          attr.uid = 0;
+          attr.gid = 0;
+          attr.rdev = node.rdev;
+          if (FS.isDir(node.mode)) {
+            attr.size = 4096;
+          } else if (FS.isFile(node.mode)) {
+            attr.size = node.usedBytes;
+          } else if (FS.isLink(node.mode)) {
+            attr.size = node.link.length;
+          } else {
+            attr.size = 0;
+          }
+          attr.atime = new Date(node.atime);
+          attr.mtime = new Date(node.mtime);
+          attr.ctime = new Date(node.ctime);
+          // NOTE: In our implementation, st_blocks = Math.ceil(st_size/st_blksize),
+          //       but this is not required by the standard.
+          attr.blksize = 4096;
+          attr.blocks = Math.ceil(attr.size / attr.blksize);
+          return attr;
+        },
+  setattr(node, attr) {
+          for (const key of ['mode', 'atime', 'mtime', 'ctime']) {
+            if (attr[key] != null) {
+              node[key] = attr[key];
+            }
+          }
+          if (attr.size !== undefined) {
+            MEMFS.resizeFileStorage(node, attr.size);
+          }
+        },
+  lookup(parent, name) {
+          throw new FS.ErrnoError(44);
+        },
+  mknod(parent, name, mode, dev = undefined) {
+          return MEMFS.createNode(parent, name, mode, dev);
+        },
+  rename(old_node, new_dir, new_name) {
+          var new_node;
+          try {
+            new_node = FS.lookupNode(new_dir, new_name);
+          } catch (e) {}
+          if (new_node && FS.isDir(old_node.mode)) {
+            // if we're overwriting a directory at new_name, make sure it's empty.
+            for (var i in new_node.contents) {
+              throw new FS.ErrnoError(55);
+            }
+          }
+          // do the internal rewiring
+          delete old_node.parent.contents[old_node.name];
+          new_dir.contents[new_name] = old_node;
+          old_node.name = new_name;
+          new_dir.ctime = new_dir.mtime = old_node.parent.ctime = old_node.parent.mtime = Date.now();
+        },
+  unlink(parent, name) {
+          delete parent.contents[name];
+          parent.ctime = parent.mtime = Date.now();
+        },
+  rmdir(parent, name) {
+          var node = FS.lookupNode(parent, name);
+          for (var i in node.contents) {
+            throw new FS.ErrnoError(55);
+          }
+          delete parent.contents[name];
+          parent.ctime = parent.mtime = Date.now();
+        },
+  readdir(node) {
+          return ['.', '..', ...Object.keys(node.contents)];
+        },
+  symlink(parent, newname, oldpath) {
+          var node = MEMFS.createNode(parent, newname, 0o777 | 40960, 0);
+          node.link = oldpath;
+          return node;
+        },
+  readlink(node) {
+          if (!FS.isLink(node.mode)) {
+            throw new FS.ErrnoError(28);
+          }
+          return node.link;
+        },
+  },
+  stream_ops:{
+  read(stream, buffer, offset, length, position) {
+          var contents = stream.node.contents;
+          if (position >= stream.node.usedBytes) return 0;
+          var size = Math.min(stream.node.usedBytes - position, length);
+          assert(size >= 0);
+          buffer.set(contents.subarray(position, position + size), offset);
+          return size;
+        },
+  write(stream, buffer, offset, length, position, canOwn) {
+          assert(buffer.subarray, 'FS.write expects a TypedArray');
+          // If the buffer is located in main memory (HEAP), and if
+          // memory can grow, we can't hold on to references of the
+          // memory buffer, as they may get invalidated. That means we
+          // need to copy its contents.
+          if (buffer.buffer === HEAP8.buffer) {
+            canOwn = false;
+          }
+  
+          if (!length) return 0;
+          var node = stream.node;
+          node.mtime = node.ctime = Date.now();
+  
+          if (canOwn) {
+            assert(!position, 'canOwn must imply no weird position inside the file');
+            node.contents = buffer.subarray(offset, offset + length);
+            node.usedBytes = length;
+          } else if (!node.usedBytes && !position) { // If this is a simple first write to an empty file, do a fast set since we don't need to care about old data.
+            node.contents = buffer.slice(offset, offset + length);
+            node.usedBytes = length;
+          } else {
+            MEMFS.expandFileStorage(node, position+length);
+            // Use typed array write which is available.
+            node.contents.set(buffer.subarray(offset, offset + length), position);
+            node.usedBytes = Math.max(node.usedBytes, position + length);
+          }
+          return length;
+        },
+  llseek(stream, offset, whence) {
+          var position = offset;
+          if (whence === 1) {
+            position += stream.position;
+          } else if (whence === 2) {
+            if (FS.isFile(stream.node.mode)) {
+              position += stream.node.usedBytes;
+            }
+          }
+          if (position < 0) {
+            throw new FS.ErrnoError(28);
+          }
+          return position;
+        },
+  mmap(stream, length, position, prot, flags) {
+          if (!FS.isFile(stream.node.mode)) {
+            throw new FS.ErrnoError(43);
+          }
+          var ptr;
+          var allocated;
+          var contents = stream.node.contents;
+          // Only make a new copy when MAP_PRIVATE is specified.
+          if (!(flags & 2) && contents.buffer === HEAP8.buffer) {
+            // We can't emulate MAP_SHARED when the file is not backed by the
+            // buffer we're mapping to (e.g. the HEAP buffer).
+            allocated = false;
+            ptr = contents.byteOffset;
+          } else {
+            allocated = true;
+            ptr = mmapAlloc(length);
+            if (!ptr) {
+              throw new FS.ErrnoError(48);
+            }
+            if (contents) {
+              // Try to avoid unnecessary slices.
+              if (position > 0 || position + length < contents.length) {
+                if (contents.subarray) {
+                  contents = contents.subarray(position, position + length);
+                } else {
+                  contents = contents.slice(position, position + length);
+                }
+              }
+              HEAP8.set(contents, ptr);
+            }
+          }
+          return { ptr, allocated };
+        },
+  msync(stream, buffer, offset, length, mmapFlags) {
+          MEMFS.stream_ops.write(stream, buffer, 0, length, offset, false);
+          // should we check if bytesWritten and length are the same?
+          return 0;
+        },
+  },
+  };
+  var FS_stdin_getChar_buffer = [];
   var FS_stdin_getChar = () => {
       if (!FS_stdin_getChar_buffer.length) {
         var result = null;
@@ -1469,601 +1983,17 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         },
   },
   };
-  
-  
-  var mmapAlloc = (size) => {
-      abort('internal error: mmapAlloc called but `emscripten_builtin_memalign` native symbol not exported');
-    };
-  
-  var MEMFS = {
-  ops_table:null,
-  mount(mount) {
-        return MEMFS.createNode(null, '/', 16895, 0);
-      },
-  createNode(parent, name, mode, dev) {
-        if (FS.isBlkdev(mode) || FS.isFIFO(mode)) {
-          // not supported
-          throw new FS.ErrnoError(63);
-        }
-        MEMFS.ops_table ||= {
-          dir: {
-            node: {
-              getattr: MEMFS.node_ops.getattr,
-              setattr: MEMFS.node_ops.setattr,
-              lookup: MEMFS.node_ops.lookup,
-              mknod: MEMFS.node_ops.mknod,
-              rename: MEMFS.node_ops.rename,
-              unlink: MEMFS.node_ops.unlink,
-              rmdir: MEMFS.node_ops.rmdir,
-              readdir: MEMFS.node_ops.readdir,
-              symlink: MEMFS.node_ops.symlink
-            },
-            stream: {
-              llseek: MEMFS.stream_ops.llseek
-            }
-          },
-          file: {
-            node: {
-              getattr: MEMFS.node_ops.getattr,
-              setattr: MEMFS.node_ops.setattr
-            },
-            stream: {
-              llseek: MEMFS.stream_ops.llseek,
-              read: MEMFS.stream_ops.read,
-              write: MEMFS.stream_ops.write,
-              mmap: MEMFS.stream_ops.mmap,
-              msync: MEMFS.stream_ops.msync
-            }
-          },
-          link: {
-            node: {
-              getattr: MEMFS.node_ops.getattr,
-              setattr: MEMFS.node_ops.setattr,
-              readlink: MEMFS.node_ops.readlink
-            },
-            stream: {}
-          },
-          chrdev: {
-            node: {
-              getattr: MEMFS.node_ops.getattr,
-              setattr: MEMFS.node_ops.setattr
-            },
-            stream: FS.chrdev_stream_ops
-          }
-        };
-        var node = FS.createNode(parent, name, mode, dev);
-        if (FS.isDir(node.mode)) {
-          node.node_ops = MEMFS.ops_table.dir.node;
-          node.stream_ops = MEMFS.ops_table.dir.stream;
-          node.contents = {};
-        } else if (FS.isFile(node.mode)) {
-          node.node_ops = MEMFS.ops_table.file.node;
-          node.stream_ops = MEMFS.ops_table.file.stream;
-          // The actual number of bytes used in the typed array, as opposed to
-          // contents.length which gives the whole capacity.
-          node.usedBytes = 0;
-          // The byte data of the file is stored in a typed array.
-          // Note: typed arrays are not resizable like normal JS arrays are, so
-          // there is a small penalty involved for appending file writes that
-          // continuously grow a file similar to std::vector capacity vs used.
-          node.contents = MEMFS.emptyFileContents ??= new Uint8Array(0);
-        } else if (FS.isLink(node.mode)) {
-          node.node_ops = MEMFS.ops_table.link.node;
-          node.stream_ops = MEMFS.ops_table.link.stream;
-        } else if (FS.isChrdev(node.mode)) {
-          node.node_ops = MEMFS.ops_table.chrdev.node;
-          node.stream_ops = MEMFS.ops_table.chrdev.stream;
-        }
-        node.atime = node.mtime = node.ctime = Date.now();
-        // add the new node to the parent
-        if (parent) {
-          parent.contents[name] = node;
-          parent.atime = parent.mtime = parent.ctime = node.atime;
-        }
-        return node;
-      },
-  getFileDataAsTypedArray(node) {
-        assert(FS.isFile(node.mode), 'getFileDataAsTypedArray called on non-file');
-        return node.contents.subarray(0, node.usedBytes); // Make sure to not return excess unused bytes.
-      },
-  expandFileStorage(node, newCapacity) {
-        var prevCapacity = node.contents.length;
-        if (prevCapacity >= newCapacity) return; // No need to expand, the storage was already large enough.
-        // Don't expand strictly to the given requested limit if it's only a very
-        // small increase, but instead geometrically grow capacity.
-        // For small filesizes (<1MB), perform size*2 geometric increase, but for
-        // large sizes, do a much more conservative size*1.125 increase to avoid
-        // overshooting the allocation cap by a very large margin.
-        var CAPACITY_DOUBLING_MAX = 1024 * 1024;
-        newCapacity = Math.max(newCapacity, (prevCapacity * (prevCapacity < CAPACITY_DOUBLING_MAX ? 2.0 : 1.125)) >>> 0);
-        if (prevCapacity) newCapacity = Math.max(newCapacity, 256); // At minimum allocate 256b for each file when expanding.
-        var oldContents = MEMFS.getFileDataAsTypedArray(node);
-        node.contents = new Uint8Array(newCapacity); // Allocate new storage.
-        node.contents.set(oldContents);
-      },
-  resizeFileStorage(node, newSize) {
-        if (node.usedBytes == newSize) return;
-        var oldContents = node.contents;
-        node.contents = new Uint8Array(newSize); // Allocate new storage.
-        node.contents.set(oldContents.subarray(0, Math.min(newSize, node.usedBytes))); // Copy old data over to the new storage.
-        node.usedBytes = newSize;
-      },
-  node_ops:{
-  getattr(node) {
-          var attr = {};
-          // device numbers reuse inode numbers.
-          attr.dev = FS.isChrdev(node.mode) ? node.id : 1;
-          attr.ino = node.id;
-          attr.mode = node.mode;
-          attr.nlink = 1;
-          attr.uid = 0;
-          attr.gid = 0;
-          attr.rdev = node.rdev;
-          if (FS.isDir(node.mode)) {
-            attr.size = 4096;
-          } else if (FS.isFile(node.mode)) {
-            attr.size = node.usedBytes;
-          } else if (FS.isLink(node.mode)) {
-            attr.size = node.link.length;
-          } else {
-            attr.size = 0;
-          }
-          attr.atime = new Date(node.atime);
-          attr.mtime = new Date(node.mtime);
-          attr.ctime = new Date(node.ctime);
-          // NOTE: In our implementation, st_blocks = Math.ceil(st_size/st_blksize),
-          //       but this is not required by the standard.
-          attr.blksize = 4096;
-          attr.blocks = Math.ceil(attr.size / attr.blksize);
-          return attr;
-        },
-  setattr(node, attr) {
-          for (const key of ['mode', 'atime', 'mtime', 'ctime']) {
-            if (attr[key] != null) {
-              node[key] = attr[key];
-            }
-          }
-          if (attr.size !== undefined) {
-            MEMFS.resizeFileStorage(node, attr.size);
-          }
-        },
-  lookup(parent, name) {
-          throw new FS.ErrnoError(44);
-        },
-  mknod(parent, name, mode, dev) {
-          return MEMFS.createNode(parent, name, mode, dev);
-        },
-  rename(old_node, new_dir, new_name) {
-          var new_node;
-          try {
-            new_node = FS.lookupNode(new_dir, new_name);
-          } catch (e) {}
-          if (new_node) {
-            if (FS.isDir(old_node.mode)) {
-              // if we're overwriting a directory at new_name, make sure it's empty.
-              for (var i in new_node.contents) {
-                throw new FS.ErrnoError(55);
-              }
-            }
-            FS.hashRemoveNode(new_node);
-          }
-          // do the internal rewiring
-          delete old_node.parent.contents[old_node.name];
-          new_dir.contents[new_name] = old_node;
-          old_node.name = new_name;
-          new_dir.ctime = new_dir.mtime = old_node.parent.ctime = old_node.parent.mtime = Date.now();
-        },
-  unlink(parent, name) {
-          delete parent.contents[name];
-          parent.ctime = parent.mtime = Date.now();
-        },
-  rmdir(parent, name) {
-          var node = FS.lookupNode(parent, name);
-          for (var i in node.contents) {
-            throw new FS.ErrnoError(55);
-          }
-          delete parent.contents[name];
-          parent.ctime = parent.mtime = Date.now();
-        },
-  readdir(node) {
-          return ['.', '..', ...Object.keys(node.contents)];
-        },
-  symlink(parent, newname, oldpath) {
-          var node = MEMFS.createNode(parent, newname, 0o777 | 40960, 0);
-          node.link = oldpath;
-          return node;
-        },
-  readlink(node) {
-          if (!FS.isLink(node.mode)) {
-            throw new FS.ErrnoError(28);
-          }
-          return node.link;
-        },
-  },
-  stream_ops:{
-  read(stream, buffer, offset, length, position) {
-          var contents = stream.node.contents;
-          if (position >= stream.node.usedBytes) return 0;
-          var size = Math.min(stream.node.usedBytes - position, length);
-          assert(size >= 0);
-          buffer.set(contents.subarray(position, position + size), offset);
-          return size;
-        },
-  write(stream, buffer, offset, length, position, canOwn) {
-          assert(buffer.subarray, 'FS.write expects a TypedArray');
-          // If the buffer is located in main memory (HEAP), and if
-          // memory can grow, we can't hold on to references of the
-          // memory buffer, as they may get invalidated. That means we
-          // need to copy its contents.
-          if (buffer.buffer === HEAP8.buffer) {
-            canOwn = false;
-          }
-  
-          if (!length) return 0;
-          var node = stream.node;
-          node.mtime = node.ctime = Date.now();
-  
-          if (canOwn) {
-            assert(!position, 'canOwn must imply no weird position inside the file');
-            node.contents = buffer.subarray(offset, offset + length);
-            node.usedBytes = length;
-          } else if (!node.usedBytes && !position) { // If this is a simple first write to an empty file, do a fast set since we don't need to care about old data.
-            node.contents = buffer.slice(offset, offset + length);
-            node.usedBytes = length;
-          } else {
-            MEMFS.expandFileStorage(node, position+length);
-            // Use typed array write which is available.
-            node.contents.set(buffer.subarray(offset, offset + length), position);
-            node.usedBytes = Math.max(node.usedBytes, position + length);
-          }
-          return length;
-        },
-  llseek(stream, offset, whence) {
-          var position = offset;
-          if (whence === 1) {
-            position += stream.position;
-          } else if (whence === 2) {
-            if (FS.isFile(stream.node.mode)) {
-              position += stream.node.usedBytes;
-            }
-          }
-          if (position < 0) {
-            throw new FS.ErrnoError(28);
-          }
-          return position;
-        },
-  mmap(stream, length, position, prot, flags) {
-          if (!FS.isFile(stream.node.mode)) {
-            throw new FS.ErrnoError(43);
-          }
-          var ptr;
-          var allocated;
-          var contents = stream.node.contents;
-          // Only make a new copy when MAP_PRIVATE is specified.
-          if (!(flags & 2) && contents.buffer === HEAP8.buffer) {
-            // We can't emulate MAP_SHARED when the file is not backed by the
-            // buffer we're mapping to (e.g. the HEAP buffer).
-            allocated = false;
-            ptr = contents.byteOffset;
-          } else {
-            allocated = true;
-            ptr = mmapAlloc(length);
-            if (!ptr) {
-              throw new FS.ErrnoError(48);
-            }
-            if (contents) {
-              // Try to avoid unnecessary slices.
-              if (position > 0 || position + length < contents.length) {
-                if (contents.subarray) {
-                  contents = contents.subarray(position, position + length);
-                } else {
-                  contents = Array.prototype.slice.call(contents, position, position + length);
-                }
-              }
-              HEAP8.set(contents, ptr);
-            }
-          }
-          return { ptr, allocated };
-        },
-  msync(stream, buffer, offset, length, mmapFlags) {
-          MEMFS.stream_ops.write(stream, buffer, 0, length, offset, false);
-          // should we check if bytesWritten and length are the same?
-          return 0;
-        },
-  },
-  };
-  
-  var FS_modeStringToFlags = (str) => {
-      if (typeof str != 'string') return str;
-      var flagModes = {
-        'r': 0,
-        'r+': 2,
-        'w': 512 | 64 | 1,
-        'w+': 512 | 64 | 2,
-        'a': 1024 | 64 | 1,
-        'a+': 1024 | 64 | 2,
-      };
-      var flags = flagModes[str];
-      if (typeof flags == 'undefined') {
-        throw new Error(`Unknown file open mode: ${str}`);
+  var initRandomFill = () => {
+      // This block is not needed on v19+ since crypto.getRandomValues is builtin
+      if (ENVIRONMENT_IS_NODE) {
+        var nodeCrypto = require('node:crypto');
+        return (view) => (nodeCrypto.randomFillSync(view), 0);
       }
-      return flags;
+  
+      return (view) => (crypto.getRandomValues(view), 0);
     };
-  
-  var FS_fileDataToTypedArray = (data) => {
-      if (typeof data == 'string') {
-        data = intArrayFromString(data, true);
-      }
-      if (!data.subarray) {
-        data = new Uint8Array(data);
-      }
-      return data;
-    };
-  
-  var FS_getMode = (canRead, canWrite) => {
-      var mode = 0;
-      if (canRead) mode |= 292 | 73;
-      if (canWrite) mode |= 146;
-      return mode;
-    };
-  
-  
-  
-  
+  var randomFill = (view) => (randomFill = initRandomFill())(view);
   var strError = (errno) => UTF8ToString(_strerror(errno));
-  
-  var ERRNO_CODES = {
-      'EPERM': 63,
-      'ENOENT': 44,
-      'ESRCH': 71,
-      'EINTR': 27,
-      'EIO': 29,
-      'ENXIO': 60,
-      'E2BIG': 1,
-      'ENOEXEC': 45,
-      'EBADF': 8,
-      'ECHILD': 12,
-      'EAGAIN': 6,
-      'EWOULDBLOCK': 6,
-      'ENOMEM': 48,
-      'EACCES': 2,
-      'EFAULT': 21,
-      'ENOTBLK': 105,
-      'EBUSY': 10,
-      'EEXIST': 20,
-      'EXDEV': 75,
-      'ENODEV': 43,
-      'ENOTDIR': 54,
-      'EISDIR': 31,
-      'EINVAL': 28,
-      'ENFILE': 41,
-      'EMFILE': 33,
-      'ENOTTY': 59,
-      'ETXTBSY': 74,
-      'EFBIG': 22,
-      'ENOSPC': 51,
-      'ESPIPE': 70,
-      'EROFS': 69,
-      'EMLINK': 34,
-      'EPIPE': 64,
-      'EDOM': 18,
-      'ERANGE': 68,
-      'ENOMSG': 49,
-      'EIDRM': 24,
-      'ECHRNG': 106,
-      'EL2NSYNC': 156,
-      'EL3HLT': 107,
-      'EL3RST': 108,
-      'ELNRNG': 109,
-      'EUNATCH': 110,
-      'ENOCSI': 111,
-      'EL2HLT': 112,
-      'EDEADLK': 16,
-      'ENOLCK': 46,
-      'EBADE': 113,
-      'EBADR': 114,
-      'EXFULL': 115,
-      'ENOANO': 104,
-      'EBADRQC': 103,
-      'EBADSLT': 102,
-      'EDEADLOCK': 16,
-      'EBFONT': 101,
-      'ENOSTR': 100,
-      'ENODATA': 116,
-      'ETIME': 117,
-      'ENOSR': 118,
-      'ENONET': 119,
-      'ENOPKG': 120,
-      'EREMOTE': 121,
-      'ENOLINK': 47,
-      'EADV': 122,
-      'ESRMNT': 123,
-      'ECOMM': 124,
-      'EPROTO': 65,
-      'EMULTIHOP': 36,
-      'EDOTDOT': 125,
-      'EBADMSG': 9,
-      'ENOTUNIQ': 126,
-      'EBADFD': 127,
-      'EREMCHG': 128,
-      'ELIBACC': 129,
-      'ELIBBAD': 130,
-      'ELIBSCN': 131,
-      'ELIBMAX': 132,
-      'ELIBEXEC': 133,
-      'ENOSYS': 52,
-      'ENOTEMPTY': 55,
-      'ENAMETOOLONG': 37,
-      'ELOOP': 32,
-      'EOPNOTSUPP': 138,
-      'EPFNOSUPPORT': 139,
-      'ECONNRESET': 15,
-      'ENOBUFS': 42,
-      'EAFNOSUPPORT': 5,
-      'EPROTOTYPE': 67,
-      'ENOTSOCK': 57,
-      'ENOPROTOOPT': 50,
-      'ESHUTDOWN': 140,
-      'ECONNREFUSED': 14,
-      'EADDRINUSE': 3,
-      'ECONNABORTED': 13,
-      'ENETUNREACH': 40,
-      'ENETDOWN': 38,
-      'ETIMEDOUT': 73,
-      'EHOSTDOWN': 142,
-      'EHOSTUNREACH': 23,
-      'EINPROGRESS': 26,
-      'EALREADY': 7,
-      'EDESTADDRREQ': 17,
-      'EMSGSIZE': 35,
-      'EPROTONOSUPPORT': 66,
-      'ESOCKTNOSUPPORT': 137,
-      'EADDRNOTAVAIL': 4,
-      'ENETRESET': 39,
-      'EISCONN': 30,
-      'ENOTCONN': 53,
-      'ETOOMANYREFS': 141,
-      'EUSERS': 136,
-      'EDQUOT': 19,
-      'ESTALE': 72,
-      'ENOTSUP': 138,
-      'ENOMEDIUM': 148,
-      'EILSEQ': 25,
-      'EOVERFLOW': 61,
-      'ECANCELED': 11,
-      'ENOTRECOVERABLE': 56,
-      'EOWNERDEAD': 62,
-      'ESTRPIPE': 135,
-    };
-  
-  
-  var asyncLoad = async (url) => {
-      var arrayBuffer = await readAsync(url);
-      assert(arrayBuffer, `Loading data file "${url}" failed (no arrayBuffer).`);
-      return new Uint8Array(arrayBuffer);
-    };
-  
-  
-  var FS_createDataFile = (...args) => FS.createDataFile(...args);
-  
-  var getUniqueRunDependency = (id) => {
-      var orig = id;
-      while (1) {
-        if (!runDependencyTracking[id]) return id;
-        id = orig + Math.random();
-      }
-    };
-  
-  var dependenciesPromise = null;
-  var resolveRunDependencies = async () => dependenciesPromise;
-  var runDependencies = 0;
-  
-  
-  var dependenciesPromiseResolve = null;
-  
-  var runDependencyTracking = {
-  };
-  
-  var runDependencyWatcher = null;
-  var removeRunDependency = (id) => {
-      runDependencies--;
-  
-      Module['monitorRunDependencies']?.(runDependencies);
-  
-      assert(id, 'removeRunDependency requires an ID');
-      assert(runDependencyTracking[id]);
-      delete runDependencyTracking[id];
-      if (!runDependencies) {
-        if (runDependencyWatcher !== null) {
-          clearInterval(runDependencyWatcher);
-          runDependencyWatcher = null;
-        }
-        dependenciesPromiseResolve();
-      }
-    };
-  
-  
-  
-  
-  var addRunDependency = (id) => {
-      if (!runDependencies) {
-        dependenciesPromise = new Promise((resolve) => dependenciesPromiseResolve = resolve);
-      }
-      runDependencies++;
-  
-      Module['monitorRunDependencies']?.(runDependencies);
-  
-      assert(id, 'addRunDependency requires an ID')
-      assert(!runDependencyTracking[id]);
-      runDependencyTracking[id] = 1;
-      if (!runDependencyWatcher && globalThis.setInterval) {
-        // Check for missing dependencies every few seconds
-        runDependencyWatcher = setInterval(() => {
-          if (ABORT) {
-            clearInterval(runDependencyWatcher);
-            runDependencyWatcher = null;
-            return;
-          }
-          var shown = false;
-          for (var dep in runDependencyTracking) {
-            if (!shown) {
-              shown = true;
-              err('still waiting on run dependencies:');
-            }
-            err(`dependency: ${dep}`);
-          }
-          if (shown) {
-            err('(end of list)');
-          }
-        }, 10_000);
-        // Prevent this timer from keeping the runtime alive if nothing
-        // else is.
-        runDependencyWatcher.unref?.()
-      }
-    };
-  
-  
-  var preloadPlugins = [];
-  var FS_handledByPreloadPlugin = async (byteArray, fullname) => {
-      // Ensure plugins are ready.
-      if (typeof Browser != 'undefined') Browser.init();
-  
-      for (var plugin of preloadPlugins) {
-        if (plugin['canHandle'](fullname)) {
-          assert(plugin['handle'].constructor.name === 'AsyncFunction', 'Filesystem plugin handlers must be async functions (See #24914)')
-          return plugin['handle'](byteArray, fullname);
-        }
-      }
-      // If no plugin handled this file then return the original/unmodified
-      // byteArray.
-      return byteArray;
-    };
-  var FS_preloadFile = async (parent, name, url, canRead, canWrite, dontCreateFile, canOwn, preFinish) => {
-      // TODO we should allow people to just pass in a complete filename instead
-      // of parent and name being that we just join them anyways
-      var fullname = name ? PATH_FS.resolve(PATH.join2(parent, name)) : parent;
-      var dep = getUniqueRunDependency(`cp ${fullname}`); // might have several active requests for the same fullname
-      addRunDependency(dep);
-  
-      try {
-        var byteArray = url;
-        if (typeof url == 'string') {
-          byteArray = await asyncLoad(url);
-        }
-  
-        byteArray = await FS_handledByPreloadPlugin(byteArray, fullname);
-        preFinish?.();
-        if (!dontCreateFile) {
-          FS_createDataFile(parent, name, byteArray, canRead, canWrite, canOwn);
-        }
-      } finally {
-        removeRunDependency(dep);
-      }
-    };
-  var FS_createPreloadedFile = (parent, name, url, canRead, canWrite, onload, onerror, dontCreateFile, canOwn, preFinish) => {
-      FS_preloadFile(parent, name, url, canRead, canWrite, dontCreateFile, canOwn, preFinish).then(onload).catch(onerror);
-    };
-  
   var FS = {
   root:null,
   mounts:[],
@@ -2071,11 +2001,10 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
   },
   streams:[],
   nextInode:1,
-  nameTable:null,
+  nameTable:[],
   currentPath:"/",
   initialized:false,
   ignorePermissions:true,
-  filesystems:null,
   syncFSRequests:0,
   ErrnoError:class extends Error {
         name = 'ErrnoError';
@@ -2340,8 +2269,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         // if we failed to find it in the cache, call into the VFS
         return FS.lookup(parent, name);
       },
-  createNode(parent, name, mode, rdev) {
-        assert(typeof parent == 'object')
+  createNode(parent, name, mode, rdev = undefined) {
+        assert(typeof parent === 'object')
         var node = new FS.FSNode(parent, name, mode, rdev);
   
         FS.hashAddNode(node);
@@ -2465,9 +2394,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         }
         return op;
       },
-  MAX_OPEN_FDS:4096,
   nextfd() {
-        for (var fd = 0; fd <= FS.MAX_OPEN_FDS; fd++) {
+        for (var fd = 0; fd <= FS_MAX_OPEN_FDS; fd++) {
           if (!FS.streams[fd]) {
             return fd;
           }
@@ -2550,7 +2478,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         return mounts;
       },
   syncfs(populate, callback) {
-        if (typeof populate == 'function') {
+        if (typeof populate === 'function') {
           callback = populate;
           populate = false;
         }
@@ -2593,7 +2521,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         }
       },
   mount(type, opts, mountpoint) {
-        if (typeof type == 'string') {
+        if (typeof type === 'string') {
           // The filesystem was not included, and instead we have an error
           // message stored in the variable.
           throw type;
@@ -2740,7 +2668,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         mode |= 16384;
         return FS.mknod(path, mode, 0);
       },
-  mkdirTree(path, mode) {
+  mkdirTree(path, mode = 0o777) {
         var dirs = path.split('/');
         var d = '';
         for (var dir of dirs) {
@@ -2754,8 +2682,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           }
         }
       },
-  mkdev(path, mode, dev) {
-        if (typeof dev == 'undefined') {
+  mkdev(path, mode, dev = undefined) {
+        if (typeof dev === 'undefined') {
           dev = mode;
           mode = 0o666;
         }
@@ -2874,6 +2802,11 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         // do the underlying fs rename
         try {
           old_dir.node_ops.rename(old_node, new_dir, new_name);
+          // The replaced node is stale now. Evict it only after the rename
+          // succeeded: backends like NODEFS report node.id as st_ino.
+          if (new_node) {
+            FS.hashRemoveNode(new_node);
+          }
           // update old node (we do this here to avoid each backend
           // needing to)
           old_node.parent = new_dir;
@@ -2944,7 +2877,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         }
         return link.node_ops.readlink(link);
       },
-  stat(path, dontFollow) {
+  stat(path, dontFollow = false) {
         var lookup = FS.lookupPath(path, { follow: !dontFollow });
         var node = lookup.node;
         var getattr = FS.checkOpExists(node.node_ops.getattr, 63);
@@ -2962,16 +2895,16 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
   lstat(path) {
         return FS.stat(path, true);
       },
-  doChmod(stream, node, mode, dontFollow) {
+  doChmod(stream, node, mode, dontFollow = false) {
         FS.doSetAttr(stream, node, {
           mode: (mode & 4095) | (node.mode & ~4095),
           ctime: Date.now(),
           dontFollow
         });
       },
-  chmod(path, mode, dontFollow) {
+  chmod(path, mode, dontFollow = false) {
         var node;
-        if (typeof path == 'string') {
+        if (typeof path === 'string') {
           var lookup = FS.lookupPath(path, { follow: !dontFollow });
           node = lookup.node;
         } else {
@@ -2986,16 +2919,16 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         var stream = FS.getStreamChecked(fd);
         FS.doChmod(stream, stream.node, mode, false);
       },
-  doChown(stream, node, dontFollow) {
+  doChown(stream, node, dontFollow = false) {
         FS.doSetAttr(stream, node, {
           timestamp: Date.now(),
           dontFollow
           // we ignore the uid / gid for now
         });
       },
-  chown(path, uid, gid, dontFollow) {
+  chown(path, uid, gid, dontFollow = false) {
         var node;
-        if (typeof path == 'string') {
+        if (typeof path === 'string') {
           var lookup = FS.lookupPath(path, { follow: !dontFollow });
           node = lookup.node;
         } else {
@@ -3031,7 +2964,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           throw new FS.ErrnoError(28);
         }
         var node;
-        if (typeof path == 'string') {
+        if (typeof path === 'string') {
           var lookup = FS.lookupPath(path, { follow: true });
           node = lookup.node;
         } else {
@@ -3046,7 +2979,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         }
         FS.doTruncate(stream, stream.node, len);
       },
-  utime(path, atime, mtime, dontFollow) {
+  utime(path, atime, mtime, dontFollow = false) {
         var lookup = FS.lookupPath(path, { follow: !dontFollow });
         FS.doSetAttr(null, lookup.node, {
           atime: atime,
@@ -3066,7 +2999,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         }
         var node;
         var isDirPath;
-        if (typeof path == 'object') {
+        if (typeof path === 'object') {
           node = path;
         } else {
           isDirPath = path.endsWith('/');
@@ -3185,7 +3118,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         stream.ungotten = [];
         return stream.position;
       },
-  read(stream, buffer, offset, length, position) {
+  read(stream, buffer, offset, length, position = undefined) {
         assert(offset >= 0);
         if (length < 0 || position < 0) {
           throw new FS.ErrnoError(28);
@@ -3202,7 +3135,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         if (!stream.stream_ops.read) {
           throw new FS.ErrnoError(28);
         }
-        var seeking = typeof position != 'undefined';
+        var seeking = typeof position !== 'undefined';
         if (!seeking) {
           position = stream.position;
         } else if (!stream.seekable) {
@@ -3212,7 +3145,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         if (!seeking) stream.position += bytesRead;
         return bytesRead;
       },
-  write(stream, buffer, offset, length, position, canOwn) {
+  write(stream, buffer, offset, length, position = undefined, canOwn = undefined) {
         assert(offset >= 0);
         assert(buffer.subarray, 'FS.write expects a TypedArray');
         if (length < 0 || position < 0) {
@@ -3234,7 +3167,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           // seek to the end before writing in append mode
           FS.llseek(stream, 0, 2);
         }
-        var seeking = typeof position != 'undefined';
+        var seeking = typeof position !== 'undefined';
         if (!seeking) {
           position = stream.position;
         } else if (!stream.seekable) {
@@ -3427,19 +3360,15 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         assert(stderr.fd === 2, `invalid handle for stderr (${stderr.fd})`);
       },
   staticInit() {
-        FS.nameTable = new Array(4096);
+        FS.nameTable.length = 4096;
   
         FS.mount(MEMFS, {}, '/');
   
         FS.createDefaultDirectories();
         FS.createDefaultDevices();
         FS.createSpecialDirectories();
-  
-        FS.filesystems = {
-          'MEMFS': MEMFS,
-        };
       },
-  init(input, output, error) {
+  init(input = undefined, output = undefined, error = undefined) {
         assert(!FS.initialized, 'FS.init was previously called. If you want to initialize later with custom parameters, remove any earlier calls (note that one is automatically added to the generated code)');
         FS.initialized = true;
   
@@ -3461,7 +3390,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           }
         }
       },
-  analyzePath(path, dontResolveLastLink) {
+  analyzePath(path, dontResolveLastLink = false) {
         warnOnce('FS.analyzePath is deprecated; use FS.lookupPath or FS.stat instead');
         // operate from within the context of the symlink's target
         try {
@@ -3490,8 +3419,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         };
         return ret;
       },
-  createPath(parent, path, canRead, canWrite) {
-        parent = typeof parent == 'string' ? parent : FS.getPath(parent);
+  createPath(parent, path, canRead = undefined, canWrite = undefined) {
+        parent = typeof parent === 'string' ? parent : FS.getPath(parent);
         var parts = path.split('/').reverse();
         while (parts.length) {
           var part = parts.pop();
@@ -3506,15 +3435,15 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         }
         return current;
       },
-  createFile(parent, name, properties, canRead, canWrite) {
-        var path = PATH.join2(typeof parent == 'string' ? parent : FS.getPath(parent), name);
+  createFile(parent, name, properties, canRead = undefined, canWrite = undefined) {
+        var path = PATH.join2(typeof parent === 'string' ? parent : FS.getPath(parent), name);
         var mode = FS_getMode(canRead, canWrite);
         return FS.create(path, mode);
       },
-  createDataFile(parent, name, data, canRead, canWrite, canOwn) {
+  createDataFile(parent, name, data = undefined, canRead = undefined, canWrite = undefined, canOwn = undefined) {
         var path = name;
         if (parent) {
-          parent = typeof parent == 'string' ? parent : FS.getPath(parent);
+          parent = typeof parent === 'string' ? parent : FS.getPath(parent);
           path = name ? PATH.join2(parent, name) : parent;
         }
         var mode = FS_getMode(canRead, canWrite);
@@ -3529,8 +3458,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           FS.chmod(node, mode);
         }
       },
-  createDevice(parent, name, input, output) {
-        var path = PATH.join2(typeof parent == 'string' ? parent : FS.getPath(parent), name);
+  createDevice(parent, name, input = undefined, output = undefined) {
+        var path = PATH.join2(typeof parent === 'string' ? parent : FS.getPath(parent), name);
         var mode = FS_getMode(!!input, !!output);
         FS.createDevice.major ??= 64;
         var dev = FS.makedev(FS.createDevice.major++, 0);
@@ -3595,7 +3524,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           }
         }
       },
-  createLazyFile(parent, name, url, canRead, canWrite) {
+  createLazyFile(parent, name, url, canRead = undefined, canWrite = undefined) {
         // Lazy chunked Uint8Array (implements get and length from Uint8Array).
         // Actual getting is abstracted away for eventual reuse.
         class LazyUint8Array {
@@ -3655,10 +3584,10 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
               var start = chunkNum * chunkSize;
               var end = (chunkNum+1) * chunkSize - 1; // including this byte
               end = Math.min(end, datalength-1); // if datalength-1 is selected, this is the last block
-              if (typeof lazyArray.chunks[chunkNum] == 'undefined') {
+              if (typeof lazyArray.chunks[chunkNum] === 'undefined') {
                 lazyArray.chunks[chunkNum] = doXHR(start, end);
               }
-              if (typeof lazyArray.chunks[chunkNum] == 'undefined') abort('doXHR failed!');
+              if (typeof lazyArray.chunks[chunkNum] === 'undefined') abort('doXHR failed!');
               return lazyArray.chunks[chunkNum];
             });
   
@@ -3756,16 +3685,11 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         return node;
       },
   };
-  
-  
-  
-  
-  
   /** not-@type {!BigInt64Array} */
   var HEAP64;
   var SYSCALLS = {
   currentUmask:18,
-  calculateAt(dirfd, path, allowEmpty) {
+  calculateAt(dirfd, path, allowEmpty = false) {
         if (PATH.isAbs(path)) {
           return path;
         }
@@ -3795,17 +3719,15 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         HEAP64[(((buf)+(24))>>3)] = BigInt(stat.size);checkInt64(stat.size);
         HEAP32[(((buf)+(32))>>2)] = 4096;checkInt32(4096);
         HEAP32[(((buf)+(36))>>2)] = stat.blocks;checkInt32(stat.blocks);
-        // Prefer `*Ms` properties if available (e.g. from NODEFS / host `fs.Stats`)
-        // for sub-millisecond precision; fall back to Date#getTime for other filesystems.
-        var atime = stat.atimeMs ?? stat.atime.getTime();
-        var mtime = stat.mtimeMs ?? stat.mtime.getTime();
-        var ctime = stat.ctimeMs ?? stat.ctime.getTime();
+        var atime = stat.atime.getTime();
+        var mtime = stat.mtime.getTime();
+        var ctime = stat.ctime.getTime();
         HEAP64[(((buf)+(40))>>3)] = BigInt(Math.floor(atime / 1000));checkInt64(Math.floor(atime / 1000));
-        HEAPU32[(((buf)+(48))>>2)] = Math.floor((atime % 1000) * 1_000_000);checkInt32(Math.floor((atime % 1000) * 1_000_000));
+        HEAPU32[(((buf)+(48))>>2)] = (atime % 1000) * 1000 * 1000;checkInt32((atime % 1000) * 1000 * 1000);
         HEAP64[(((buf)+(56))>>3)] = BigInt(Math.floor(mtime / 1000));checkInt64(Math.floor(mtime / 1000));
-        HEAPU32[(((buf)+(64))>>2)] = Math.floor((mtime % 1000) * 1_000_000);checkInt32(Math.floor((mtime % 1000) * 1_000_000));
+        HEAPU32[(((buf)+(64))>>2)] = (mtime % 1000) * 1000 * 1000;checkInt32((mtime % 1000) * 1000 * 1000);
         HEAP64[(((buf)+(72))>>3)] = BigInt(Math.floor(ctime / 1000));checkInt64(Math.floor(ctime / 1000));
-        HEAPU32[(((buf)+(80))>>2)] = Math.floor((ctime % 1000) * 1_000_000);checkInt32(Math.floor((ctime % 1000) * 1_000_000));
+        HEAPU32[(((buf)+(80))>>2)] = (ctime % 1000) * 1000 * 1000;checkInt32((ctime % 1000) * 1000 * 1000);
         HEAP64[(((buf)+(88))>>3)] = BigInt(stat.ino);checkInt64(stat.ino);
         return 0;
       },
@@ -3849,12 +3771,11 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       FS.chmod(path, mode);
       return 0;
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
   
-
   function ___syscall_dup3(fd, newfd, flags) {
   try {
   
@@ -3862,7 +3783,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       if (flags & ~524288) return -28;
       var old = SYSCALLS.getStreamFromFD(fd);
       // Check newfd is within range of valid open file descriptors.
-      if (newfd < 0 || newfd >= FS.MAX_OPEN_FDS) return -8;
+      if (newfd < 0 || newfd >= FS_MAX_OPEN_FDS) return -8;
       var existing = FS.getStream(newfd);
       if (existing) FS.close(existing);
       var stream = FS.dupStream(old, newfd);
@@ -3871,12 +3792,13 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       }
       return stream.fd;
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
   
-
+  /** @type {!Int16Array} */
+  var HEAP16;
   var syscallGetVarargI = () => {
       assert(SYSCALLS.varargs != undefined);
       // the `+` prepended here is necessary to convince the JSCompiler that varargs is indeed a number.
@@ -3884,12 +3806,6 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       SYSCALLS.varargs += 4;
       return ret;
     };
-  var syscallGetVarargP = syscallGetVarargI;
-  
-  
-  
-  /** @type {!Int16Array} */
-  var HEAP16;
   function ___syscall_fcntl64(fd, cmd, varargs) {
   SYSCALLS.varargs = varargs;
   try {
@@ -3936,26 +3852,20 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       }
       return -28;
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
   
-
   function ___syscall_fstat64(fd, buf) {
   try {
   
       return SYSCALLS.writeStat(buf, FS.fstat(fd));
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
-  
-
-  
-  
-  
   
   function ___syscall_ioctl(fd, op, varargs) {
   SYSCALLS.varargs = varargs;
@@ -4048,24 +3958,22 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         default: return -28; // not supported
       }
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
   
-
   function ___syscall_lstat64(path, buf) {
   try {
   
       path = SYSCALLS.getStr(path);
       return SYSCALLS.writeStat(buf, FS.lstat(path));
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
   
-
   function ___syscall_newfstatat(dirfd, path, buf, flags) {
   try {
   
@@ -4077,12 +3985,10 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       path = SYSCALLS.calculateAt(dirfd, path, allowEmpty);
       return SYSCALLS.writeStat(buf, nofollow ? FS.lstat(path) : FS.stat(path));
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
-  
-
   
   function ___syscall_openat(dirfd, path, flags, varargs) {
   SYSCALLS.varargs = varargs;
@@ -4096,30 +4002,25 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       }
       return FS.open(path, flags, mode).fd;
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
   
-
   function ___syscall_stat64(path, buf) {
   try {
   
       path = SYSCALLS.getStr(path);
       return SYSCALLS.writeStat(buf, FS.stat(path));
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
   
-
-  
   var readI53FromI64 = (ptr) => {
       return HEAPU32[((ptr)>>2)] + HEAP32[(((ptr)+(4))>>2)] * 4294967296;
     };
-  
-  
   function ___syscall_utimensat(dirfd, path, times, flags) {
   try {
   
@@ -4140,10 +4041,7 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
             return null;
           }
           var tv_sec = readI53FromI64(ptr);
-          // Round down tv_nsec to the nearest 10 microseconds (10,000 ns) to prevent
-          // floating-point rounding into the next whole second when converting to host/Windows timestamps.
-          tv_nsec = (tv_nsec / 10_000 | 0) * 10_000;
-          return (tv_sec + (tv_nsec / 1_000_000_000)) * 1000;
+          return (tv_sec*1000) + Math.floor(tv_nsec/(1000*1000));
         }
         atime = readTimespec(times);
         mtime = readTimespec(times + 16);
@@ -4155,31 +4053,25 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       }
       return 0;
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return -e.errno;
   }
   }
   
-
   var getCppExceptionTag = () => ___cpp_exception;
-  
-  
   var getCppExceptionThrownObjectFromWebAssemblyException = (ex) => {
       // In Wasm EH, the value extracted from WebAssembly.Exception is a pointer
       // to the unwind header. Convert it to the actual thrown value.
       var unwind_header = ex.getArg(getCppExceptionTag(), 0);
       return ___thrown_object_from_unwind_exception(unwind_header);
     };
-  
-  
-  
-  var stackSave = () => _emscripten_stack_get_current();
-  
-  var stackRestore = (val) => __emscripten_stack_restore(val);
-  
+  var decrementExceptionRefcount = (ex) => {
+      var ptr = getCppExceptionThrownObjectFromWebAssemblyException(ex);
+      ___cxa_decrement_exception_refcount(ptr);
+    };
   var stackAlloc = (sz) => __emscripten_stack_alloc(sz);
-  
-  
+  var stackRestore = (val) => __emscripten_stack_restore(val);
+  var stackSave = () => _emscripten_stack_get_current();
   var getExceptionMessageCommon = (ptr) => {
       var sp = stackSave();
       var type_addr_addr = stackAlloc(4);
@@ -4201,14 +4093,6 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       var ptr = getCppExceptionThrownObjectFromWebAssemblyException(ex);
       return getExceptionMessageCommon(ptr);
     };
-  
-  
-  var decrementExceptionRefcount = (ex) => {
-      var ptr = getCppExceptionThrownObjectFromWebAssemblyException(ex);
-      ___cxa_decrement_exception_refcount(ptr);
-    };
-  
-  
   var incrementExceptionRefcount = (ex) => {
       var ptr = getCppExceptionThrownObjectFromWebAssemblyException(ex);
       ___cxa_increment_exception_refcount(ptr);
@@ -4218,13 +4102,12 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       e.message = getExceptionMessage(e);
       throw e;
     };
-
   var __abort_js = () =>
       abort('native code called abort()');
-
-  var structRegistrations = {
-  };
-  
+  /** @suppress {globalThis} */
+  function readPointer(pointer) {
+      return this.fromWireType(HEAPU32[((pointer)>>2)]);
+    }
   var runDestructors = (destructors) => {
       while (destructors.length) {
         var ptr = destructors.pop();
@@ -4232,21 +4115,48 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         del(ptr);
       }
     };
-  
-  /** @suppress {globalThis} */
-  function readPointer(pointer) {
-      return this.fromWireType(HEAPU32[((pointer)>>2)]);
-    }
-  
+  var structRegistrations = {
+  };
   var awaitingDependencies = {
   };
-  
   var registeredTypes = {
   };
-  
+  class BindingError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = 'BindingError';
+      }
+    }
+  var throwBindingError = (message) => { throw new BindingError(message); };
   var typeDependencies = {
   };
+  /** @param {Object=} options */
+  function sharedRegisterType(typeID, registeredInstance, options = {}) {
+      var name = registeredInstance.name;
+      if (!typeID) {
+        throwBindingError(`type "${name}" must have a positive integer typeid pointer`);
+      }
+      if (registeredTypes[typeID]) {
+        if (options.ignoreDuplicateRegistrations) {
+          return;
+        } else {
+          throwBindingError(`Cannot register type '${name}' twice`);
+        }
+      }
   
+      registeredTypes[typeID] = registeredInstance;
+      delete typeDependencies[typeID];
+  
+      if (awaitingDependencies[typeID]) {
+        var callbacks = awaitingDependencies[typeID];
+        delete awaitingDependencies[typeID];
+        callbacks.forEach((cb) => cb());
+      }
+    }
+  /** @param {Object=} options */
+  function registerType(typeID, registeredInstance, options = {}) {
+      return sharedRegisterType(typeID, registeredInstance, options);
+    }
   class InternalError extends Error {
       constructor(message) {
         super(message);
@@ -4271,14 +4181,11 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       var unregisteredTypes = [];
       var registered = 0;
       for (let [i, dt] of dependentTypes.entries()) {
-        if (registeredTypes.hasOwnProperty(dt)) {
+        if (registeredTypes[dt]) {
           typeConverters[i] = registeredTypes[dt];
         } else {
           unregisteredTypes.push(dt);
-          if (!awaitingDependencies.hasOwnProperty(dt)) {
-            awaitingDependencies[dt] = [];
-          }
-          awaitingDependencies[dt].push(() => {
+          (awaitingDependencies[dt] ??= []).push(() => {
             typeConverters[i] = registeredTypes[dt];
             ++registered;
             if (registered === unregisteredTypes.length) {
@@ -4291,21 +4198,19 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         onComplete(typeConverters);
       }
     };
-  
-  
   var zeroMemory = (ptr, size) => HEAPU8.fill(0, ptr, ptr + size);
-  var __embind_finalize_value_object = (structType) => {
-      var reg = structRegistrations[structType];
-      delete structRegistrations[structType];
+  var __embind_finalize_value_object = (structTypeID) => {
+      var reg = structRegistrations[structTypeID];
+      delete structRegistrations[structTypeID];
   
       var rawConstructor = reg.rawConstructor;
       var rawDestructor = reg.rawDestructor;
       var valueSize = reg.valueSize;
       var isTrivial = reg.isTrivial;
       var fieldRecords = reg.fields;
-      var fieldTypes = fieldRecords.map((field) => field.getterReturnType).
-                concat(fieldRecords.map((field) => field.setterArgumentType));
-      whenDependentTypesAreResolved([structType], fieldTypes, (fieldTypes) => {
+      var fieldTypeIDs = fieldRecords.map((field) => field.getterReturnTypeID).
+                concat(fieldRecords.map((field) => field.setterArgumentTypeID));
+      whenDependentTypesAreResolved([structTypeID], fieldTypeIDs, (fieldTypes) => {
         var fields = {};
         for (var [i, field] of fieldRecords.entries()) {
           const getterReturnType = fieldTypes[i];
@@ -4375,7 +4280,6 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         }];
       });
     };
-
   var AsciiToString = (ptr) => {
       var str = '';
       while (1) {
@@ -4384,54 +4288,24 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         str += String.fromCharCode(ch);
       }
     };
-  
-  
-  
-  
-  class BindingError extends Error {
-      constructor(message) {
-        super(message);
-        this.name = 'BindingError';
+  var embindRepr = (v) => {
+      if (v === null) {
+          return 'null';
       }
-    }
-  var throwBindingError = (message) => { throw new BindingError(message); };
-  /** @param {Object=} options */
-  function sharedRegisterType(rawType, registeredInstance, options = {}) {
-      var name = registeredInstance.name;
-      if (!rawType) {
-        throwBindingError(`type "${name}" must have a positive integer typeid pointer`);
+      var t = typeof v;
+      if (t === 'object' || t === 'array' || t === 'function') {
+          return v.toString();
+      } else {
+          return '' + v;
       }
-      if (registeredTypes.hasOwnProperty(rawType)) {
-        if (options.ignoreDuplicateRegistrations) {
-          return;
-        } else {
-          throwBindingError(`Cannot register type '${name}' twice`);
-        }
+    };
+  var assertIntegerRange = (typeName, value, minRange, maxRange) => {
+      if (value < minRange || value > maxRange) {
+        throw new TypeError(`Passing a number "${embindRepr(value)}" from JS side to C/C++ side to an argument of type "${typeName}", which is outside the valid range [${minRange}, ${maxRange}]!`);
       }
-  
-      registeredTypes[rawType] = registeredInstance;
-      delete typeDependencies[rawType];
-  
-      if (awaitingDependencies.hasOwnProperty(rawType)) {
-        var callbacks = awaitingDependencies[rawType];
-        delete awaitingDependencies[rawType];
-        callbacks.forEach((cb) => cb());
-      }
-    }
-  /** @param {Object=} options */
-  function registerType(rawType, registeredInstance, options = {}) {
-      return sharedRegisterType(rawType, registeredInstance, options);
-    }
-  
-  
-  
-  
+    };
   /** @type {!Uint16Array} */
   var HEAPU16;
-  
-  
-  
-  
   /** not-@type {!BigUint64Array} */
   var HEAPU64;
   var integerReadValueFromPointer = (name, width, signed) => {
@@ -4453,26 +4327,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
           throw new TypeError(`invalid integer width (${width}): ${name}`);
       }
     };
-  
-  var embindRepr = (v) => {
-      if (v === null) {
-          return 'null';
-      }
-      var t = typeof v;
-      if (t === 'object' || t === 'array' || t === 'function') {
-          return v.toString();
-      } else {
-          return '' + v;
-      }
-    };
-  
-  var assertIntegerRange = (typeName, value, minRange, maxRange) => {
-      if (value < minRange || value > maxRange) {
-        throw new TypeError(`Passing a number "${embindRepr(value)}" from JS side to C/C++ side to an argument of type "${typeName}", which is outside the valid range [${minRange}, ${maxRange}]!`);
-      }
-    };
   /** @suppress {globalThis} */
-  var __embind_register_bigint = (primitiveType, name, size, minRange, maxRange) => {
+  var __embind_register_bigint = (typeID, name, size, minRange, maxRange) => {
       name = AsciiToString(name);
   
       const isUnsignedType = minRange === 0n;
@@ -4487,14 +4343,14 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         maxRange = fromWireType(maxRange);
       }
   
-      registerType(primitiveType, {
+      registerType(typeID, {
         name,
         fromWireType: fromWireType,
         toWireType: (destructors, value) => {
-          if (typeof value == 'number') {
+          if (typeof value === 'number') {
             value = BigInt(value);
           }
-          else if (typeof value != 'bigint') {
+          else if (typeof value !== 'bigint') {
             throw new TypeError(`Cannot convert "${embindRepr(value)}" to ${name}`);
           }
           assertIntegerRange(name, value, minRange, maxRange);
@@ -4504,13 +4360,10 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         destructorFunction: null, // This type does not need a destructor
       });
     };
-
-  
-  
   /** @suppress {globalThis} */
-  var __embind_register_bool = (rawType, name, trueValue, falseValue) => {
+  var __embind_register_bool = (typeID, name, trueValue, falseValue) => {
       name = AsciiToString(name);
-      registerType(rawType, {
+      registerType(typeID, {
         name,
         fromWireType: function(wt) {
           // ambiguous emscripten ABI: sometimes return values are
@@ -4526,47 +4379,6 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         destructorFunction: null, // This type does not need a destructor
       });
     };
-
-  
-  
-  var shallowCopyInternalPointer = (o) => {
-      return {
-        count: o.count,
-        deleteScheduled: o.deleteScheduled,
-        preservePointerOnDelete: o.preservePointerOnDelete,
-        ptr: o.ptr,
-        ptrType: o.ptrType,
-        smartPtr: o.smartPtr,
-        smartPtrType: o.smartPtrType,
-      };
-    };
-  
-  var throwInstanceAlreadyDeleted = (obj) => {
-      function getInstanceTypeName(handle) {
-        return handle.$$.ptrType.registeredClass.name;
-      }
-      throwBindingError(getInstanceTypeName(obj) + ' instance already deleted');
-    };
-  
-  var finalizationRegistry = false;
-  
-  var detachFinalizer = (handle) => {};
-  
-  var runDestructor = ($$) => {
-      if ($$.smartPtr) {
-        $$.smartPtrType.rawDestructor($$.smartPtr);
-      } else {
-        $$.ptrType.registeredClass.rawDestructor($$.ptr);
-      }
-    };
-  var releaseClassHandle = ($$) => {
-      $$.count.value -= 1;
-      var toDelete = 0 === $$.count.value;
-      if (toDelete) {
-        runDestructor($$);
-      }
-    };
-  
   var downcastPointer = (ptr, ptrClass, desiredClass) => {
       if (ptrClass === desiredClass) {
         return ptr;
@@ -4581,13 +4393,6 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       }
       return desiredClass.downcast(rv);
     };
-  
-  var registeredPointers = {
-  };
-  
-  var registeredInstances = {
-  };
-  
   var getBasestPointer = (class_, ptr) => {
       if (ptr === undefined) {
           throwBindingError('ptr should not be undefined');
@@ -4598,12 +4403,12 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
       }
       return ptr;
     };
+  var registeredInstances = {
+  };
   var getInheritedInstance = (class_, ptr) => {
       ptr = getBasestPointer(class_, ptr);
       return registeredInstances[ptr];
     };
-  
-  
   var makeClassHandle = (prototype, record) => {
       if (!record.ptrType || !record.ptr) {
         throwInternalError('makeClassHandle requires ptr and ptrType');
@@ -4621,6 +4426,8 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         },
       }));
     };
+  var registeredPointers = {
+  };
   /** @suppress {globalThis} */
   function RegisteredPointer_fromWireType(ptr) {
       // ptr is a raw pointer (or a raw smartpointer)
@@ -4697,6 +4504,22 @@ var stringToUTF8Array = (str, heap, outIdx, maxBytesToWrite) => {
         });
       }
     }
+  var finalizationRegistry = false;
+  var detachFinalizer = (handle) => {};
+  var runDestructor = ($$) => {
+      if ($$.smartPtr) {
+        $$.smartPtrType.rawDestructor($$.smartPtr);
+      } else {
+        $$.ptrType.registeredClass.rawDestructor($$.ptr);
+      }
+    };
+  var releaseClassHandle = ($$) => {
+      $$.count.value -= 1;
+      var toDelete = 0 === $$.count.value;
+      if (toDelete) {
+        runDestructor($$);
+      }
+    };
   var attachFinalizer = (handle) => {
       if (!globalThis.FinalizationRegistry) {
         attachFinalizer = (handle) => handle;
@@ -4736,10 +4559,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       detachFinalizer = (handle) => finalizationRegistry.unregister(handle);
       return attachFinalizer(handle);
     };
-  
-  
-  
-  
+  var delayFunction;
   var deletionQueue = [];
   var flushPendingDeletes = () => {
       while (deletionQueue.length) {
@@ -4748,8 +4568,23 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         obj['delete']();
       }
     };
-  
-  var delayFunction;
+  var shallowCopyInternalPointer = (o) => {
+      return {
+        count: o.count,
+        deleteScheduled: o.deleteScheduled,
+        preservePointerOnDelete: o.preservePointerOnDelete,
+        ptr: o.ptr,
+        ptrType: o.ptrType,
+        smartPtr: o.smartPtr,
+        smartPtrType: o.smartPtrType,
+      };
+    };
+  var throwInstanceAlreadyDeleted = (obj) => {
+      function getInstanceTypeName(handle) {
+        return handle.$$.ptrType.registeredClass.name;
+      }
+      throwBindingError(getInstanceTypeName(obj) + ' instance already deleted');
+    };
   var init_ClassHandle = () => {
       let proto = ClassHandle.prototype;
   
@@ -4849,62 +4684,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
   /** @constructor */
   function ClassHandle() {
     }
-  
-  var createNamedFunction = (name, func) => Object.defineProperty(func, 'name', { value: name });
-  
-  
-  var ensureOverloadTable = (proto, methodName, humanName) => {
-      if (undefined === proto[methodName].overloadTable) {
-        var prevFunc = proto[methodName];
-        // Inject an overload resolver function that routes to the appropriate overload based on the number of arguments.
-        proto[methodName] = function(...args) {
-          // TODO This check can be removed in -O3 level "unsafe" optimizations.
-          if (!proto[methodName].overloadTable.hasOwnProperty(args.length)) {
-            throwBindingError(`Function '${humanName}' called with an invalid number of arguments (${args.length}) - expects one of (${proto[methodName].overloadTable})!`);
-          }
-          return proto[methodName].overloadTable[args.length].apply(this, args);
-        };
-        // Move the previous function into the overload table.
-        proto[methodName].overloadTable = [];
-        proto[methodName].overloadTable[prevFunc.argCount] = prevFunc;
-      }
-    };
-  
-  /** @param {number=} numArguments */
-  var exposePublicSymbol = (name, value, numArguments) => {
-      if (Module.hasOwnProperty(name)) {
-        if (undefined === numArguments || (undefined !== Module[name].overloadTable && undefined !== Module[name].overloadTable[numArguments])) {
-          throwBindingError(`Cannot register public name '${name}' twice`);
-        }
-  
-        // We are exposing a function with the same name as an existing function. Create an overload table and a function selector
-        // that routes between the two.
-        ensureOverloadTable(Module, name, name);
-        if (Module[name].overloadTable.hasOwnProperty(numArguments)) {
-          throwBindingError(`Cannot register multiple overloads of a function with the same number of arguments (${numArguments})!`);
-        }
-        // Add the new function into the overload table.
-        Module[name].overloadTable[numArguments] = value;
-      } else {
-        Module[name] = value;
-        Module[name].argCount = numArguments;
-      }
-    };
-  
-  var char_0 = 48;
-  
-  var char_9 = 57;
-  var makeLegalFunctionName = (name) => {
-      assert(typeof name === 'string');
-      name = name.replace(/[^a-zA-Z0-9_]/g, '$');
-      var f = name.charCodeAt(0);
-      if (f >= char_0 && f <= char_9) {
-        return `_${name}`;
-      }
-      return name;
-    };
-  
-  
   /** @constructor */
   function RegisteredClass(name,
                                constructor,
@@ -4924,8 +4703,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       this.downcast = downcast;
       this.pureVirtualFunctions = [];
     }
-  
-  
   var upcastPointer = (ptr, ptrClass, desiredClass) => {
       while (ptrClass !== desiredClass) {
         if (!ptrClass.upcast) {
@@ -4936,7 +4713,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       }
       return ptr;
     };
-  
   /** @suppress {globalThis} */
   function constNoSmartPtrRawPointerToWireType(destructors, handle) {
       if (handle === null) {
@@ -4956,8 +4732,33 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       var ptr = upcastPointer(handle.$$.ptr, handleClass, this.registeredClass);
       return ptr;
     }
-  
-  
+  var emval_freelist = [];
+  const EMVAL_RESERVED_HANDLES = 5;
+  var emval_handles = [0,1,,1,null,1,true,1,false,1];
+  var Emval = {
+  toValue:(handle) => {
+        if (!handle) {
+            throwBindingError(`Cannot use deleted val. handle = ${handle}`);
+        }
+        // handle 2 is supposed to be `undefined`.
+        assert(handle === 2 || emval_handles[handle] !== undefined && handle % 2 === 0, `invalid handle: ${handle}`);
+        return emval_handles[handle];
+      },
+  toHandle:(value) => {
+        switch (value) {
+          case undefined: return 2;
+          case null: return 4;
+          case true: return 6;
+          case false: return 8;
+          default:{
+            const handle = emval_freelist.pop() || emval_handles.length;
+            emval_handles[handle] = value;
+            emval_handles[handle + 1] = 1;
+            return handle;
+          }
+        }
+      },
+  };
   /** @suppress {globalThis} */
   function genericPointerToWireType(destructors, handle) {
       var ptr;
@@ -5032,9 +4833,21 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       }
       return ptr;
     }
-  
-  
-  
+  var init_RegisteredPointer = () => {
+      Object.assign(RegisteredPointer.prototype, {
+        getPointee(ptr) {
+          if (this.rawGetPointee) {
+            ptr = this.rawGetPointee(ptr);
+          }
+          return ptr;
+        },
+        destructor(ptr) {
+          this.rawDestructor?.(ptr);
+        },
+        readValueFromPointer: readPointer,
+        fromWireType: RegisteredPointer_fromWireType,
+      });
+    };
   /** @suppress {globalThis} */
   function nonConstNoSmartPtrRawPointerToWireType(destructors, handle) {
       if (handle === null) {
@@ -5057,24 +4870,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       var ptr = upcastPointer(handle.$$.ptr, handleClass, this.registeredClass);
       return ptr;
     }
-  
-  
-  
-  var init_RegisteredPointer = () => {
-      Object.assign(RegisteredPointer.prototype, {
-        getPointee(ptr) {
-          if (this.rawGetPointee) {
-            ptr = this.rawGetPointee(ptr);
-          }
-          return ptr;
-        },
-        destructor(ptr) {
-          this.rawDestructor?.(ptr);
-        },
-        readValueFromPointer: readPointer,
-        fromWireType: RegisteredPointer_fromWireType,
-      });
-    };
   /** @constructor
     @param {*=} pointeeType,
     @param {*=} sharingPolicy,
@@ -5128,26 +4923,8 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         //       craftInvokerFunction altogether.
       }
     }
-  
-  /** @param {number=} numArguments */
-  var replacePublicSymbol = (name, value, numArguments) => {
-      if (!Module.hasOwnProperty(name)) {
-        throwInternalError('Replacing nonexistent public symbol');
-      }
-      // If there's an overload table for this symbol, replace the symbol in the overload table instead.
-      if (undefined !== Module[name].overloadTable && undefined !== numArguments) {
-        Module[name].overloadTable[numArguments] = value;
-      } else {
-        Module[name] = value;
-        Module[name].argCount = numArguments;
-      }
-    };
-  
-  
-  
+  var createNamedFunction = (name, func) => Object.defineProperty(func, 'name', { value: name });
   var wasmTableMirror = [];
-  
-  
   var getWasmTableEntry = (funcPtr) => {
       var func = wasmTableMirror[funcPtr];
       if (!func) {
@@ -5169,20 +4946,76 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       }
   
       var fp = makeDynCaller();
-      if (typeof fp != 'function') {
+      if (typeof fp !== 'function') {
           throwBindingError(`unknown function pointer with signature ${signature}: ${rawFunction}`);
       }
       return fp;
     };
+  var ensureOverloadTable = (proto, methodName, humanName) => {
+      if (undefined === proto[methodName].overloadTable) {
+        var prevFunc = proto[methodName];
+        // Inject an overload resolver function that routes to the appropriate overload based on the number of arguments.
+        proto[methodName] = function(...args) {
+          // TODO This check can be removed in -O3 level "unsafe" optimizations.
+          if (!proto[methodName].overloadTable[args.length]) {
+            throwBindingError(`Function '${humanName}' called with an invalid number of arguments (${args.length}) - expects one of (${proto[methodName].overloadTable})!`);
+          }
+          return proto[methodName].overloadTable[args.length].apply(this, args);
+        };
+        // Move the previous function into the overload table.
+        proto[methodName].overloadTable = [];
+        proto[methodName].overloadTable[prevFunc.argCount] = prevFunc;
+      }
+    };
+  /** @type {function(?, ?): boolean} */
+  var hasOwn = Object.hasOwn;
+  /** @param {number=} numArguments */
+  var exposePublicSymbol = (name, value, numArguments) => {
+      if (hasOwn(Module, name)) {
+        if (undefined === numArguments || (undefined !== Module[name].overloadTable && undefined !== Module[name].overloadTable[numArguments])) {
+          throwBindingError(`Cannot register public name '${name}' twice`);
+        }
   
-  
-  
+        // We are exposing a function with the same name as an existing function. Create an overload table and a function selector
+        // that routes between the two.
+        ensureOverloadTable(Module, name, name);
+        if (Module[name].overloadTable[numArguments]) {
+          throwBindingError(`Cannot register multiple overloads of a function with the same number of arguments (${numArguments})!`);
+        }
+        // Add the new function into the overload table.
+        Module[name].overloadTable[numArguments] = value;
+      } else {
+        Module[name] = value;
+        Module[name].argCount = numArguments;
+      }
+    };
+  const char_0 = 48;
+  const char_9 = 57;
+  var makeLegalFunctionName = (name) => {
+      assert(typeof name === 'string');
+      name = name.replace(/[^a-zA-Z0-9_]/g, '$');
+      var f = name.charCodeAt(0);
+      if (f >= char_0 && f <= char_9) {
+        return `_${name}`;
+      }
+      return name;
+    };
+  /** @param {number=} numArguments */
+  var replacePublicSymbol = (name, value, numArguments) => {
+      if (!hasOwn(Module, name)) {
+        throwInternalError('Replacing nonexistent public symbol');
+      }
+      // If there's an overload table for this symbol, replace the symbol in the overload table instead.
+      if (undefined !== Module[name].overloadTable && undefined !== numArguments) {
+        Module[name].overloadTable[numArguments] = value;
+      } else {
+        Module[name] = value;
+        Module[name].argCount = numArguments;
+      }
+    };
   class UnboundTypeError extends Error {}
-  
-  
-  
-  var getTypeName = (type) => {
-      var ptr = ___getTypeName(type);
+  var getTypeName = (typeID) => {
+      var ptr = ___getTypeName(typeID);
       var rv = AsciiToString(ptr);
       _free(ptr);
       return rv;
@@ -5208,11 +5041,10 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
   
       throw new UnboundTypeError(`${message}: ` + unboundTypes.map(getTypeName).join([', ']));
     };
-  
-  var __embind_register_class = (rawType,
-                             rawPointerType,
-                             rawConstPointerType,
-                             baseClassRawType,
+  var __embind_register_class = (typeID,
+                             pointerTypeID,
+                             constPointerTypeID,
+                             baseClassTypeID,
                              getActualTypeSignature,
                              getActualType,
                              upcastSignature,
@@ -5230,19 +5062,19 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       var legalFunctionName = makeLegalFunctionName(name);
   
       exposePublicSymbol(legalFunctionName, function() {
-        // this code cannot run if baseClassRawType is zero
-        throwUnboundTypeError(`Cannot construct ${name} due to unbound types`, [baseClassRawType]);
+        // this code cannot run if baseClassTypeID is zero
+        throwUnboundTypeError(`Cannot construct ${name} due to unbound types`, [baseClassTypeID]);
       });
   
       whenDependentTypesAreResolved(
-        [rawType, rawPointerType, rawConstPointerType],
-        baseClassRawType ? [baseClassRawType] : [],
+        [typeID, pointerTypeID, constPointerTypeID],
+        baseClassTypeID ? [baseClassTypeID] : [],
         (base) => {
           base = base[0];
   
           var baseClass;
           var basePrototype;
-          if (baseClassRawType) {
+          if (baseClassTypeID) {
             baseClass = base.registeredClass;
             basePrototype = baseClass.instancePrototype;
           } else {
@@ -5303,7 +5135,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
                                                             true,
                                                             false);
   
-          registeredPointers[rawType] = {
+          registeredPointers[typeID] = {
             pointerType: pointerConverter,
             constPointerType: constPointerConverter
           };
@@ -5314,33 +5146,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         }
       );
     };
-
-  var heap32VectorToArray = (count, firstElement) => {
-      var array = [];
-      for (var i = 0; i < count; i++) {
-        // TODO(https://github.com/emscripten-core/emscripten/issues/17310):
-        // Find a way to hoist the `>> 2` or `>> 3` out of this loop.
-        array.push(HEAPU32[(((firstElement)+(i * 4))>>2)]);
-      }
-      return array;
-    };
-  
-  
-  
-  
-  
-  
-  function usesDestructorStack(argTypes) {
-      // Skip return value at index 0 - it's not deleted here.
-      for (var i = 1; i < argTypes.length; ++i) {
-        // The type does not define a destructor function - must use dynamic stack
-        if (argTypes[i] !== null && argTypes[i].destructorFunction === undefined) {
-          return true;
-        }
-      }
-      return false;
-    }
-  
   function argsUseStackAlloc(argTypes) {
       // Skip return value at index 0 - only arguments stack-allocate.
       for (var i = 1; i < argTypes.length; ++i) {
@@ -5350,16 +5155,21 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       }
       return false;
     }
-  
-  
-  
-  
-  
   function checkArgCount(numArgs, minArgs, maxArgs, humanName, throwBindingError) {
       if (numArgs < minArgs || numArgs > maxArgs) {
         var argCountMessage = minArgs == maxArgs ? minArgs : `${minArgs} to ${maxArgs}`;
         throwBindingError(`function ${humanName} called with ${numArgs} arguments, expected ${argCountMessage}`);
       }
+    }
+  function usesDestructorStack(argTypes) {
+      // Skip return value at index 0 - it's not deleted here.
+      for (var i = 1; i < argTypes.length; ++i) {
+        // The type does not define a destructor function - must use dynamic stack
+        if (argTypes[i] !== null && argTypes[i].destructorFunction === undefined) {
+          return true;
+        }
+      }
+      return false;
     }
   function createJsInvoker(argTypes, isClassMethodFunc, returns, isAsync) {
       var needsDestructorStack = usesDestructorStack(argTypes);
@@ -5394,10 +5204,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         invokerFnBody += 'var destructors = [];\n';
       }
       if (useStackFrame) {
-        // The frame must be released on every completion, including a throwing
-        // argument conversion or callee: a skipped stackRestore permanently
-        // leaks wasm stack. `var` declarations hoist out of the try block.
-        invokerFnBody += 'var sp = stackSave();\ntry {\n';
+        invokerFnBody += 'var sp = stackSave();\n';
       }
   
       var dtorStack = needsDestructorStack ? 'destructors' : 'null';
@@ -5419,8 +5226,10 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       invokerFnBody += (returns || isAsync ? 'var rv = ' : '') + `invoker(${argsListWired});\n`;
       if (useStackFrame) {
         // The callee has consumed the stack-allocated argument temporaries;
-        // release the frame before any post-call work.
-        invokerFnBody += '} finally {\nstackRestore(sp);\n}\n';
+        // release the frame before any post-call work. Not restored on an
+        // exception path, matching the rest of emscripten (see the exceptions
+        // docs on stackSave/stackRestore at JS catch sites).
+        invokerFnBody += 'stackRestore(sp);\n';
       }
   
       var returnVal = returns ? 'rv' : '';
@@ -5449,7 +5258,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       invokerFnBody = `if (arguments.length !== ${args1.length}){ throw new Error(humanName + "Expected ${args1.length} closure arguments " + arguments.length + " given."); }\n${invokerFnBody}`;
       return new Function(args1, invokerFnBody);
     }
-  
   function getRequiredArgCount(argTypes) {
       var requiredArgCount = argTypes.length - 2;
       for (var i = argTypes.length - 1; i >= 2; --i) {
@@ -5460,7 +5268,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       }
       return requiredArgCount;
     }
-  
   function craftInvokerFunction(humanName, argTypes, classType, cppInvokerFunc, cppTargetFunc, /** boolean= */ isAsync) {
       // humanName: a human-readable string name for the function to be generated.
       // argTypes: An array that contains the embind type objects for all types in the function signature.
@@ -5529,8 +5336,17 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       var invokerFn = invokerFactory(...closureArgs);
       return createNamedFunction(humanName, invokerFn);
     }
+  var heap32VectorToArray = (count, firstElement) => {
+      var array = [];
+      for (var i = 0; i < count; i++) {
+        // TODO(https://github.com/emscripten-core/emscripten/issues/17310):
+        // Find a way to hoist the `>> 2` or `>> 3` out of this loop.
+        array.push(HEAPU32[(((firstElement)+(i * 4))>>2)]);
+      }
+      return array;
+    };
   var __embind_register_class_constructor = (
-      rawClassType,
+      classTypeID,
       argCount,
       rawArgTypesAddr,
       invokerSignature,
@@ -5538,12 +5354,12 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       rawConstructor
     ) => {
       assert(argCount > 0);
-      var rawArgTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
+      var argTypeIDs = heap32VectorToArray(argCount, rawArgTypesAddr);
       invoker = embind__requireFunction(invokerSignature, invoker);
       var args = [rawConstructor];
       var destructors = [];
   
-      whenDependentTypesAreResolved([], [rawClassType], (classType) => {
+      whenDependentTypesAreResolved([], [classTypeID], (classType) => {
         classType = classType[0];
         var humanName = `constructor ${classType.name}`;
   
@@ -5554,10 +5370,10 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
           throw new BindingError(`Cannot register multiple constructors with identical number of parameters (${argCount-1}) for class '${classType.name}'! Overload resolution is currently only performed using the parameter count, not actual type info!`);
         }
         classType.registeredClass.constructor_body[argCount - 1] = () => {
-          throwUnboundTypeError(`Cannot construct ${classType.name} due to unbound types`, rawArgTypes);
+          throwUnboundTypeError(`Cannot construct ${classType.name} due to unbound types`, argTypeIDs);
         };
   
-        whenDependentTypesAreResolved([], rawArgTypes, (argTypes) => {
+        whenDependentTypesAreResolved([], argTypeIDs, (argTypes) => {
           // Insert empty slot for context type (argTypes[1]).
           argTypes.splice(1, 0, null);
           classType.registeredClass.constructor_body[argCount - 1] = craftInvokerFunction(humanName, argTypes, null, invoker, rawConstructor);
@@ -5566,13 +5382,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         return [];
       });
     };
-
-  
-  
-  
-  
-  
-  
   var getFunctionName = (signature) => {
       signature = signature.trim();
       const argsIndex = signature.indexOf('(');
@@ -5580,7 +5389,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       assert(signature.endsWith(')'), 'Parentheses for argument names should match.');
       return signature.slice(0, argsIndex);
     };
-  var __embind_register_class_function = (rawClassType,
+  var __embind_register_class_function = (classTypeID,
                                       methodName,
                                       argCount,
                                       rawArgTypesAddr, // [ReturnType, ThisType, Args...]
@@ -5590,12 +5399,12 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
                                       isPureVirtual,
                                       isAsync,
                                       isNonnullReturn) => {
-      var rawArgTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
+      var argTypeIDs = heap32VectorToArray(argCount, rawArgTypesAddr);
       methodName = AsciiToString(methodName);
       methodName = getFunctionName(methodName);
       rawInvoker = embind__requireFunction(invokerSignature, rawInvoker, isAsync);
   
-      whenDependentTypesAreResolved([], [rawClassType], (classType) => {
+      whenDependentTypesAreResolved([], [classTypeID], (classType) => {
         classType = classType[0];
         var humanName = `${classType.name}.${methodName}`;
   
@@ -5608,7 +5417,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         }
   
         function unboundTypesHandler() {
-          throwUnboundTypeError(`Cannot call ${humanName} due to unbound types`, rawArgTypes);
+          throwUnboundTypeError(`Cannot call ${humanName} due to unbound types`, argTypeIDs);
         }
   
         var proto = classType.registeredClass.instancePrototype;
@@ -5626,7 +5435,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
           proto[methodName].overloadTable[argCount - 2] = unboundTypesHandler;
         }
   
-        whenDependentTypesAreResolved([], rawArgTypes, (argTypes) => {
+        whenDependentTypesAreResolved([], argTypeIDs, (argTypes) => {
           var memberFunction = craftInvokerFunction(humanName, argTypes, classType, rawInvoker, context, isAsync);
   
           // Replace the initial unbound-handler-stub function with the
@@ -5646,15 +5455,10 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         return [];
       });
     };
-
-  
-  var emval_freelist = [];
-  
-  var emval_handles = [0,1,,1,null,1,true,1,false,1];
-  
+  const EMVAL_LAST_RESERVED_HANDLE = 9;
   var emval_exception_decrefs = [];
   var __emval_decref = (handle) => {
-      if (handle > 9 && 0 === --emval_handles[handle + 1]) {
+      if (handle > EMVAL_LAST_RESERVED_HANDLE && 0 === --emval_handles[handle + 1]) {
         assert(emval_handles[handle] !== undefined, `decref for unallocated handle`);
         var value = emval_handles[handle];
         emval_handles[handle] = undefined;
@@ -5668,34 +5472,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         emval_freelist.push(handle);
       }
     };
-  
-  
-  
-  var Emval = {
-  toValue:(handle) => {
-        if (!handle) {
-            throwBindingError(`Cannot use deleted val. handle = ${handle}`);
-        }
-        // handle 2 is supposed to be `undefined`.
-        assert(handle === 2 || emval_handles[handle] !== undefined && handle % 2 === 0, `invalid handle: ${handle}`);
-        return emval_handles[handle];
-      },
-  toHandle:(value) => {
-        switch (value) {
-          case undefined: return 2;
-          case null: return 4;
-          case true: return 6;
-          case false: return 8;
-          default:{
-            const handle = emval_freelist.pop() || emval_handles.length;
-            emval_handles[handle] = value;
-            emval_handles[handle + 1] = 1;
-            return handle;
-          }
-        }
-      },
-  };
-  
   var EmValType = {
       name: 'emscripten::val',
       fromWireType: (handle) => {
@@ -5710,11 +5486,9 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       // TODO: do we need a deleteObject here?  write a test where
       // emval is passed into JS via an interface
     };
-  var __embind_register_emval = (rawType) => registerType(rawType, EmValType);
-
+  var __embind_register_emval = (typeID) => registerType(typeID, EmValType);
   /** @type {!Float32Array} */
   var HEAPF32;
-  
   /** @type {!Float64Array} */
   var HEAPF64;
   var floatReadValueFromPointer = (name, width) => {
@@ -5729,16 +5503,13 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
           throw new TypeError(`invalid float width (${width}): ${name}`);
       }
     };
-  
-  
-  
-  var __embind_register_float = (rawType, name, size) => {
+  var __embind_register_float = (typeID, name, size) => {
       name = AsciiToString(name);
-      registerType(rawType, {
+      registerType(typeID, {
         name,
         fromWireType: (value) => value,
         toWireType: (destructors, value) => {
-          if (typeof value != 'number' && typeof value != 'boolean') {
+          if (typeof value !== 'number' && typeof value !== 'boolean') {
             throw new TypeError(`Cannot convert ${embindRepr(value)} to ${name}`);
           }
           // The VM will perform JS to Wasm value conversion, according to the spec:
@@ -5749,39 +5520,25 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         destructorFunction: null, // This type does not need a destructor
       });
     };
-
-  
-  
-  
-  
-  
-  
-  
-  
   var __embind_register_function = (name, argCount, rawArgTypesAddr, signature, rawInvoker, fn, isAsync, isNonnullReturn) => {
-      var argTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
+      var argTypeIDs = heap32VectorToArray(argCount, rawArgTypesAddr);
       name = AsciiToString(name);
       name = getFunctionName(name);
   
       rawInvoker = embind__requireFunction(signature, rawInvoker, isAsync);
   
       exposePublicSymbol(name, function() {
-        throwUnboundTypeError(`Cannot call ${name} due to unbound types`, argTypes);
+        throwUnboundTypeError(`Cannot call ${name} due to unbound types`, argTypeIDs);
       }, argCount - 1);
   
-      whenDependentTypesAreResolved([], argTypes, (argTypes) => {
+      whenDependentTypesAreResolved([], argTypeIDs, (argTypes) => {
         var invokerArgsArray = [argTypes[0] /* return value */, null /* no class 'this'*/].concat(argTypes.slice(1) /* actual params */);
         replacePublicSymbol(name, craftInvokerFunction(name, invokerArgsArray, null /* no class 'this'*/, rawInvoker, fn, isAsync), argCount - 1);
         return [];
       });
     };
-
-  
-  
-  
-  
   /** @suppress {globalThis} */
-  var __embind_register_integer = (primitiveType, name, size, minRange, maxRange) => {
+  var __embind_register_integer = (typeID, name, size, minRange, maxRange) => {
       name = AsciiToString(name);
   
       const isUnsignedType = minRange === 0;
@@ -5793,11 +5550,11 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         maxRange = fromWireType(maxRange);
       }
   
-      registerType(primitiveType, {
+      registerType(typeID, {
         name,
         fromWireType: fromWireType,
         toWireType: (destructors, value) => {
-          if (typeof value != 'number' && typeof value != 'boolean') {
+          if (typeof value !== 'number' && typeof value !== 'boolean') {
             throw new TypeError(`Cannot convert "${embindRepr(value)}" to ${name}`);
           }
           assertIntegerRange(name, value, minRange, maxRange);
@@ -5809,14 +5566,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         destructorFunction: null, // This type does not need a destructor
       });
     };
-
-  
-  
-  
-  
-  
-  
-  
   
     /**
    * @param {number} ptr
@@ -5862,21 +5611,16 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         };
       }
     };
-  
-  var __embind_register_iterable = (rawClassType, rawElementType, sizeMethodName, getMethodName) => {
+  var __embind_register_iterable = (classTypeID, elementTypeID, sizeMethodName, getMethodName) => {
       sizeMethodName = AsciiToString(sizeMethodName);
       getMethodName = AsciiToString(getMethodName);
-      whenDependentTypesAreResolved([], [rawClassType, rawElementType], (types) => {
+      whenDependentTypesAreResolved([], [classTypeID, elementTypeID], (types) => {
         const classType = types[0];
         installIndexedIterator(classType.registeredClass.instancePrototype, sizeMethodName, getMethodName);
         return [];
       });
     };
-
-  
-  
-  
-  var __embind_register_memory_view = (rawType, dataTypeIndex, name) => {
+  var __embind_register_memory_view = (typeID, dataTypeIndex, name) => {
       var typeMapping = [
         Int8Array,
         Uint8Array,
@@ -5899,7 +5643,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       }
   
       name = AsciiToString(name);
-      registerType(rawType, {
+      registerType(typeID, {
         name,
         fromWireType: decodeMemoryView,
         readValueFromPointer: decodeMemoryView,
@@ -5907,33 +5651,19 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         ignoreDuplicateRegistrations: true,
       });
     };
-
-  
   var EmValOptionalType = Object.assign({optional: true}, EmValType);;
-  var __embind_register_optional = (rawOptionalType, rawType) => {
-      registerType(rawOptionalType, EmValOptionalType);
+  var __embind_register_optional = (optionalTypeID, typeID) => {
+      registerType(optionalTypeID, EmValOptionalType);
     };
-
-  
-  
-  
-  
-  
   var stringToUTF8 = (str, outPtr, maxBytesToWrite) => {
-      assert(typeof maxBytesToWrite == 'number', 'stringToUTF8 requires a third parameter that specifies the length of the output buffer');
+      assert(typeof maxBytesToWrite === 'number', 'stringToUTF8 requires a third parameter that specifies the length of the output buffer');
       return stringToUTF8Array(str, HEAPU8, outPtr, maxBytesToWrite);
     };
-  
-  
-  
-  
-  
-  
-  var __embind_register_std_string = (rawType, name) => {
+  var __embind_register_std_string = (typeID, name) => {
       name = AsciiToString(name);
-      var stdStringIsUTF8 = true;
+      const stdStringIsUTF8 = true;
   
-      registerType(rawType, {
+      registerType(typeID, {
         name,
         // For some method names we use string keys here since they are part of
         // the public/external API and/or used by the runtime-generated code.
@@ -5961,7 +5691,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
           }
   
           var length;
-          var valueIsOfTypeString = (typeof value == 'string');
+          var valueIsOfTypeString = (typeof value === 'string');
   
           // We accept `string` or array views with single byte elements
           if (!(valueIsOfTypeString || (ArrayBuffer.isView(value) && value.BYTES_PER_ELEMENT == 1))) {
@@ -6005,13 +5735,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         },
       });
     };
-
-  
-  
-  
   var UTF16Decoder = globalThis.TextDecoder ? new TextDecoder('utf-16le') : undefined;;
-  
-  
   var UTF16ToString = (ptr, maxBytesToRead, ignoreNul) => {
       assert(ptr % 2 == 0, 'pointer passed to UTF16ToString must be 2-byte aligned');
       var idx = ((ptr)>>1);
@@ -6036,10 +5760,37 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
   
       return str;
     };
+  var UTF32ToString = (ptr, maxBytesToRead, ignoreNul) => {
+      assert(ptr % 4 == 0, 'pointer passed to UTF32ToString must be 2-byte aligned');
+      var str = '';
+      var startIdx = ((ptr)>>2);
+      // If maxBytesToRead is not passed explicitly, it will be undefined, and this
+      // will always evaluate to true. This saves on code size.
+      for (var i = 0; !(i >= maxBytesToRead / 4); i++) {
+        var utf32 = HEAPU32[startIdx + i];
+        if (!utf32 && !ignoreNul) break;
+        str += String.fromCodePoint(utf32);
+      }
+      return str;
+    };
+  var lengthBytesUTF16 = (str) => str.length*2;
+  var lengthBytesUTF32 = (str) => {
+      var len = 0;
+      for (var i = 0; i < str.length; ++i) {
+        var codePoint = str.codePointAt(i);
+        // Gotcha: if codePoint is over 0xFFFF, it is represented as a surrogate pair in UTF-16.
+        // We need to manually skip over the second code unit for correct iteration.
+        if (codePoint > 0xFFFF) {
+          i++;
+        }
+        len += 4;
+      }
   
+      return len;
+    };
   var stringToUTF16 = (str, outPtr, maxBytesToWrite = 0x7FFFFFFF) => {
       assert(outPtr % 2 == 0, 'pointer passed to stringToUTF16 must be 2-byte aligned');
-      assert(typeof maxBytesToWrite == 'number', 'stringToUTF16 requires a third parameter that specifies the length of the output buffer');
+      assert(typeof maxBytesToWrite === 'number', 'stringToUTF16 requires a third parameter that specifies the length of the output buffer');
       if (maxBytesToWrite < 2) return 0;
       maxBytesToWrite -= 2; // Null terminator.
       var startPtr = outPtr;
@@ -6054,26 +5805,9 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       HEAP16[((outPtr)>>1)] = 0;checkInt16(0);
       return outPtr - startPtr;
     };
-  
-  var lengthBytesUTF16 = (str) => str.length*2;
-  
-  var UTF32ToString = (ptr, maxBytesToRead, ignoreNul) => {
-      assert(ptr % 4 == 0, 'pointer passed to UTF32ToString must be 2-byte aligned');
-      var str = '';
-      var startIdx = ((ptr)>>2);
-      // If maxBytesToRead is not passed explicitly, it will be undefined, and this
-      // will always evaluate to true. This saves on code size.
-      for (var i = 0; !(i >= maxBytesToRead / 4); i++) {
-        var utf32 = HEAPU32[startIdx + i];
-        if (!utf32 && !ignoreNul) break;
-        str += String.fromCodePoint(utf32);
-      }
-      return str;
-    };
-  
   var stringToUTF32 = (str, outPtr, maxBytesToWrite = 0x7FFFFFFF) => {
       assert(outPtr % 4 == 0, 'pointer passed to stringToUTF32 must be 4-byte aligned');
-      assert(typeof maxBytesToWrite == 'number', 'stringToUTF32 requires a third parameter that specifies the length of the output buffer');
+      assert(typeof maxBytesToWrite === 'number', 'stringToUTF32 requires a third parameter that specifies the length of the output buffer');
       if (maxBytesToWrite < 4) return 0;
       var startPtr = outPtr;
       var endPtr = startPtr + maxBytesToWrite - 4;
@@ -6092,23 +5826,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       HEAP32[((outPtr)>>2)] = 0;checkInt32(0);
       return outPtr - startPtr;
     };
-  
-  var lengthBytesUTF32 = (str) => {
-      var len = 0;
-      for (var i = 0; i < str.length; ++i) {
-        var codePoint = str.codePointAt(i);
-        // Gotcha: if codePoint is over 0xFFFF, it is represented as a surrogate pair in UTF-16.
-        // We need to manually skip over the second code unit for correct iteration.
-        if (codePoint > 0xFFFF) {
-          i++;
-        }
-        len += 4;
-      }
-  
-      return len;
-    };
-  
-  var __embind_register_std_wstring = (rawType, charSize, name) => {
+  var __embind_register_std_wstring = (typeID, charSize, name) => {
       name = AsciiToString(name);
       var decodeString, encodeString, lengthBytesUTF;
       if (charSize === 2) {
@@ -6121,7 +5839,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         encodeString = stringToUTF32;
         lengthBytesUTF = lengthBytesUTF32;
       }
-      registerType(rawType, {
+      registerType(typeID, {
         name,
         fromWireType: (value) => {
           // Code mostly taken from _embind_register_std_string fromWireType
@@ -6133,7 +5851,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
           return str;
         },
         toWireType: (destructors, value) => {
-          if (!(typeof value == 'string')) {
+          if (!(typeof value === 'string')) {
             throwBindingError(`Cannot pass non-string to C++ string type ${name}`);
           }
   
@@ -6155,11 +5873,8 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         }
       });
     };
-
-  
-  
   var __embind_register_value_object = (
-      rawType,
+      typeID,
       name,
       constructorSignature,
       rawConstructor,
@@ -6168,7 +5883,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       valueSize,
       isTrivial
     ) => {
-      structRegistrations[rawType] = {
+      structRegistrations[typeID] = {
         name: AsciiToString(name),
         rawConstructor: embind__requireFunction(constructorSignature, rawConstructor),
         rawDestructor: embind__requireFunction(destructorSignature, rawDestructor),
@@ -6177,36 +5892,31 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         fields: [],
       };
     };
-
-  
-  
   var __embind_register_value_object_field = (
-      structType,
+      structTypeID,
       fieldName,
-      getterReturnType,
+      getterReturnTypeID,
       getterSignature,
       getter,
       getterContext,
-      setterArgumentType,
+      setterArgumentTypeID,
       setterSignature,
       setter,
       setterContext
     ) => {
-      structRegistrations[structType].fields.push({
+      structRegistrations[structTypeID].fields.push({
         fieldName: AsciiToString(fieldName),
-        getterReturnType,
+        getterReturnTypeID,
         getter: embind__requireFunction(getterSignature, getter),
         getterContext,
-        setterArgumentType,
+        setterArgumentTypeID,
         setter: embind__requireFunction(setterSignature, setter),
         setterContext,
       });
     };
-
-  
-  var __embind_register_void = (rawType, name) => {
+  var __embind_register_void = (typeID, name) => {
       name = AsciiToString(name);
-      registerType(rawType, {
+      registerType(typeID, {
         isVoid: true, // void return values can be optimized out sometimes
         name,
         fromWireType: () => undefined,
@@ -6214,24 +5924,19 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         toWireType: (destructors, o) => undefined,
       });
     };
-
   var emval_methodCallers = [];
   var emval_addMethodCaller = (caller) => {
       var id = emval_methodCallers.length;
       emval_methodCallers.push(caller);
       return id;
     };
-  
-  
-  
-  var requireRegisteredType = (rawType, humanName) => {
-      var impl = registeredTypes[rawType];
+  var requireRegisteredType = (typeID, humanName) => {
+      var impl = registeredTypes[typeID];
       if (undefined === impl) {
-        throwBindingError(`${humanName} has unknown type ${getTypeName(rawType)}`);
+        throwBindingError(`${humanName} has unknown type ${getTypeName(typeID)}`);
       }
       return impl;
     };
-  
   var emval_lookupTypes = (argCount, argTypes) => {
       var a = new Array(argCount);
       for (var i = 0; i < argCount; ++i) {
@@ -6240,9 +5945,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       }
       return a;
     };
-  
-  
-  
   var emval_returnValue = (toReturnWire, destructorsRef, handle) => {
       var destructors = [];
       var result = toReturnWire(destructors, handle);
@@ -6252,11 +5954,8 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       }
       return result;
     };
-  
-  
   var emval_symbols = {
   };
-  
   var getStringOrSymbol = (address) => {
       var symbol = emval_symbols[address];
       if (symbol === undefined) {
@@ -6265,7 +5964,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       return symbol;
     };
   var __emval_create_invoker = (argCount, argTypesPtr, kind) => {
-      var GenericWireTypeSize = 8;
+      const GenericWireTypeSize = 8;
   
       var [retType, ...argTypes] = emval_lookupTypes(argCount, argTypesPtr);
       var toReturnWire = retType.toWireType.bind(retType);
@@ -6308,27 +6007,17 @@ ${functionBody}
       var functionName = `methodCaller<(${argTypes.map(t => t.name)}) => ${retType.name}>`;
       return emval_addMethodCaller(createNamedFunction(functionName, invokerFunction));
     };
-
-
-  
-  
   var __emval_invoke = (caller, handle, methodName, destructorsRef, args) => {
       return emval_methodCallers[caller](handle, methodName, destructorsRef, args);
     };
-
-  
-  
   var __emval_run_destructors = (handle) => {
       var destructors = Emval.toValue(handle);
       runDestructors(destructors);
       __emval_decref(handle);
     };
-
-  var INT53_MAX = 9007199254740992;
-  
-  var INT53_MIN = -9007199254740992;
+  const INT53_MAX = 9007199254740992;
+  const INT53_MIN = -9007199254740992;
   var bigintToI53Checked = (num) => (num < INT53_MIN || num > INT53_MAX) ? NaN : Number(num);
-  
   function __gmtime_js(time, tmPtr) {
     time = bigintToI53Checked(time);
   
@@ -6350,12 +6039,9 @@ ${functionBody}
       return 0;
     ;
   }
-
-  var isLeapYear = (year) => year%4 === 0 && (year%100 !== 0 || year%400 === 0);
-  
   var MONTH_DAYS_LEAP_CUMULATIVE = [0,31,60,91,121,152,182,213,244,274,305,335];
-  
   var MONTH_DAYS_REGULAR_CUMULATIVE = [0,31,59,90,120,151,181,212,243,273,304,334];
+  var isLeapYear = (year) => year%4 === 0 && (year%100 !== 0 || year%400 === 0);
   var ydayFromDate = (date) => {
       var leap = isLeapYear(date.getFullYear());
       var monthDaysCumulative = (leap ? MONTH_DAYS_LEAP_CUMULATIVE : MONTH_DAYS_REGULAR_CUMULATIVE);
@@ -6363,8 +6049,6 @@ ${functionBody}
   
       return yday;
     };
-  
-  
   function __localtime_js(time, tmPtr) {
     time = bigintToI53Checked(time);
   
@@ -6394,9 +6078,6 @@ ${functionBody}
       return 0;
     ;
   }
-
-  
-  
   var __mktime_js = function(tmPtr) {
   
   var ret = (() => { 
@@ -6450,10 +6131,6 @@ ${functionBody}
      })();
   return BigInt(ret);
   };
-
-  
-  
-  
   var __tzset_js = (timezone, daylight, std_name, dst_name) => {
       // TODO: Use (malleable) environment variables instead of system settings.
       var currentYear = new Date().getFullYear();
@@ -6506,16 +6183,10 @@ ${functionBody}
         stringToUTF8(summerName, std_name, 17);
       }
     };
-
-  var _emscripten_get_now = () => performance.now();
-  
-  var _emscripten_date_now = () => Date.now();
-  
-  var nowIsMonotonic = 1;
-  
   var checkWasiClock = (clock_id) => clock_id >= 0 && clock_id <= 3;
-  
-  
+  const nowIsMonotonic = 1;
+  var _emscripten_date_now = () => Date.now();
+  var _emscripten_get_now = () => performance.now();
   function _clock_time_get(clk_id, ignored_precision, ptime) {
     ignored_precision = bigintToI53Checked(ignored_precision);
   
@@ -6539,7 +6210,6 @@ ${functionBody}
     ;
   }
 
-
   var getHeapMax = () =>
       // Stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate
       // full 4GB Wasm memories, the size will wrap back to 0 bytes in Wasm side
@@ -6547,14 +6217,10 @@ ${functionBody}
       // casing all heap size related code to treat 0 specially.
       1572864000;
   var _emscripten_get_heap_max = () => getHeapMax();
-
-  
-  
   var alignMemory = (size, alignment) => {
       assert(alignment, 'alignment argument is required');
       return Math.ceil(size / alignment) * alignment;
     };
-  
   var growMemory = (size) => {
       var oldHeapSize = wasmMemory.buffer.byteLength;
       var pages = ((size - oldHeapSize + 65535) / 65536) | 0;
@@ -6569,7 +6235,6 @@ ${functionBody}
       // implicit 0 return to save code size (caller will cast 'undefined' into 0
       // anyhow)
     };
-  
   var _emscripten_resize_heap = (requestedSize) => {
       var oldSize = HEAPU8.length;
       // With CAN_ADDRESS_2GB or MEMORY64, pointers are already unsigned.
@@ -6625,10 +6290,8 @@ ${functionBody}
       err(`Failed to grow the heap from ${oldSize} bytes to ${newSize} bytes, not enough memory!`);
       return false;
     };
-
   var ENV = {
   };
-  
   var getExecutableName = () => thisProgram;
   var getEnvStrings = () => {
       if (!getEnvStrings.strings) {
@@ -6659,8 +6322,6 @@ ${functionBody}
       }
       return getEnvStrings.strings;
     };
-  
-  
   var _environ_get = (__environ, environ_buf) => {
       var bufSize = 0;
       var envp = 0;
@@ -6672,9 +6333,6 @@ ${functionBody}
       }
       return 0;
     };
-
-  
-  
   var _environ_sizes_get = (penviron_count, penviron_buf_size) => {
       var strings = getEnvStrings();
       HEAPU32[((penviron_count)>>2)] = strings.length;checkInt32(strings.length);
@@ -6685,7 +6343,6 @@ ${functionBody}
       HEAPU32[((penviron_buf_size)>>2)] = bufSize;checkInt32(bufSize);
       return 0;
     };
-
   function _fd_close(fd) {
   try {
   
@@ -6693,12 +6350,10 @@ ${functionBody}
       FS.close(stream);
       return 0;
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return e.errno;
   }
   }
-  
-
   
   /** @param {number=} offset */
   var doReadv = (stream, iov, iovcnt, offset) => {
@@ -6722,14 +6377,12 @@ ${functionBody}
         if (curr < 0) return -1;
         ret += curr;
         if (curr < len) break; // nothing more to read
-        if (typeof offset != 'undefined') {
+        if (typeof offset !== 'undefined') {
           offset += curr;
         }
       }
       return ret;
     };
-  
-  
   function _fd_read(fd, iov, iovcnt, pnum) {
   try {
   
@@ -6738,13 +6391,10 @@ ${functionBody}
       HEAPU32[((pnum)>>2)] = num;checkInt32(num);
       return 0;
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return e.errno;
   }
   }
-  
-
-  
   
   function _fd_seek(fd, offset, whence, newOffset) {
     offset = bigintToI53Checked(offset);
@@ -6759,14 +6409,11 @@ ${functionBody}
       if (stream.getdents && !offset && whence === 0) stream.getdents = null; // reset readdir state
       return 0;
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return e.errno;
   }
   ;
   }
-
-  
-  
   /** @param {number=} offset */
   var doWritev = (stream, iov, iovcnt, offset) => {
       // Gather all iovecs into one contiguous buffer and issue a single
@@ -6791,8 +6438,6 @@ ${functionBody}
       }
       return FS.write(stream, view, 0, total, offset);
     };
-  
-  
   function _fd_write(fd, iov, iovcnt, pnum) {
   try {
   
@@ -6801,12 +6446,10 @@ ${functionBody}
       HEAPU32[((pnum)>>2)] = num;checkInt32(num);
       return 0;
     } catch (e) {
-    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    if (typeof FS === 'undefined' || !(e.name === 'ErrnoError')) throw e;
     return e.errno;
   }
   }
-  
-
   
   var _random_get = (buffer, size) => randomFill(HEAPU8.subarray(buffer, buffer + size));
 
@@ -6820,8 +6463,11 @@ ${functionBody}
 
 
 
-
-
+  function getFullscreenElement() {
+      return document.fullscreenElement
+             ?? document.webkitFullscreenElement
+             ;
+    }
   var handleException = (e) => {
       // Certain exception types we do not treat as errors since they are used for
       // internal control flow.
@@ -6839,8 +6485,6 @@ ${functionBody}
       }
       quit_(1, e);
     };
-  
-  
   var runtimeKeepaliveCounter = 0;
   var keepRuntimeAlive = () => noExitRuntime || runtimeKeepaliveCounter > 0;
   var _proc_exit = (code) => {
@@ -6851,8 +6495,6 @@ ${functionBody}
       }
       quit_(code, new ExitStatus(code));
     };
-  
-  
   /** @param {boolean|number=} implicit */
   var exitJS = (status, implicit) => {
       EXITSTATUS = status;
@@ -6867,9 +6509,6 @@ ${functionBody}
   
       _proc_exit(status);
     };
-  var _exit = exitJS;
-  
-  
   var maybeExit = () => {
       if (!keepRuntimeAlive()) {
         try {
@@ -6892,13 +6531,6 @@ ${functionBody}
         maybeExit();
       }
     };
-  
-  function getFullscreenElement() {
-      return document.fullscreenElement
-             ?? document.webkitFullscreenElement
-             ;
-    }
-  
   /** @param {number=} timeout */
   var safeSetTimeout = (func, timeout) => {
       
@@ -6910,11 +6542,6 @@ ${functionBody}
       }, timeout));
       return id;
     };
-  
-  
-  
-  
-  
   var Browser = {
   useWebGL:false,
   isFullscreen:false,
@@ -6992,7 +6619,7 @@ ${functionBody}
               err(`warning: browser could not fully decode audio ${name}, trying slower base64 approach`);
               function encode64(data) {
                 var BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-                var PAD = '=';
+                const PAD = '=';
                 var ret = '';
                 var leftchar = 0;
                 var leftbits = 0;
@@ -7071,7 +6698,7 @@ ${functionBody}
           // This check of existence of GL is here to satisfy Closure compiler, which yells if variable GL is referenced below but GL object is not
           // actually compiled in because application is not doing any GL operations. TODO: Ideally if GL is not being used, this function
           // Browser.createContext() should not even be emitted.
-          if (typeof GL != 'undefined') {
+          if (typeof GL !== 'undefined') {
             contextHandle = GL.createContext(canvas, contextAttributes);
             if (contextHandle) {
               ctx = GL.getContext(contextHandle).GLctx;
@@ -7084,7 +6711,7 @@ ${functionBody}
         if (!ctx) return null;
   
         if (setInModule) {
-          if (!useWebGL) assert(typeof GLctx == 'undefined', 'cannot set in module if GLctx is used, but we are a non-GL context that would replace it');
+          if (!useWebGL) assert(typeof GLctx === 'undefined', 'cannot set in module if GLctx is used, but we are a non-GL context that would replace it');
           Module['ctx'] = ctx;
           if (useWebGL) GL.makeContextCurrent(contextHandle);
           Browser.useWebGL = useWebGL;
@@ -7099,8 +6726,8 @@ ${functionBody}
   requestFullscreen(lockPointer, resizeCanvas) {
         Browser.lockPointer = lockPointer;
         Browser.resizeCanvas = resizeCanvas;
-        if (typeof Browser.lockPointer == 'undefined') Browser.lockPointer = true;
-        if (typeof Browser.resizeCanvas == 'undefined') Browser.resizeCanvas = false;
+        if (typeof Browser.lockPointer === 'undefined') Browser.lockPointer = true;
+        if (typeof Browser.resizeCanvas === 'undefined') Browser.resizeCanvas = false;
   
         var canvas = Browser.getCanvas();
         function fullscreenChange() {
@@ -7108,7 +6735,7 @@ ${functionBody}
           var canvasContainer = canvas.parentNode;
           if (getFullscreenElement() === canvasContainer) {
             canvas.exitFullscreen = Browser.exitFullscreen;
-            if (Browser.lockPointer) canvas.requestPointerLock();
+            if (Browser.lockPointer) canvas.requestPointerLock?.();
             Browser.isFullscreen = true;
             if (Browser.resizeCanvas) {
               Browser.setFullscreenCanvasSize();
@@ -7157,14 +6784,8 @@ ${functionBody}
         }
   
         var CFS = document.exitFullscreen ?? document['webkitCancelFullScreen'];
-        CFS.apply(document, []);
+        CFS.call(document);
         return true;
-      },
-  safeSetTimeout(func, timeout) {
-        // Legacy function, this is used by the SDL2 port so we need to keep it
-        // around at least until that is updated.
-        // See https://github.com/libsdl-org/SDL/pull/6304
-        return safeSetTimeout(func, timeout);
       },
   getMimetype(name) {
         return {
@@ -7176,9 +6797,6 @@ ${functionBody}
           'wav': 'audio/wav',
           'mp3': 'audio/mpeg'
         }[name.slice(name.lastIndexOf('.')+1)];
-      },
-  getUserMedia(func) {
-        return navigator.mediaDevices.getUserMedia(func);
       },
   getMouseWheelDelta(event) {
         var delta = 0;
@@ -7286,18 +6904,16 @@ ${functionBody}
         var canvas = Browser.getCanvas();
         Browser.resizeListeners.forEach((listener) => listener(canvas.width, canvas.height));
       },
-  setCanvasSize(width, height, noUpdates) {
+  setCanvasSize(width, height, noUpdates = undefined) {
         var canvas = Browser.getCanvas();
         Browser.updateCanvasDimensions(canvas, width, height);
         if (!noUpdates) Browser.updateResizeListeners();
       },
-  windowedWidth:0,
-  windowedHeight:0,
   setFullscreenCanvasSize() {
         // check if SDL is available
-        if (typeof SDL != 'undefined') {
+        if (typeof SDL !== 'undefined') {
           var flags = HEAPU32[((SDL.screen)>>2)];
-          flags = flags | 0x00800000; // set SDL_FULLSCREEN flag
+          flags = flags | 8388608;
           HEAP32[((SDL.screen)>>2)] = flags;checkInt32(flags);
         }
         Browser.updateCanvasDimensions(Browser.getCanvas());
@@ -7305,15 +6921,15 @@ ${functionBody}
       },
   setWindowedCanvasSize() {
         // check if SDL is available
-        if (typeof SDL != 'undefined') {
+        if (typeof SDL !== 'undefined') {
           var flags = HEAPU32[((SDL.screen)>>2)];
-          flags = flags & ~0x00800000; // clear SDL_FULLSCREEN flag
+          flags = flags & ~8388608;
           HEAP32[((SDL.screen)>>2)] = flags;checkInt32(flags);
         }
         Browser.updateCanvasDimensions(Browser.getCanvas());
         Browser.updateResizeListeners();
       },
-  updateCanvasDimensions(canvas, wNative, hNative) {
+  updateCanvasDimensions(canvas, wNative = undefined, hNative = undefined) {
         if (wNative && hNative) {
           canvas.widthNative = wNative;
           canvas.heightNative = hNative;
@@ -7323,7 +6939,7 @@ ${functionBody}
         }
         var w = wNative;
         var h = hNative;
-        if ((getFullscreenElement() === canvas.parentNode) && (typeof screen != 'undefined')) {
+        if ((getFullscreenElement() === canvas.parentNode) && (typeof screen !== 'undefined')) {
            var factor = Math.min(screen.width / w, screen.height / h);
            w = Math.round(w * factor);
            h = Math.round(h * factor);
@@ -7331,14 +6947,14 @@ ${functionBody}
         if (Browser.resizeCanvas) {
           if (canvas.width  != w) canvas.width  = w;
           if (canvas.height != h) canvas.height = h;
-          if (typeof canvas.style != 'undefined') {
+          if (typeof canvas.style !== 'undefined') {
             canvas.style.removeProperty( 'width');
             canvas.style.removeProperty('height');
           }
         } else {
           if (canvas.width  != wNative) canvas.width  = wNative;
           if (canvas.height != hNative) canvas.height = hNative;
-          if (typeof canvas.style != 'undefined') {
+          if (typeof canvas.style !== 'undefined') {
             if (w != wNative || h != hNative) {
               canvas.style.setProperty( 'width', w + 'px', 'important');
               canvas.style.setProperty('height', h + 'px', 'important');
@@ -7351,26 +6967,24 @@ ${functionBody}
       },
   };
   var requestFullscreen = Browser.requestFullscreen;
-
   var FS_createPath = (...args) => FS.createPath(...args);
 
 
-
   var FS_unlink = (...args) => FS.unlink(...args);
-
   var FS_createLazyFile = (...args) => FS.createLazyFile(...args);
-
   var FS_createDevice = (...args) => FS.createDevice(...args);
 
 
-
+  var syscallGetVarargP = syscallGetVarargI;
+  var _exit = exitJS;
+  
   FS.createPreloadedFile = FS_createPreloadedFile;
   FS.preloadFile = FS_preloadFile;
   FS.staticInit();;
-init_ClassHandle();
-init_RegisteredPointer();
-assert(emval_handles.length === 5 * 2);
-safeSetTimeout.pending = new Map(); safeSetTimeout.nextId = 1;;
+  init_ClassHandle();
+  init_RegisteredPointer();
+  assert(emval_handles.length === EMVAL_RESERVED_HANDLES * 2);
+  safeSetTimeout.pending = new Map(); safeSetTimeout.nextId = 1;;
 // End JS library code
 
 // include: postlibrary.js
@@ -7392,24 +7006,24 @@ if (Module['printErr']) err = Module['printErr'];
   if (Module['thisProgram']) thisProgram = Module['thisProgram'];
 
   // Assertions on removed incoming Module JS APIs.
-  assert(typeof Module['memoryInitializerPrefixURL'] == 'undefined', 'Module.memoryInitializerPrefixURL option was removed, use Module.locateFile instead');
-  assert(typeof Module['pthreadMainPrefixURL'] == 'undefined', 'Module.pthreadMainPrefixURL option was removed, use Module.locateFile instead');
-  assert(typeof Module['cdInitializerPrefixURL'] == 'undefined', 'Module.cdInitializerPrefixURL option was removed, use Module.locateFile instead');
-  assert(typeof Module['filePackagePrefixURL'] == 'undefined', 'Module.filePackagePrefixURL option was removed, use Module.locateFile instead');
-  assert(typeof Module['read'] == 'undefined', 'Module.read option was removed');
-  assert(typeof Module['readAsync'] == 'undefined', 'Module.readAsync option was removed (modify readAsync in JS)');
-  assert(typeof Module['readBinary'] == 'undefined', 'Module.readBinary option was removed (modify readBinary in JS)');
-  assert(typeof Module['setWindowTitle'] == 'undefined', 'Module.setWindowTitle option was removed (modify emscripten_set_window_title in JS)');
-  assert(typeof Module['TOTAL_MEMORY'] == 'undefined', 'Module.TOTAL_MEMORY has been renamed Module.INITIAL_MEMORY');
-  assert(typeof Module['ENVIRONMENT'] == 'undefined', 'Module.ENVIRONMENT has been deprecated. To force the environment, use the ENVIRONMENT compile-time option (for example, -sENVIRONMENT=web or -sENVIRONMENT=node)');
-  assert(typeof Module['STACK_SIZE'] == 'undefined', 'STACK_SIZE can no longer be set at runtime.  Use -sSTACK_SIZE at link time')
+  assert(typeof Module['memoryInitializerPrefixURL'] === 'undefined', 'Module.memoryInitializerPrefixURL option was removed, use Module.locateFile instead');
+  assert(typeof Module['pthreadMainPrefixURL'] === 'undefined', 'Module.pthreadMainPrefixURL option was removed, use Module.locateFile instead');
+  assert(typeof Module['cdInitializerPrefixURL'] === 'undefined', 'Module.cdInitializerPrefixURL option was removed, use Module.locateFile instead');
+  assert(typeof Module['filePackagePrefixURL'] === 'undefined', 'Module.filePackagePrefixURL option was removed, use Module.locateFile instead');
+  assert(typeof Module['read'] === 'undefined', 'Module.read option was removed');
+  assert(typeof Module['readAsync'] === 'undefined', 'Module.readAsync option was removed (modify readAsync in JS)');
+  assert(typeof Module['readBinary'] === 'undefined', 'Module.readBinary option was removed (modify readBinary in JS)');
+  assert(typeof Module['setWindowTitle'] === 'undefined', 'Module.setWindowTitle option was removed (modify emscripten_set_window_title in JS)');
+  assert(typeof Module['TOTAL_MEMORY'] === 'undefined', 'Module.TOTAL_MEMORY has been renamed Module.INITIAL_MEMORY');
+  assert(typeof Module['ENVIRONMENT'] === 'undefined', 'Module.ENVIRONMENT has been deprecated. To force the environment, use the ENVIRONMENT compile-time option (for example, -sENVIRONMENT=web or -sENVIRONMENT=node)');
+  assert(typeof Module['STACK_SIZE'] === 'undefined', 'STACK_SIZE can no longer be set at runtime.  Use -sSTACK_SIZE at link time')
   // If memory is defined in wasm, the user can't provide it, or set INITIAL_MEMORY
-  assert(typeof Module['wasmMemory'] == 'undefined', 'Use of `wasmMemory` detected.  Use -sIMPORTED_MEMORY to define wasmMemory externally');
-  assert(typeof Module['INITIAL_MEMORY'] == 'undefined', 'Detected runtime INITIAL_MEMORY setting.  Use -sIMPORTED_MEMORY to define wasmMemory dynamically');
+  assert(typeof Module['wasmMemory'] === 'undefined', 'Use of `wasmMemory` detected.  Use -sIMPORTED_MEMORY to define wasmMemory externally');
+  assert(typeof Module['INITIAL_MEMORY'] === 'undefined', 'Detected runtime INITIAL_MEMORY setting.  Use -sIMPORTED_MEMORY to define wasmMemory dynamically');
 
   var preInit = Module['preInit'];
   if (preInit) {
-    if (typeof preInit == 'function') Module['preInit'] = preInit = [preInit];
+    if (typeof preInit === 'function') Module['preInit'] = preInit = [preInit];
     // Written as a loop so that preInit functions that themselves add more
     // preInit functions.  Is this actually needed?
     while (preInit.length > 0) {
@@ -7575,14 +7189,14 @@ if (Module['printErr']) err = Module['printErr'];
   'demangle',
   'stackTrace',
   'getNativeTypeSize',
+  'getInheritedInstanceCount',
+  'getLiveInheritedInstances',
   'getFunctionArgsName',
   'createJsInvokerSignature',
   'getEnumValueType',
   'PureVirtualError',
   'registerInheritedInstance',
   'unregisterInheritedInstance',
-  'getInheritedInstanceCount',
-  'getLiveInheritedInstances',
   'enumReadValueFromPointer',
   'setDelayFunction',
   'validateThis',
@@ -7625,11 +7239,11 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'strError',
   'DNS',
   'Protocols',
-  'Sockets',
   'timers',
   'warnOnce',
   'readEmAsmArgsArray',
   'getExecutableName',
+  'getWasmTableEntry',
   'handleException',
   'keepRuntimeAlive',
   'callUserCallback',
@@ -7677,7 +7291,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'randomFill',
   'safeSetTimeout',
   'emSetImmediate',
-  'emClearImmediate_deps',
   'emClearImmediate',
   'promiseMap',
   'getExceptionMessageCommon',
@@ -7690,9 +7303,7 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'getExceptionMessage',
   'Browser',
   'setCanvasSize',
-  'getUserMedia',
   'createContext',
-  'getPreloadedImageData__data',
   'wget',
   'MONTH_DAYS_REGULAR',
   'MONTH_DAYS_LEAP',
@@ -7709,17 +7320,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'FS_stdin_getChar_buffer',
   'FS_stdin_getChar',
   'FS_readFile',
-  'FS_root',
-  'FS_mounts',
-  'FS_devices',
-  'FS_streams',
-  'FS_nextInode',
-  'FS_nameTable',
-  'FS_currentPath',
-  'FS_initialized',
-  'FS_ignorePermissions',
-  'FS_filesystems',
-  'FS_syncFSRequests',
   'FS_lookupPath',
   'FS_getPath',
   'FS_hashName',
@@ -7751,7 +7351,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'FS_closeStream',
   'FS_dupStream',
   'FS_doSetAttr',
-  'FS_chrdev_stream_ops',
   'FS_major',
   'FS_minor',
   'FS_makedev',
@@ -7880,7 +7479,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'runDestructor',
   'releaseClassHandle',
   'finalizationRegistry',
-  'detachFinalizer_deps',
   'detachFinalizer',
   'attachFinalizer',
   'makeClassHandle',
@@ -7894,8 +7492,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'shallowCopyInternalPointer',
   'downcastPointer',
   'upcastPointer',
-  'char_0',
-  'char_9',
   'makeLegalFunctionName',
   'emval_freelist',
   'emval_exception_decrefs',
@@ -7945,9 +7541,6 @@ function checkIncomingModuleAPI() {
   ignoredModuleProp('wasmMemory');
   ignoredModuleProp('wasmBinary');
 }
-function call_jsLogCallback(szEvent,iLength) { jsLogCallback(UTF8ToString(szEvent, iLength)); }
-function call_jsToWGS84Async(iCRS,fX,fY,fZ) { jsToWGS84AsyncCallback(iCRS, fX, fY, fZ); }
-function call_jsGetWGS84(iCRS,fX,fY,fZ) { return jsGetWGS84Callback(iCRS, fX, fY, fZ); }
 function js_log_info(msg) { if (window.logInfo) { window.logInfo(UTF8ToString(msg)); } else { console.log(UTF8ToString(msg)); } }
 function js_log_warn(msg) { if (window.logWarn) { window.logWarn(UTF8ToString(msg)); } else { console.log(UTF8ToString(msg)); } }
 function js_log_err(msg) { if (window.logErr) { window.logErr(UTF8ToString(msg)); } else { console.log(UTF8ToString(msg)); } }
@@ -8200,8 +7793,11 @@ var _SetSPFFHeader = Module['_SetSPFFHeader'] = makeInvalidEarlyAccess('_SetSPFF
 var _SetSPFFHeaderItem = Module['_SetSPFFHeaderItem'] = makeInvalidEarlyAccess('_SetSPFFHeaderItem');
 var _GetSPFFHeaderItem = Module['_GetSPFFHeaderItem'] = makeInvalidEarlyAccess('_GetSPFFHeaderItem');
 var _GetDateTime = Module['_GetDateTime'] = makeInvalidEarlyAccess('_GetDateTime');
+var _GetDateTimeW = Module['_GetDateTimeW'] = makeInvalidEarlyAccess('_GetDateTimeW');
 var _GetLibraryIdentifier = Module['_GetLibraryIdentifier'] = makeInvalidEarlyAccess('_GetLibraryIdentifier');
+var _GetLibraryIdentifierW = Module['_GetLibraryIdentifierW'] = makeInvalidEarlyAccess('_GetLibraryIdentifierW');
 var _GetSchemaName = Module['_GetSchemaName'] = makeInvalidEarlyAccess('_GetSchemaName');
+var _GetSchemaNameW = Module['_GetSchemaNameW'] = makeInvalidEarlyAccess('_GetSchemaNameW');
 var _engiSetMappingSupport = Module['_engiSetMappingSupport'] = makeInvalidEarlyAccess('_engiSetMappingSupport');
 var _engiGetMappingSupport = Module['_engiGetMappingSupport'] = makeInvalidEarlyAccess('_engiGetMappingSupport');
 var _sdaiCreateModelBN = Module['_sdaiCreateModelBN'] = makeInvalidEarlyAccess('_sdaiCreateModelBN');
@@ -8435,7 +8031,6 @@ var _internalGetBoundingBox = Module['_internalGetBoundingBox'] = makeInvalidEar
 var _internalGetCenter = Module['_internalGetCenter'] = makeInvalidEarlyAccess('_internalGetCenter');
 var _getRootAxis2Placement = Module['_getRootAxis2Placement'] = makeInvalidEarlyAccess('_getRootAxis2Placement');
 var _getGlobalPlacement = Module['_getGlobalPlacement'] = makeInvalidEarlyAccess('_getGlobalPlacement');
-var _engiGetAggrElement = Module['_engiGetAggrElement'] = makeInvalidEarlyAccess('_engiGetAggrElement');
 var _setGlobalPlacement = Module['_setGlobalPlacement'] = makeInvalidEarlyAccess('_setGlobalPlacement');
 var _getTimeStamp = Module['_getTimeStamp'] = makeInvalidEarlyAccess('_getTimeStamp');
 var _setInstanceReference = Module['_setInstanceReference'] = makeInvalidEarlyAccess('_setInstanceReference');
@@ -8447,8 +8042,8 @@ var _engiGetEntityAttributeByIndex = Module['_engiGetEntityAttributeByIndex'] = 
 var _iterateOverProperties = Module['_iterateOverProperties'] = makeInvalidEarlyAccess('_iterateOverProperties');
 var _engiGetEntityAttributeIndex = Module['_engiGetEntityAttributeIndex'] = makeInvalidEarlyAccess('_engiGetEntityAttributeIndex');
 var _engiGetAttrIndexBN = Module['_engiGetAttrIndexBN'] = makeInvalidEarlyAccess('_engiGetAttrIndexBN');
-var _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = makeInvalidEarlyAccess('_engiGetAttrIndexExBN');
 var _engiGetEntityAttributeIndexEx = Module['_engiGetEntityAttributeIndexEx'] = makeInvalidEarlyAccess('_engiGetEntityAttributeIndexEx');
+var _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = makeInvalidEarlyAccess('_engiGetAttrIndexExBN');
 var _engiGetEntityArgumentName = Module['_engiGetEntityArgumentName'] = makeInvalidEarlyAccess('_engiGetEntityArgumentName');
 var _engiGetAttrNameByIndex = Module['_engiGetAttrNameByIndex'] = makeInvalidEarlyAccess('_engiGetAttrNameByIndex');
 var _engiGetEntityArgumentType = Module['_engiGetEntityArgumentType'] = makeInvalidEarlyAccess('_engiGetEntityArgumentType');
@@ -8465,6 +8060,7 @@ var _engiGetEntityNoArguments = Module['_engiGetEntityNoArguments'] = makeInvali
 var _engiGetArgumentType = Module['_engiGetArgumentType'] = makeInvalidEarlyAccess('_engiGetArgumentType');
 var _engiGetAttributeType = Module['_engiGetAttributeType'] = makeInvalidEarlyAccess('_engiGetAttributeType');
 var _engiGetEntityArgumentIndex = Module['_engiGetEntityArgumentIndex'] = makeInvalidEarlyAccess('_engiGetEntityArgumentIndex');
+var _engiGetAggrElement = Module['_engiGetAggrElement'] = makeInvalidEarlyAccess('_engiGetAggrElement');
 var _engiGetEntityArgument = Module['_engiGetEntityArgument'] = makeInvalidEarlyAccess('_engiGetEntityArgument');
 var _sdaiGetADBTypePathx = Module['_sdaiGetADBTypePathx'] = makeInvalidEarlyAccess('_sdaiGetADBTypePathx');
 var _xxxxOpenModelByStream = Module['_xxxxOpenModelByStream'] = makeInvalidEarlyAccess('_xxxxOpenModelByStream');
@@ -8527,574 +8123,577 @@ var wasmMemory = makeInvalidEarlyAccess('wasmMemory');
 var wasmTable = makeInvalidEarlyAccess('wasmTable');
 
 function assignWasmExports(wasmExports) {
-  assert(typeof wasmExports['__getTypeName'] != 'undefined', 'missing Wasm export: __getTypeName');
-  assert(typeof wasmExports['GetRevision'] != 'undefined', 'missing Wasm export: GetRevision');
-  assert(typeof wasmExports['GetRevisionW'] != 'undefined', 'missing Wasm export: GetRevisionW');
-  assert(typeof wasmExports['GetProtection'] != 'undefined', 'missing Wasm export: GetProtection');
-  assert(typeof wasmExports['GetEnvironment'] != 'undefined', 'missing Wasm export: GetEnvironment');
-  assert(typeof wasmExports['GetEnvironmentW'] != 'undefined', 'missing Wasm export: GetEnvironmentW');
-  assert(typeof wasmExports['SetAssertionFile'] != 'undefined', 'missing Wasm export: SetAssertionFile');
-  assert(typeof wasmExports['SetAssertionFileW'] != 'undefined', 'missing Wasm export: SetAssertionFileW');
-  assert(typeof wasmExports['GetAssertionFile'] != 'undefined', 'missing Wasm export: GetAssertionFile');
-  assert(typeof wasmExports['GetAssertionFileW'] != 'undefined', 'missing Wasm export: GetAssertionFileW');
-  assert(typeof wasmExports['SetCharacterSerialization'] != 'undefined', 'missing Wasm export: SetCharacterSerialization');
-  assert(typeof wasmExports['GetCharacterSerialization'] != 'undefined', 'missing Wasm export: GetCharacterSerialization');
-  assert(typeof wasmExports['SetModellingStyle'] != 'undefined', 'missing Wasm export: SetModellingStyle');
-  assert(typeof wasmExports['GetModellingStyle'] != 'undefined', 'missing Wasm export: GetModellingStyle');
-  assert(typeof wasmExports['AbortModel'] != 'undefined', 'missing Wasm export: AbortModel');
-  assert(typeof wasmExports['GetSessionMetaInfo'] != 'undefined', 'missing Wasm export: GetSessionMetaInfo');
-  assert(typeof wasmExports['GetModelMetaInfo'] != 'undefined', 'missing Wasm export: GetModelMetaInfo');
-  assert(typeof wasmExports['GetInstanceMetaInfo'] != 'undefined', 'missing Wasm export: GetInstanceMetaInfo');
-  assert(typeof wasmExports['GetSmoothness'] != 'undefined', 'missing Wasm export: GetSmoothness');
-  assert(typeof wasmExports['AddState'] != 'undefined', 'missing Wasm export: AddState');
-  assert(typeof wasmExports['GetModel'] != 'undefined', 'missing Wasm export: GetModel');
-  assert(typeof wasmExports['OrderedHandles'] != 'undefined', 'missing Wasm export: OrderedHandles');
-  assert(typeof wasmExports['PeelArray'] != 'undefined', 'missing Wasm export: PeelArray');
-  assert(typeof wasmExports['SetInternalCheck'] != 'undefined', 'missing Wasm export: SetInternalCheck');
-  assert(typeof wasmExports['GetInternalCheck'] != 'undefined', 'missing Wasm export: GetInternalCheck');
-  assert(typeof wasmExports['GetInternalCheckIssueCnt'] != 'undefined', 'missing Wasm export: GetInternalCheckIssueCnt');
-  assert(typeof wasmExports['GetInternalCheckIssue'] != 'undefined', 'missing Wasm export: GetInternalCheckIssue');
-  assert(typeof wasmExports['GetInternalCheckIssueW'] != 'undefined', 'missing Wasm export: GetInternalCheckIssueW');
-  assert(typeof wasmExports['ValidateResource'] != 'undefined', 'missing Wasm export: ValidateResource');
-  assert(typeof wasmExports['CloseSession'] != 'undefined', 'missing Wasm export: CloseSession');
-  assert(typeof wasmExports['CleanMemory'] != 'undefined', 'missing Wasm export: CleanMemory');
-  assert(typeof wasmExports['ClearCache'] != 'undefined', 'missing Wasm export: ClearCache');
-  assert(typeof wasmExports['AllocModelMemory'] != 'undefined', 'missing Wasm export: AllocModelMemory');
-  assert(typeof wasmExports['SetExternalReferenceData'] != 'undefined', 'missing Wasm export: SetExternalReferenceData');
-  assert(typeof wasmExports['GetExternalReferenceData'] != 'undefined', 'missing Wasm export: GetExternalReferenceData');
-  assert(typeof wasmExports['GetExternalReferenceDataId'] != 'undefined', 'missing Wasm export: GetExternalReferenceDataId');
-  assert(typeof wasmExports['CreateModel'] != 'undefined', 'missing Wasm export: CreateModel');
-  assert(typeof wasmExports['OpenModel'] != 'undefined', 'missing Wasm export: OpenModel');
-  assert(typeof wasmExports['OpenModelW'] != 'undefined', 'missing Wasm export: OpenModelW');
-  assert(typeof wasmExports['OpenModelS'] != 'undefined', 'missing Wasm export: OpenModelS');
-  assert(typeof wasmExports['OpenModelA'] != 'undefined', 'missing Wasm export: OpenModelA');
-  assert(typeof wasmExports['ImportModel'] != 'undefined', 'missing Wasm export: ImportModel');
-  assert(typeof wasmExports['ImportModelW'] != 'undefined', 'missing Wasm export: ImportModelW');
-  assert(typeof wasmExports['ImportModelS'] != 'undefined', 'missing Wasm export: ImportModelS');
-  assert(typeof wasmExports['ImportModelA'] != 'undefined', 'missing Wasm export: ImportModelA');
-  assert(typeof wasmExports['SaveInstanceTree'] != 'undefined', 'missing Wasm export: SaveInstanceTree');
-  assert(typeof wasmExports['SaveInstanceTreeW'] != 'undefined', 'missing Wasm export: SaveInstanceTreeW');
-  assert(typeof wasmExports['SaveInstanceTreeS'] != 'undefined', 'missing Wasm export: SaveInstanceTreeS');
-  assert(typeof wasmExports['SaveInstanceTreeA'] != 'undefined', 'missing Wasm export: SaveInstanceTreeA');
-  assert(typeof wasmExports['SaveInstanceNetwork'] != 'undefined', 'missing Wasm export: SaveInstanceNetwork');
-  assert(typeof wasmExports['SaveInstanceNetworkW'] != 'undefined', 'missing Wasm export: SaveInstanceNetworkW');
-  assert(typeof wasmExports['SaveInstanceNetworkS'] != 'undefined', 'missing Wasm export: SaveInstanceNetworkS');
-  assert(typeof wasmExports['SaveInstanceNetworkA'] != 'undefined', 'missing Wasm export: SaveInstanceNetworkA');
-  assert(typeof wasmExports['SaveModel'] != 'undefined', 'missing Wasm export: SaveModel');
-  assert(typeof wasmExports['SaveModelW'] != 'undefined', 'missing Wasm export: SaveModelW');
-  assert(typeof wasmExports['SaveModelS'] != 'undefined', 'missing Wasm export: SaveModelS');
-  assert(typeof wasmExports['SaveModelA'] != 'undefined', 'missing Wasm export: SaveModelA');
-  assert(typeof wasmExports['SetOverrideFileIO'] != 'undefined', 'missing Wasm export: SetOverrideFileIO');
-  assert(typeof wasmExports['GetOverrideFileIO'] != 'undefined', 'missing Wasm export: GetOverrideFileIO');
-  assert(typeof wasmExports['CopyInstanceTree'] != 'undefined', 'missing Wasm export: CopyInstanceTree');
-  assert(typeof wasmExports['CopyInstanceNetwork'] != 'undefined', 'missing Wasm export: CopyInstanceNetwork');
-  assert(typeof wasmExports['EncodeBase64'] != 'undefined', 'missing Wasm export: EncodeBase64');
-  assert(typeof wasmExports['EncodeBase64W'] != 'undefined', 'missing Wasm export: EncodeBase64W');
-  assert(typeof wasmExports['DecodeBase64'] != 'undefined', 'missing Wasm export: DecodeBase64');
-  assert(typeof wasmExports['DecodeBase64W'] != 'undefined', 'missing Wasm export: DecodeBase64W');
-  assert(typeof wasmExports['CopyModel'] != 'undefined', 'missing Wasm export: CopyModel');
-  assert(typeof wasmExports['CloseModel'] != 'undefined', 'missing Wasm export: CloseModel');
-  assert(typeof wasmExports['IsModel'] != 'undefined', 'missing Wasm export: IsModel');
-  assert(typeof wasmExports['CreateClass'] != 'undefined', 'missing Wasm export: CreateClass');
-  assert(typeof wasmExports['CreateClassW'] != 'undefined', 'missing Wasm export: CreateClassW');
-  assert(typeof wasmExports['GetClassByName'] != 'undefined', 'missing Wasm export: GetClassByName');
-  assert(typeof wasmExports['GetClassByNameW'] != 'undefined', 'missing Wasm export: GetClassByNameW');
-  assert(typeof wasmExports['GetClassesByIterator'] != 'undefined', 'missing Wasm export: GetClassesByIterator');
-  assert(typeof wasmExports['SetClassParent'] != 'undefined', 'missing Wasm export: SetClassParent');
-  assert(typeof wasmExports['SetClassParentEx'] != 'undefined', 'missing Wasm export: SetClassParentEx');
-  assert(typeof wasmExports['UnsetClassParent'] != 'undefined', 'missing Wasm export: UnsetClassParent');
-  assert(typeof wasmExports['UnsetClassParentEx'] != 'undefined', 'missing Wasm export: UnsetClassParentEx');
-  assert(typeof wasmExports['IsClassAncestor'] != 'undefined', 'missing Wasm export: IsClassAncestor');
-  assert(typeof wasmExports['GetClassParentsByIterator'] != 'undefined', 'missing Wasm export: GetClassParentsByIterator');
-  assert(typeof wasmExports['SetNameOfClass'] != 'undefined', 'missing Wasm export: SetNameOfClass');
-  assert(typeof wasmExports['SetNameOfClassW'] != 'undefined', 'missing Wasm export: SetNameOfClassW');
-  assert(typeof wasmExports['SetNameOfClassEx'] != 'undefined', 'missing Wasm export: SetNameOfClassEx');
-  assert(typeof wasmExports['SetNameOfClassWEx'] != 'undefined', 'missing Wasm export: SetNameOfClassWEx');
-  assert(typeof wasmExports['GetNameOfClass'] != 'undefined', 'missing Wasm export: GetNameOfClass');
-  assert(typeof wasmExports['GetNameOfClassW'] != 'undefined', 'missing Wasm export: GetNameOfClassW');
-  assert(typeof wasmExports['GetNameOfClassEx'] != 'undefined', 'missing Wasm export: GetNameOfClassEx');
-  assert(typeof wasmExports['GetNameOfClassWEx'] != 'undefined', 'missing Wasm export: GetNameOfClassWEx');
-  assert(typeof wasmExports['GetClassPropertyByIterator'] != 'undefined', 'missing Wasm export: GetClassPropertyByIterator');
-  assert(typeof wasmExports['GetClassPropertyByIteratorEx'] != 'undefined', 'missing Wasm export: GetClassPropertyByIteratorEx');
-  assert(typeof wasmExports['SetClassPropertyCardinalityRestriction'] != 'undefined', 'missing Wasm export: SetClassPropertyCardinalityRestriction');
-  assert(typeof wasmExports['SetClassPropertyCardinalityRestrictionEx'] != 'undefined', 'missing Wasm export: SetClassPropertyCardinalityRestrictionEx');
-  assert(typeof wasmExports['GetClassPropertyCardinalityRestriction'] != 'undefined', 'missing Wasm export: GetClassPropertyCardinalityRestriction');
-  assert(typeof wasmExports['GetClassPropertyCardinalityRestrictionEx'] != 'undefined', 'missing Wasm export: GetClassPropertyCardinalityRestrictionEx');
-  assert(typeof wasmExports['GetClassPropertyAggregatedCardinalityRestriction'] != 'undefined', 'missing Wasm export: GetClassPropertyAggregatedCardinalityRestriction');
-  assert(typeof wasmExports['GetClassPropertyAggregatedCardinalityRestrictionEx'] != 'undefined', 'missing Wasm export: GetClassPropertyAggregatedCardinalityRestrictionEx');
-  assert(typeof wasmExports['GetGeometryClass'] != 'undefined', 'missing Wasm export: GetGeometryClass');
-  assert(typeof wasmExports['GetGeometryClassEx'] != 'undefined', 'missing Wasm export: GetGeometryClassEx');
-  assert(typeof wasmExports['IsClass'] != 'undefined', 'missing Wasm export: IsClass');
-  assert(typeof wasmExports['CreateProperty'] != 'undefined', 'missing Wasm export: CreateProperty');
-  assert(typeof wasmExports['CreatePropertyW'] != 'undefined', 'missing Wasm export: CreatePropertyW');
-  assert(typeof wasmExports['GetPropertyByName'] != 'undefined', 'missing Wasm export: GetPropertyByName');
-  assert(typeof wasmExports['GetPropertyByNameW'] != 'undefined', 'missing Wasm export: GetPropertyByNameW');
-  assert(typeof wasmExports['GetPropertiesByIterator'] != 'undefined', 'missing Wasm export: GetPropertiesByIterator');
-  assert(typeof wasmExports['SetPropertyRangeRestriction'] != 'undefined', 'missing Wasm export: SetPropertyRangeRestriction');
-  assert(typeof wasmExports['SetPropertyRangeRestrictionEx'] != 'undefined', 'missing Wasm export: SetPropertyRangeRestrictionEx');
-  assert(typeof wasmExports['GetRangeRestrictionsByIterator'] != 'undefined', 'missing Wasm export: GetRangeRestrictionsByIterator');
-  assert(typeof wasmExports['GetRangeRestrictionsByIteratorEx'] != 'undefined', 'missing Wasm export: GetRangeRestrictionsByIteratorEx');
-  assert(typeof wasmExports['GetPropertyParentsByIterator'] != 'undefined', 'missing Wasm export: GetPropertyParentsByIterator');
-  assert(typeof wasmExports['SetNameOfProperty'] != 'undefined', 'missing Wasm export: SetNameOfProperty');
-  assert(typeof wasmExports['SetNameOfPropertyW'] != 'undefined', 'missing Wasm export: SetNameOfPropertyW');
-  assert(typeof wasmExports['SetNameOfPropertyEx'] != 'undefined', 'missing Wasm export: SetNameOfPropertyEx');
-  assert(typeof wasmExports['SetNameOfPropertyWEx'] != 'undefined', 'missing Wasm export: SetNameOfPropertyWEx');
-  assert(typeof wasmExports['GetNameOfProperty'] != 'undefined', 'missing Wasm export: GetNameOfProperty');
-  assert(typeof wasmExports['GetNameOfPropertyW'] != 'undefined', 'missing Wasm export: GetNameOfPropertyW');
-  assert(typeof wasmExports['GetNameOfPropertyEx'] != 'undefined', 'missing Wasm export: GetNameOfPropertyEx');
-  assert(typeof wasmExports['GetNameOfPropertyWEx'] != 'undefined', 'missing Wasm export: GetNameOfPropertyWEx');
-  assert(typeof wasmExports['SetPropertyType'] != 'undefined', 'missing Wasm export: SetPropertyType');
-  assert(typeof wasmExports['GetPropertyType'] != 'undefined', 'missing Wasm export: GetPropertyType');
-  assert(typeof wasmExports['SetPropertyTypeEx'] != 'undefined', 'missing Wasm export: SetPropertyTypeEx');
-  assert(typeof wasmExports['GetPropertyTypeEx'] != 'undefined', 'missing Wasm export: GetPropertyTypeEx');
-  assert(typeof wasmExports['RemoveProperty'] != 'undefined', 'missing Wasm export: RemoveProperty');
-  assert(typeof wasmExports['RemovePropertyEx'] != 'undefined', 'missing Wasm export: RemovePropertyEx');
-  assert(typeof wasmExports['IsProperty'] != 'undefined', 'missing Wasm export: IsProperty');
-  assert(typeof wasmExports['CreateInstance'] != 'undefined', 'missing Wasm export: CreateInstance');
-  assert(typeof wasmExports['CreateInstanceW'] != 'undefined', 'missing Wasm export: CreateInstanceW');
-  assert(typeof wasmExports['CreateInstanceEx'] != 'undefined', 'missing Wasm export: CreateInstanceEx');
-  assert(typeof wasmExports['CreateInstanceWEx'] != 'undefined', 'missing Wasm export: CreateInstanceWEx');
-  assert(typeof wasmExports['GetInstancesByIterator'] != 'undefined', 'missing Wasm export: GetInstancesByIterator');
-  assert(typeof wasmExports['GetInstanceClass'] != 'undefined', 'missing Wasm export: GetInstanceClass');
-  assert(typeof wasmExports['GetInstanceClassEx'] != 'undefined', 'missing Wasm export: GetInstanceClassEx');
-  assert(typeof wasmExports['GetInstanceClassByIterator'] != 'undefined', 'missing Wasm export: GetInstanceClassByIterator');
-  assert(typeof wasmExports['GetInstanceClassByIteratorEx'] != 'undefined', 'missing Wasm export: GetInstanceClassByIteratorEx');
-  assert(typeof wasmExports['GetInstanceGeometryClass'] != 'undefined', 'missing Wasm export: GetInstanceGeometryClass');
-  assert(typeof wasmExports['GetInstanceGeometryClassEx'] != 'undefined', 'missing Wasm export: GetInstanceGeometryClassEx');
-  assert(typeof wasmExports['SetInstanceClass'] != 'undefined', 'missing Wasm export: SetInstanceClass');
-  assert(typeof wasmExports['SetInstanceClassEx'] != 'undefined', 'missing Wasm export: SetInstanceClassEx');
-  assert(typeof wasmExports['UnsetInstanceClass'] != 'undefined', 'missing Wasm export: UnsetInstanceClass');
-  assert(typeof wasmExports['UnsetInstanceClassEx'] != 'undefined', 'missing Wasm export: UnsetInstanceClassEx');
-  assert(typeof wasmExports['GetInstancePropertyByIterator'] != 'undefined', 'missing Wasm export: GetInstancePropertyByIterator');
-  assert(typeof wasmExports['GetInstancePropertyByIteratorEx'] != 'undefined', 'missing Wasm export: GetInstancePropertyByIteratorEx');
-  assert(typeof wasmExports['GetInstanceInverseReferencesByIterator'] != 'undefined', 'missing Wasm export: GetInstanceInverseReferencesByIterator');
-  assert(typeof wasmExports['GetInstanceReferencesByIterator'] != 'undefined', 'missing Wasm export: GetInstanceReferencesByIterator');
-  assert(typeof wasmExports['ConsolidateInstanceTree'] != 'undefined', 'missing Wasm export: ConsolidateInstanceTree');
-  assert(typeof wasmExports['SetNameOfInstance'] != 'undefined', 'missing Wasm export: SetNameOfInstance');
-  assert(typeof wasmExports['SetNameOfInstanceW'] != 'undefined', 'missing Wasm export: SetNameOfInstanceW');
-  assert(typeof wasmExports['SetNameOfInstanceEx'] != 'undefined', 'missing Wasm export: SetNameOfInstanceEx');
-  assert(typeof wasmExports['SetNameOfInstanceWEx'] != 'undefined', 'missing Wasm export: SetNameOfInstanceWEx');
-  assert(typeof wasmExports['GetNameOfInstance'] != 'undefined', 'missing Wasm export: GetNameOfInstance');
-  assert(typeof wasmExports['GetNameOfInstanceW'] != 'undefined', 'missing Wasm export: GetNameOfInstanceW');
-  assert(typeof wasmExports['GetNameOfInstanceEx'] != 'undefined', 'missing Wasm export: GetNameOfInstanceEx');
-  assert(typeof wasmExports['GetNameOfInstanceWEx'] != 'undefined', 'missing Wasm export: GetNameOfInstanceWEx');
-  assert(typeof wasmExports['SetDatatypeProperty'] != 'undefined', 'missing Wasm export: SetDatatypeProperty');
-  assert(typeof wasmExports['SetDatatypePropertyEx'] != 'undefined', 'missing Wasm export: SetDatatypePropertyEx');
-  assert(typeof wasmExports['GetDatatypeProperty'] != 'undefined', 'missing Wasm export: GetDatatypeProperty');
-  assert(typeof wasmExports['GetDatatypePropertyEx'] != 'undefined', 'missing Wasm export: GetDatatypePropertyEx');
-  assert(typeof wasmExports['SetObjectProperty'] != 'undefined', 'missing Wasm export: SetObjectProperty');
-  assert(typeof wasmExports['SetObjectPropertyEx'] != 'undefined', 'missing Wasm export: SetObjectPropertyEx');
-  assert(typeof wasmExports['GetObjectProperty'] != 'undefined', 'missing Wasm export: GetObjectProperty');
-  assert(typeof wasmExports['GetObjectPropertyEx'] != 'undefined', 'missing Wasm export: GetObjectPropertyEx');
-  assert(typeof wasmExports['CreateInstanceInContextStructure'] != 'undefined', 'missing Wasm export: CreateInstanceInContextStructure');
-  assert(typeof wasmExports['DestroyInstanceInContextStructure'] != 'undefined', 'missing Wasm export: DestroyInstanceInContextStructure');
-  assert(typeof wasmExports['InstanceInContextChild'] != 'undefined', 'missing Wasm export: InstanceInContextChild');
-  assert(typeof wasmExports['InstanceInContextNext'] != 'undefined', 'missing Wasm export: InstanceInContextNext');
-  assert(typeof wasmExports['InstanceInContextIsUpdated'] != 'undefined', 'missing Wasm export: InstanceInContextIsUpdated');
-  assert(typeof wasmExports['RemoveInstance'] != 'undefined', 'missing Wasm export: RemoveInstance');
-  assert(typeof wasmExports['RemoveInstanceRecursively'] != 'undefined', 'missing Wasm export: RemoveInstanceRecursively');
-  assert(typeof wasmExports['RemoveInstances'] != 'undefined', 'missing Wasm export: RemoveInstances');
-  assert(typeof wasmExports['IsInstance'] != 'undefined', 'missing Wasm export: IsInstance');
-  assert(typeof wasmExports['CalculateInstance'] != 'undefined', 'missing Wasm export: CalculateInstance');
-  assert(typeof wasmExports['UpdateInstance'] != 'undefined', 'missing Wasm export: UpdateInstance');
-  assert(typeof wasmExports['IsUpToDate'] != 'undefined', 'missing Wasm export: IsUpToDate');
-  assert(typeof wasmExports['SetPropertyDerived'] != 'undefined', 'missing Wasm export: SetPropertyDerived');
-  assert(typeof wasmExports['GetPropertyDerived'] != 'undefined', 'missing Wasm export: GetPropertyDerived');
-  assert(typeof wasmExports['GetClassModificationMark'] != 'undefined', 'missing Wasm export: GetClassModificationMark');
-  assert(typeof wasmExports['UpdateClassModificationMark'] != 'undefined', 'missing Wasm export: UpdateClassModificationMark');
-  assert(typeof wasmExports['InferenceInstance'] != 'undefined', 'missing Wasm export: InferenceInstance');
-  assert(typeof wasmExports['UpdateInstanceVertexBuffer'] != 'undefined', 'missing Wasm export: UpdateInstanceVertexBuffer');
-  assert(typeof wasmExports['UpdateInstanceVertexBufferTrimmed'] != 'undefined', 'missing Wasm export: UpdateInstanceVertexBufferTrimmed');
-  assert(typeof wasmExports['UpdateInstanceIndexBuffer'] != 'undefined', 'missing Wasm export: UpdateInstanceIndexBuffer');
-  assert(typeof wasmExports['UpdateInstanceIndexBufferTrimmed'] != 'undefined', 'missing Wasm export: UpdateInstanceIndexBufferTrimmed');
-  assert(typeof wasmExports['UpdateInstanceTransformationBuffer'] != 'undefined', 'missing Wasm export: UpdateInstanceTransformationBuffer');
-  assert(typeof wasmExports['ClearedInstanceExternalBuffers'] != 'undefined', 'missing Wasm export: ClearedInstanceExternalBuffers');
-  assert(typeof wasmExports['ClearedExternalBuffers'] != 'undefined', 'missing Wasm export: ClearedExternalBuffers');
-  assert(typeof wasmExports['GetConceptualFaceCnt'] != 'undefined', 'missing Wasm export: GetConceptualFaceCnt');
-  assert(typeof wasmExports['GetConceptualFaceDiscriminator'] != 'undefined', 'missing Wasm export: GetConceptualFaceDiscriminator');
-  assert(typeof wasmExports['GetConceptualFaceDiscriminatorW'] != 'undefined', 'missing Wasm export: GetConceptualFaceDiscriminatorW');
-  assert(typeof wasmExports['GetConceptualFace'] != 'undefined', 'missing Wasm export: GetConceptualFace');
-  assert(typeof wasmExports['GetConceptualFaceMatrix'] != 'undefined', 'missing Wasm export: GetConceptualFaceMatrix');
-  assert(typeof wasmExports['GetConceptualFaceMaterial'] != 'undefined', 'missing Wasm export: GetConceptualFaceMaterial');
-  assert(typeof wasmExports['GetConceptualFaceOriginCnt'] != 'undefined', 'missing Wasm export: GetConceptualFaceOriginCnt');
-  assert(typeof wasmExports['GetConceptualFaceOrigin'] != 'undefined', 'missing Wasm export: GetConceptualFaceOrigin');
-  assert(typeof wasmExports['GetConceptualFaceOriginEx'] != 'undefined', 'missing Wasm export: GetConceptualFaceOriginEx');
-  assert(typeof wasmExports['GetConceptualFaceXYZ2UV'] != 'undefined', 'missing Wasm export: GetConceptualFaceXYZ2UV');
-  assert(typeof wasmExports['GetConceptualFaceUV2XYZ'] != 'undefined', 'missing Wasm export: GetConceptualFaceUV2XYZ');
-  assert(typeof wasmExports['GetFaceCnt'] != 'undefined', 'missing Wasm export: GetFaceCnt');
-  assert(typeof wasmExports['GetFace'] != 'undefined', 'missing Wasm export: GetFace');
-  assert(typeof wasmExports['GetDependingPropertyCnt'] != 'undefined', 'missing Wasm export: GetDependingPropertyCnt');
-  assert(typeof wasmExports['GetDependingProperty'] != 'undefined', 'missing Wasm export: GetDependingProperty');
-  assert(typeof wasmExports['SetFormat'] != 'undefined', 'missing Wasm export: SetFormat');
-  assert(typeof wasmExports['GetFormat'] != 'undefined', 'missing Wasm export: GetFormat');
-  assert(typeof wasmExports['GetVertexDataOffset'] != 'undefined', 'missing Wasm export: GetVertexDataOffset');
-  assert(typeof wasmExports['SetBehavior'] != 'undefined', 'missing Wasm export: SetBehavior');
-  assert(typeof wasmExports['GetBehavior'] != 'undefined', 'missing Wasm export: GetBehavior');
-  assert(typeof wasmExports['SetVertexBufferTransformation'] != 'undefined', 'missing Wasm export: SetVertexBufferTransformation');
-  assert(typeof wasmExports['GetVertexBufferTransformation'] != 'undefined', 'missing Wasm export: GetVertexBufferTransformation');
-  assert(typeof wasmExports['SetIndexBufferOffset'] != 'undefined', 'missing Wasm export: SetIndexBufferOffset');
-  assert(typeof wasmExports['GetIndexBufferOffset'] != 'undefined', 'missing Wasm export: GetIndexBufferOffset');
-  assert(typeof wasmExports['SetVertexBufferOffset'] != 'undefined', 'missing Wasm export: SetVertexBufferOffset');
-  assert(typeof wasmExports['GetVertexBufferOffset'] != 'undefined', 'missing Wasm export: GetVertexBufferOffset');
-  assert(typeof wasmExports['SetDefaultColor'] != 'undefined', 'missing Wasm export: SetDefaultColor');
-  assert(typeof wasmExports['GetDefaultColor'] != 'undefined', 'missing Wasm export: GetDefaultColor');
-  assert(typeof wasmExports['CheckConsistency'] != 'undefined', 'missing Wasm export: CheckConsistency');
-  assert(typeof wasmExports['CheckInstanceConsistency'] != 'undefined', 'missing Wasm export: CheckInstanceConsistency');
-  assert(typeof wasmExports['IsDuplicate'] != 'undefined', 'missing Wasm export: IsDuplicate');
-  assert(typeof wasmExports['GetPerimeter'] != 'undefined', 'missing Wasm export: GetPerimeter');
-  assert(typeof wasmExports['GetArea'] != 'undefined', 'missing Wasm export: GetArea');
-  assert(typeof wasmExports['GetVolume'] != 'undefined', 'missing Wasm export: GetVolume');
-  assert(typeof wasmExports['GetCenter'] != 'undefined', 'missing Wasm export: GetCenter');
-  assert(typeof wasmExports['GetCentroid'] != 'undefined', 'missing Wasm export: GetCentroid');
-  assert(typeof wasmExports['GetConceptualFacePerimeter'] != 'undefined', 'missing Wasm export: GetConceptualFacePerimeter');
-  assert(typeof wasmExports['GetConceptualFaceArea'] != 'undefined', 'missing Wasm export: GetConceptualFaceArea');
-  assert(typeof wasmExports['SetBoundingBoxReference'] != 'undefined', 'missing Wasm export: SetBoundingBoxReference');
-  assert(typeof wasmExports['GetBoundingBox'] != 'undefined', 'missing Wasm export: GetBoundingBox');
-  assert(typeof wasmExports['GetRelativeTransformation'] != 'undefined', 'missing Wasm export: GetRelativeTransformation');
-  assert(typeof wasmExports['GetDistance'] != 'undefined', 'missing Wasm export: GetDistance');
-  assert(typeof wasmExports['GetVertexColor'] != 'undefined', 'missing Wasm export: GetVertexColor');
-  assert(typeof wasmExports['GetConceptualFaceEx'] != 'undefined', 'missing Wasm export: GetConceptualFaceEx');
-  assert(typeof wasmExports['GetTriangles'] != 'undefined', 'missing Wasm export: GetTriangles');
-  assert(typeof wasmExports['GetLines'] != 'undefined', 'missing Wasm export: GetLines');
-  assert(typeof wasmExports['GetPoints'] != 'undefined', 'missing Wasm export: GetPoints');
-  assert(typeof wasmExports['GetPropertyRestrictionsConsolidated'] != 'undefined', 'missing Wasm export: GetPropertyRestrictionsConsolidated');
-  assert(typeof wasmExports['IsGeometryType'] != 'undefined', 'missing Wasm export: IsGeometryType');
-  assert(typeof wasmExports['SetObjectTypeProperty'] != 'undefined', 'missing Wasm export: SetObjectTypeProperty');
-  assert(typeof wasmExports['GetObjectTypeProperty'] != 'undefined', 'missing Wasm export: GetObjectTypeProperty');
-  assert(typeof wasmExports['SetDataTypeProperty'] != 'undefined', 'missing Wasm export: SetDataTypeProperty');
-  assert(typeof wasmExports['GetDataTypeProperty'] != 'undefined', 'missing Wasm export: GetDataTypeProperty');
-  assert(typeof wasmExports['InstanceCopyCreated'] != 'undefined', 'missing Wasm export: InstanceCopyCreated');
-  assert(typeof wasmExports['GetPropertyByNameAndType'] != 'undefined', 'missing Wasm export: GetPropertyByNameAndType');
-  assert(typeof wasmExports['GetParentsByIterator'] != 'undefined', 'missing Wasm export: GetParentsByIterator');
-  assert(typeof wasmExports['_Z17GetConceptualFacexxPxS_'] != 'undefined', 'missing Wasm export: _Z17GetConceptualFacexxPxS_');
-  assert(typeof wasmExports['_Z9Intersectxx'] != 'undefined', 'missing Wasm export: _Z9Intersectxx');
-  assert(typeof wasmExports['SetSPFFHeader'] != 'undefined', 'missing Wasm export: SetSPFFHeader');
-  assert(typeof wasmExports['SetSPFFHeaderItem'] != 'undefined', 'missing Wasm export: SetSPFFHeaderItem');
-  assert(typeof wasmExports['GetSPFFHeaderItem'] != 'undefined', 'missing Wasm export: GetSPFFHeaderItem');
-  assert(typeof wasmExports['GetDateTime'] != 'undefined', 'missing Wasm export: GetDateTime');
-  assert(typeof wasmExports['GetLibraryIdentifier'] != 'undefined', 'missing Wasm export: GetLibraryIdentifier');
-  assert(typeof wasmExports['GetSchemaName'] != 'undefined', 'missing Wasm export: GetSchemaName');
-  assert(typeof wasmExports['engiSetMappingSupport'] != 'undefined', 'missing Wasm export: engiSetMappingSupport');
-  assert(typeof wasmExports['engiGetMappingSupport'] != 'undefined', 'missing Wasm export: engiGetMappingSupport');
-  assert(typeof wasmExports['sdaiCreateModelBN'] != 'undefined', 'missing Wasm export: sdaiCreateModelBN');
-  assert(typeof wasmExports['sdaiOpenModelBN'] != 'undefined', 'missing Wasm export: sdaiOpenModelBN');
-  assert(typeof wasmExports['sdaiCreateModelBNUnicode'] != 'undefined', 'missing Wasm export: sdaiCreateModelBNUnicode');
-  assert(typeof wasmExports['sdaiOpenModelBNUnicode'] != 'undefined', 'missing Wasm export: sdaiOpenModelBNUnicode');
-  assert(typeof wasmExports['engiOpenModelByStream'] != 'undefined', 'missing Wasm export: engiOpenModelByStream');
-  assert(typeof wasmExports['engiOpenModelByArray'] != 'undefined', 'missing Wasm export: engiOpenModelByArray');
-  assert(typeof wasmExports['sdaiSaveModelBN'] != 'undefined', 'missing Wasm export: sdaiSaveModelBN');
-  assert(typeof wasmExports['sdaiSaveModelBNUnicode'] != 'undefined', 'missing Wasm export: sdaiSaveModelBNUnicode');
-  assert(typeof wasmExports['engiSaveModelByStream'] != 'undefined', 'missing Wasm export: engiSaveModelByStream');
-  assert(typeof wasmExports['engiSaveModelByArray'] != 'undefined', 'missing Wasm export: engiSaveModelByArray');
-  assert(typeof wasmExports['sdaiSaveModelAsXmlBN'] != 'undefined', 'missing Wasm export: sdaiSaveModelAsXmlBN');
-  assert(typeof wasmExports['sdaiSaveModelAsXmlBNUnicode'] != 'undefined', 'missing Wasm export: sdaiSaveModelAsXmlBNUnicode');
-  assert(typeof wasmExports['sdaiSaveModelAsSimpleXmlBN'] != 'undefined', 'missing Wasm export: sdaiSaveModelAsSimpleXmlBN');
-  assert(typeof wasmExports['sdaiSaveModelAsSimpleXmlBNUnicode'] != 'undefined', 'missing Wasm export: sdaiSaveModelAsSimpleXmlBNUnicode');
-  assert(typeof wasmExports['sdaiSaveModelAsJsonBN'] != 'undefined', 'missing Wasm export: sdaiSaveModelAsJsonBN');
-  assert(typeof wasmExports['sdaiSaveModelAsJsonBNUnicode'] != 'undefined', 'missing Wasm export: sdaiSaveModelAsJsonBNUnicode');
-  assert(typeof wasmExports['engiSaveSchemaBN'] != 'undefined', 'missing Wasm export: engiSaveSchemaBN');
-  assert(typeof wasmExports['engiSaveSchemaBNUnicode'] != 'undefined', 'missing Wasm export: engiSaveSchemaBNUnicode');
-  assert(typeof wasmExports['sdaiCloseModel'] != 'undefined', 'missing Wasm export: sdaiCloseModel');
-  assert(typeof wasmExports['setPrecisionDoubleExport'] != 'undefined', 'missing Wasm export: setPrecisionDoubleExport');
-  assert(typeof wasmExports['engiGetNextTypeDeclarationIterator'] != 'undefined', 'missing Wasm export: engiGetNextTypeDeclarationIterator');
-  assert(typeof wasmExports['engiGetTypeDeclarationFromIterator'] != 'undefined', 'missing Wasm export: engiGetTypeDeclarationFromIterator');
-  assert(typeof wasmExports['engiGetSchemaScriptDeclarationByIterator'] != 'undefined', 'missing Wasm export: engiGetSchemaScriptDeclarationByIterator');
-  assert(typeof wasmExports['engiGetDeclarationType'] != 'undefined', 'missing Wasm export: engiGetDeclarationType');
-  assert(typeof wasmExports['engiGetEnumerationElement'] != 'undefined', 'missing Wasm export: engiGetEnumerationElement');
-  assert(typeof wasmExports['engiGetSelectElement'] != 'undefined', 'missing Wasm export: engiGetSelectElement');
-  assert(typeof wasmExports['engiGetDefinedType'] != 'undefined', 'missing Wasm export: engiGetDefinedType');
-  assert(typeof wasmExports['engiGetScriptText'] != 'undefined', 'missing Wasm export: engiGetScriptText');
-  assert(typeof wasmExports['engiEvaluateScriptExpression'] != 'undefined', 'missing Wasm export: engiEvaluateScriptExpression');
-  assert(typeof wasmExports['sdaiGetEntity'] != 'undefined', 'missing Wasm export: sdaiGetEntity');
-  assert(typeof wasmExports['sdaiGetComplexEntity'] != 'undefined', 'missing Wasm export: sdaiGetComplexEntity');
-  assert(typeof wasmExports['sdaiGetComplexEntityBN'] != 'undefined', 'missing Wasm export: sdaiGetComplexEntityBN');
-  assert(typeof wasmExports['engiGetEntityModel'] != 'undefined', 'missing Wasm export: engiGetEntityModel');
-  assert(typeof wasmExports['engiGetEntityAttributePosition'] != 'undefined', 'missing Wasm export: engiGetEntityAttributePosition');
-  assert(typeof wasmExports['engiGetEntityCount'] != 'undefined', 'missing Wasm export: engiGetEntityCount');
-  assert(typeof wasmExports['engiGetEntityElement'] != 'undefined', 'missing Wasm export: engiGetEntityElement');
-  assert(typeof wasmExports['sdaiGetEntityExtent'] != 'undefined', 'missing Wasm export: sdaiGetEntityExtent');
-  assert(typeof wasmExports['sdaiGetEntityExtentBN'] != 'undefined', 'missing Wasm export: sdaiGetEntityExtentBN');
-  assert(typeof wasmExports['engiGetEntityNameEx'] != 'undefined', 'missing Wasm export: engiGetEntityNameEx');
-  assert(typeof wasmExports['engiGetEntityName'] != 'undefined', 'missing Wasm export: engiGetEntityName');
-  assert(typeof wasmExports['engiGetEntityNoAttributes'] != 'undefined', 'missing Wasm export: engiGetEntityNoAttributes');
-  assert(typeof wasmExports['engiGetEntityNoAttributesEx'] != 'undefined', 'missing Wasm export: engiGetEntityNoAttributesEx');
-  assert(typeof wasmExports['engiGetEntityParent'] != 'undefined', 'missing Wasm export: engiGetEntityParent');
-  assert(typeof wasmExports['engiGetEntityNoParents'] != 'undefined', 'missing Wasm export: engiGetEntityNoParents');
-  assert(typeof wasmExports['engiGetEntityParentEx'] != 'undefined', 'missing Wasm export: engiGetEntityParentEx');
-  assert(typeof wasmExports['engiIsParentOf'] != 'undefined', 'missing Wasm export: engiIsParentOf');
-  assert(typeof wasmExports['engiGetAttrDerived'] != 'undefined', 'missing Wasm export: engiGetAttrDerived');
-  assert(typeof wasmExports['engiGetAttrDerivedBN'] != 'undefined', 'missing Wasm export: engiGetAttrDerivedBN');
-  assert(typeof wasmExports['engiIsAttrInverse'] != 'undefined', 'missing Wasm export: engiIsAttrInverse');
-  assert(typeof wasmExports['engiIsAttrInverseBN'] != 'undefined', 'missing Wasm export: engiIsAttrInverseBN');
-  assert(typeof wasmExports['engiIsAttrOptional'] != 'undefined', 'missing Wasm export: engiIsAttrOptional');
-  assert(typeof wasmExports['engiIsAttrOptionalBN'] != 'undefined', 'missing Wasm export: engiIsAttrOptionalBN');
-  assert(typeof wasmExports['engiGetAttrRedeclarationByIterator'] != 'undefined', 'missing Wasm export: engiGetAttrRedeclarationByIterator');
-  assert(typeof wasmExports['engiGetAttrDomainName'] != 'undefined', 'missing Wasm export: engiGetAttrDomainName');
-  assert(typeof wasmExports['engiGetAttrDomainNameBN'] != 'undefined', 'missing Wasm export: engiGetAttrDomainNameBN');
-  assert(typeof wasmExports['engiIsEntityAbstract'] != 'undefined', 'missing Wasm export: engiIsEntityAbstract');
-  assert(typeof wasmExports['engiGetEntityIsAbstract'] != 'undefined', 'missing Wasm export: engiGetEntityIsAbstract');
-  assert(typeof wasmExports['engiIsEntityAbstractBN'] != 'undefined', 'missing Wasm export: engiIsEntityAbstractBN');
-  assert(typeof wasmExports['engiGetEntityIsAbstractBN'] != 'undefined', 'missing Wasm export: engiGetEntityIsAbstractBN');
-  assert(typeof wasmExports['engiGetEnumerationValue'] != 'undefined', 'missing Wasm export: engiGetEnumerationValue');
-  assert(typeof wasmExports['engiGetEntityAttributeByIterator'] != 'undefined', 'missing Wasm export: engiGetEntityAttributeByIterator');
-  assert(typeof wasmExports['sdaiGetInstanceType'] != 'undefined', 'missing Wasm export: sdaiGetInstanceType');
-  assert(typeof wasmExports['engiGetAggregationDefinition'] != 'undefined', 'missing Wasm export: engiGetAggregationDefinition');
-  assert(typeof wasmExports['engiGetEntityUniqueRuleByIterator'] != 'undefined', 'missing Wasm export: engiGetEntityUniqueRuleByIterator');
-  assert(typeof wasmExports['engiGetEntityUniqueRuleAttributeByIterator'] != 'undefined', 'missing Wasm export: engiGetEntityUniqueRuleAttributeByIterator');
-  assert(typeof wasmExports['engiGetEntityWhereRuleByIterator'] != 'undefined', 'missing Wasm export: engiGetEntityWhereRuleByIterator');
-  assert(typeof wasmExports['sdaiGetADBType'] != 'undefined', 'missing Wasm export: sdaiGetADBType');
-  assert(typeof wasmExports['sdaiGetADBTypePath'] != 'undefined', 'missing Wasm export: sdaiGetADBTypePath');
-  assert(typeof wasmExports['sdaiGetADBValue'] != 'undefined', 'missing Wasm export: sdaiGetADBValue');
-  assert(typeof wasmExports['sdaiPutADBValue'] != 'undefined', 'missing Wasm export: sdaiPutADBValue');
-  assert(typeof wasmExports['sdaiCreateEmptyADB'] != 'undefined', 'missing Wasm export: sdaiCreateEmptyADB');
-  assert(typeof wasmExports['sdaiCreateADB'] != 'undefined', 'missing Wasm export: sdaiCreateADB');
-  assert(typeof wasmExports['sdaiDeleteADB'] != 'undefined', 'missing Wasm export: sdaiDeleteADB');
-  assert(typeof wasmExports['sdaiGetAggrByIndex'] != 'undefined', 'missing Wasm export: sdaiGetAggrByIndex');
-  assert(typeof wasmExports['sdaiPutAggrByIndex'] != 'undefined', 'missing Wasm export: sdaiPutAggrByIndex');
-  assert(typeof wasmExports['engiGetAggrType'] != 'undefined', 'missing Wasm export: engiGetAggrType');
-  assert(typeof wasmExports['engiGetAggrTypex'] != 'undefined', 'missing Wasm export: engiGetAggrTypex');
-  assert(typeof wasmExports['sdaiGetAttr'] != 'undefined', 'missing Wasm export: sdaiGetAttr');
-  assert(typeof wasmExports['sdaiGetAttrBN'] != 'undefined', 'missing Wasm export: sdaiGetAttrBN');
-  assert(typeof wasmExports['sdaiGetAttrDefinition'] != 'undefined', 'missing Wasm export: sdaiGetAttrDefinition');
-  assert(typeof wasmExports['sdaiGetAttrBNUnicode'] != 'undefined', 'missing Wasm export: sdaiGetAttrBNUnicode');
-  assert(typeof wasmExports['sdaiGetStringAttrBN'] != 'undefined', 'missing Wasm export: sdaiGetStringAttrBN');
-  assert(typeof wasmExports['sdaiGetInstanceAttrBN'] != 'undefined', 'missing Wasm export: sdaiGetInstanceAttrBN');
-  assert(typeof wasmExports['sdaiGetAggregationAttrBN'] != 'undefined', 'missing Wasm export: sdaiGetAggregationAttrBN');
-  assert(typeof wasmExports['engiGetAttrTraits'] != 'undefined', 'missing Wasm export: engiGetAttrTraits');
-  assert(typeof wasmExports['engiGetAttrName'] != 'undefined', 'missing Wasm export: engiGetAttrName');
-  assert(typeof wasmExports['engiGetAttrDefiningEntity'] != 'undefined', 'missing Wasm export: engiGetAttrDefiningEntity');
-  assert(typeof wasmExports['engiIsAttrExplicit'] != 'undefined', 'missing Wasm export: engiIsAttrExplicit');
-  assert(typeof wasmExports['engiIsAttrExplicitBN'] != 'undefined', 'missing Wasm export: engiIsAttrExplicitBN');
-  assert(typeof wasmExports['sdaiGetInstanceModel'] != 'undefined', 'missing Wasm export: sdaiGetInstanceModel');
-  assert(typeof wasmExports['sdaiGetMemberCount'] != 'undefined', 'missing Wasm export: sdaiGetMemberCount');
-  assert(typeof wasmExports['sdaiIsKindOf'] != 'undefined', 'missing Wasm export: sdaiIsKindOf');
-  assert(typeof wasmExports['sdaiIsKindOfBN'] != 'undefined', 'missing Wasm export: sdaiIsKindOfBN');
-  assert(typeof wasmExports['engiGetAttrType'] != 'undefined', 'missing Wasm export: engiGetAttrType');
-  assert(typeof wasmExports['engiGetAttrTypeBN'] != 'undefined', 'missing Wasm export: engiGetAttrTypeBN');
-  assert(typeof wasmExports['engiGetExpressAttrType'] != 'undefined', 'missing Wasm export: engiGetExpressAttrType');
-  assert(typeof wasmExports['engiGetAttrAggregation'] != 'undefined', 'missing Wasm export: engiGetAttrAggregation');
-  assert(typeof wasmExports['engiGetInstanceAttrType'] != 'undefined', 'missing Wasm export: engiGetInstanceAttrType');
-  assert(typeof wasmExports['engiGetInstanceAttrTypeBN'] != 'undefined', 'missing Wasm export: engiGetInstanceAttrTypeBN');
-  assert(typeof wasmExports['sdaiIsInstanceOf'] != 'undefined', 'missing Wasm export: sdaiIsInstanceOf');
-  assert(typeof wasmExports['sdaiIsInstanceOfBN'] != 'undefined', 'missing Wasm export: sdaiIsInstanceOfBN');
-  assert(typeof wasmExports['sdaiIsEqual'] != 'undefined', 'missing Wasm export: sdaiIsEqual');
-  assert(typeof wasmExports['sdaiValidateAttribute'] != 'undefined', 'missing Wasm export: sdaiValidateAttribute');
-  assert(typeof wasmExports['sdaiValidateAttributeBN'] != 'undefined', 'missing Wasm export: sdaiValidateAttributeBN');
-  assert(typeof wasmExports['engiGetInstanceClassInfo'] != 'undefined', 'missing Wasm export: engiGetInstanceClassInfo');
-  assert(typeof wasmExports['engiGetInstanceClassInfoUC'] != 'undefined', 'missing Wasm export: engiGetInstanceClassInfoUC');
-  assert(typeof wasmExports['engiGetInstanceMetaInfo'] != 'undefined', 'missing Wasm export: engiGetInstanceMetaInfo');
-  assert(typeof wasmExports['sdaiFindInstanceUsers'] != 'undefined', 'missing Wasm export: sdaiFindInstanceUsers');
-  assert(typeof wasmExports['sdaiFindInstanceUsedIn'] != 'undefined', 'missing Wasm export: sdaiFindInstanceUsedIn');
-  assert(typeof wasmExports['sdaiFindInstanceUsedInBN'] != 'undefined', 'missing Wasm export: sdaiFindInstanceUsedInBN');
-  assert(typeof wasmExports['sdaiPrepend'] != 'undefined', 'missing Wasm export: sdaiPrepend');
-  assert(typeof wasmExports['sdaiAppend'] != 'undefined', 'missing Wasm export: sdaiAppend');
-  assert(typeof wasmExports['sdaiAdd'] != 'undefined', 'missing Wasm export: sdaiAdd');
-  assert(typeof wasmExports['sdaiInsertByIndex'] != 'undefined', 'missing Wasm export: sdaiInsertByIndex');
-  assert(typeof wasmExports['sdaiInsertBefore'] != 'undefined', 'missing Wasm export: sdaiInsertBefore');
-  assert(typeof wasmExports['sdaiInsertAfter'] != 'undefined', 'missing Wasm export: sdaiInsertAfter');
-  assert(typeof wasmExports['sdaiCreateAggr'] != 'undefined', 'missing Wasm export: sdaiCreateAggr');
-  assert(typeof wasmExports['sdaiCreateAggrBN'] != 'undefined', 'missing Wasm export: sdaiCreateAggrBN');
-  assert(typeof wasmExports['sdaiCreateNPL'] != 'undefined', 'missing Wasm export: sdaiCreateNPL');
-  assert(typeof wasmExports['sdaiDeleteNPL'] != 'undefined', 'missing Wasm export: sdaiDeleteNPL');
-  assert(typeof wasmExports['sdaiCreateNestedAggr'] != 'undefined', 'missing Wasm export: sdaiCreateNestedAggr');
-  assert(typeof wasmExports['sdaiCreateNestedAggrByIndexADB'] != 'undefined', 'missing Wasm export: sdaiCreateNestedAggrByIndexADB');
-  assert(typeof wasmExports['sdaiCreateNestedAggrByIndex'] != 'undefined', 'missing Wasm export: sdaiCreateNestedAggrByIndex');
-  assert(typeof wasmExports['sdaiInsertNestedAggrByIndex'] != 'undefined', 'missing Wasm export: sdaiInsertNestedAggrByIndex');
-  assert(typeof wasmExports['sdaiInsertNestedAggrByIndexADB'] != 'undefined', 'missing Wasm export: sdaiInsertNestedAggrByIndexADB');
-  assert(typeof wasmExports['sdaiCreateNestedAggrByItr'] != 'undefined', 'missing Wasm export: sdaiCreateNestedAggrByItr');
-  assert(typeof wasmExports['sdaiCreateNestedAggrByItrADB'] != 'undefined', 'missing Wasm export: sdaiCreateNestedAggrByItrADB');
-  assert(typeof wasmExports['sdaiInsertNestedAggrBefore'] != 'undefined', 'missing Wasm export: sdaiInsertNestedAggrBefore');
-  assert(typeof wasmExports['sdaiInsertNestedAggrBeforeADB'] != 'undefined', 'missing Wasm export: sdaiInsertNestedAggrBeforeADB');
-  assert(typeof wasmExports['sdaiInsertNestedAggrAfter'] != 'undefined', 'missing Wasm export: sdaiInsertNestedAggrAfter');
-  assert(typeof wasmExports['sdaiInsertNestedAggrAfterADB'] != 'undefined', 'missing Wasm export: sdaiInsertNestedAggrAfterADB');
-  assert(typeof wasmExports['sdaiCreateNestedAggrADB'] != 'undefined', 'missing Wasm export: sdaiCreateNestedAggrADB');
-  assert(typeof wasmExports['sdaiRemoveByIndex'] != 'undefined', 'missing Wasm export: sdaiRemoveByIndex');
-  assert(typeof wasmExports['sdaiRemoveByIterator'] != 'undefined', 'missing Wasm export: sdaiRemoveByIterator');
-  assert(typeof wasmExports['sdaiRemove'] != 'undefined', 'missing Wasm export: sdaiRemove');
-  assert(typeof wasmExports['sdaiTestArrayByIndex'] != 'undefined', 'missing Wasm export: sdaiTestArrayByIndex');
-  assert(typeof wasmExports['sdaiTestArrayByItr'] != 'undefined', 'missing Wasm export: sdaiTestArrayByItr');
-  assert(typeof wasmExports['sdaiCreateInstance'] != 'undefined', 'missing Wasm export: sdaiCreateInstance');
-  assert(typeof wasmExports['sdaiCreateInstanceBN'] != 'undefined', 'missing Wasm export: sdaiCreateInstanceBN');
-  assert(typeof wasmExports['sdaiCreateComplexInstance'] != 'undefined', 'missing Wasm export: sdaiCreateComplexInstance');
-  assert(typeof wasmExports['sdaiCreateComplexInstanceBN'] != 'undefined', 'missing Wasm export: sdaiCreateComplexInstanceBN');
-  assert(typeof wasmExports['sdaiDeleteInstance'] != 'undefined', 'missing Wasm export: sdaiDeleteInstance');
-  assert(typeof wasmExports['sdaiPutADBTypePath'] != 'undefined', 'missing Wasm export: sdaiPutADBTypePath');
-  assert(typeof wasmExports['sdaiPutAttr'] != 'undefined', 'missing Wasm export: sdaiPutAttr');
-  assert(typeof wasmExports['sdaiPutAttrBN'] != 'undefined', 'missing Wasm export: sdaiPutAttrBN');
-  assert(typeof wasmExports['sdaiUnsetAttr'] != 'undefined', 'missing Wasm export: sdaiUnsetAttr');
-  assert(typeof wasmExports['sdaiUnsetAttrBN'] != 'undefined', 'missing Wasm export: sdaiUnsetAttrBN');
-  assert(typeof wasmExports['engiSetComment'] != 'undefined', 'missing Wasm export: engiSetComment');
-  assert(typeof wasmExports['engiGetInstanceLocalId'] != 'undefined', 'missing Wasm export: engiGetInstanceLocalId');
-  assert(typeof wasmExports['sdaiTestAttr'] != 'undefined', 'missing Wasm export: sdaiTestAttr');
-  assert(typeof wasmExports['sdaiTestAttrBN'] != 'undefined', 'missing Wasm export: sdaiTestAttrBN');
-  assert(typeof wasmExports['sdaiCreateInstanceEI'] != 'undefined', 'missing Wasm export: sdaiCreateInstanceEI');
-  assert(typeof wasmExports['sdaiCreateInstanceBNEI'] != 'undefined', 'missing Wasm export: sdaiCreateInstanceBNEI');
-  assert(typeof wasmExports['sdaiCreateIterator'] != 'undefined', 'missing Wasm export: sdaiCreateIterator');
-  assert(typeof wasmExports['sdaiDeleteIterator'] != 'undefined', 'missing Wasm export: sdaiDeleteIterator');
-  assert(typeof wasmExports['sdaiBeginning'] != 'undefined', 'missing Wasm export: sdaiBeginning');
-  assert(typeof wasmExports['sdaiNext'] != 'undefined', 'missing Wasm export: sdaiNext');
-  assert(typeof wasmExports['sdaiPrevious'] != 'undefined', 'missing Wasm export: sdaiPrevious');
-  assert(typeof wasmExports['sdaiEnd'] != 'undefined', 'missing Wasm export: sdaiEnd');
-  assert(typeof wasmExports['sdaiIsMember'] != 'undefined', 'missing Wasm export: sdaiIsMember');
-  assert(typeof wasmExports['sdaiGetAggrElementBoundByItr'] != 'undefined', 'missing Wasm export: sdaiGetAggrElementBoundByItr');
-  assert(typeof wasmExports['sdaiGetAggrElementBoundByIndex'] != 'undefined', 'missing Wasm export: sdaiGetAggrElementBoundByIndex');
-  assert(typeof wasmExports['sdaiGetLowerBound'] != 'undefined', 'missing Wasm export: sdaiGetLowerBound');
-  assert(typeof wasmExports['sdaiGetUpperBound'] != 'undefined', 'missing Wasm export: sdaiGetUpperBound');
-  assert(typeof wasmExports['sdaiGetLowerIndex'] != 'undefined', 'missing Wasm export: sdaiGetLowerIndex');
-  assert(typeof wasmExports['sdaiGetUpperIndex'] != 'undefined', 'missing Wasm export: sdaiGetUpperIndex');
-  assert(typeof wasmExports['sdaiUnsetArrayByIndex'] != 'undefined', 'missing Wasm export: sdaiUnsetArrayByIndex');
-  assert(typeof wasmExports['sdaiUnsetArrayByItr'] != 'undefined', 'missing Wasm export: sdaiUnsetArrayByItr');
-  assert(typeof wasmExports['sdaiPutAggrByIterator'] != 'undefined', 'missing Wasm export: sdaiPutAggrByIterator');
-  assert(typeof wasmExports['sdaiReindexArray'] != 'undefined', 'missing Wasm export: sdaiReindexArray');
-  assert(typeof wasmExports['sdaiResetArrayIndex'] != 'undefined', 'missing Wasm export: sdaiResetArrayIndex');
-  assert(typeof wasmExports['engiEnableDerivedAttributes'] != 'undefined', 'missing Wasm export: engiEnableDerivedAttributes');
-  assert(typeof wasmExports['engiEvaluateAllDerivedAttributes'] != 'undefined', 'missing Wasm export: engiEvaluateAllDerivedAttributes');
-  assert(typeof wasmExports['engiIsComplexEntity'] != 'undefined', 'missing Wasm export: engiIsComplexEntity');
-  assert(typeof wasmExports['setSegmentation'] != 'undefined', 'missing Wasm export: setSegmentation');
-  assert(typeof wasmExports['getSegmentation'] != 'undefined', 'missing Wasm export: getSegmentation');
-  assert(typeof wasmExports['setEpsilon'] != 'undefined', 'missing Wasm export: setEpsilon');
-  assert(typeof wasmExports['getEpsilon'] != 'undefined', 'missing Wasm export: getEpsilon');
-  assert(typeof wasmExports['circleSegments'] != 'undefined', 'missing Wasm export: circleSegments');
-  assert(typeof wasmExports['setMaximumSegmentationLength'] != 'undefined', 'missing Wasm export: setMaximumSegmentationLength');
-  assert(typeof wasmExports['getProjectUnitConversionFactor'] != 'undefined', 'missing Wasm export: getProjectUnitConversionFactor');
-  assert(typeof wasmExports['getProjectUnitConversionFactorW'] != 'undefined', 'missing Wasm export: getProjectUnitConversionFactorW');
-  assert(typeof wasmExports['getUnitInstanceConversionFactor'] != 'undefined', 'missing Wasm export: getUnitInstanceConversionFactor');
-  assert(typeof wasmExports['getUnitInstanceConversionFactorW'] != 'undefined', 'missing Wasm export: getUnitInstanceConversionFactorW');
-  assert(typeof wasmExports['setBRepProperties'] != 'undefined', 'missing Wasm export: setBRepProperties');
-  assert(typeof wasmExports['cleanMemory'] != 'undefined', 'missing Wasm export: cleanMemory');
-  assert(typeof wasmExports['internalGetP21Line'] != 'undefined', 'missing Wasm export: internalGetP21Line');
-  assert(typeof wasmExports['internalForceInstanceFromP21Line'] != 'undefined', 'missing Wasm export: internalForceInstanceFromP21Line');
-  assert(typeof wasmExports['internalGetInstanceFromP21Line'] != 'undefined', 'missing Wasm export: internalGetInstanceFromP21Line');
-  assert(typeof wasmExports['internalGetXMLID'] != 'undefined', 'missing Wasm export: internalGetXMLID');
-  assert(typeof wasmExports['setStringUnicode'] != 'undefined', 'missing Wasm export: setStringUnicode');
-  assert(typeof wasmExports['getStringUnicode'] != 'undefined', 'missing Wasm export: getStringUnicode');
-  assert(typeof wasmExports['engiSetStringEncoding'] != 'undefined', 'missing Wasm export: engiSetStringEncoding');
-  assert(typeof wasmExports['setFilter'] != 'undefined', 'missing Wasm export: setFilter');
-  assert(typeof wasmExports['getFilter'] != 'undefined', 'missing Wasm export: getFilter');
-  assert(typeof wasmExports['setSerialization'] != 'undefined', 'missing Wasm export: setSerialization');
-  assert(typeof wasmExports['getSerialization'] != 'undefined', 'missing Wasm export: getSerialization');
-  assert(typeof wasmExports['xxxxGetEntityAndSubTypesExtent'] != 'undefined', 'missing Wasm export: xxxxGetEntityAndSubTypesExtent');
-  assert(typeof wasmExports['xxxxGetEntityAndSubTypesExtentBN'] != 'undefined', 'missing Wasm export: xxxxGetEntityAndSubTypesExtentBN');
-  assert(typeof wasmExports['xxxxGetAllInstances'] != 'undefined', 'missing Wasm export: xxxxGetAllInstances');
-  assert(typeof wasmExports['xxxxGetInstancesUsing'] != 'undefined', 'missing Wasm export: xxxxGetInstancesUsing');
-  assert(typeof wasmExports['xxxxDeleteFromAggregation'] != 'undefined', 'missing Wasm export: xxxxDeleteFromAggregation');
-  assert(typeof wasmExports['xxxxGetAttrDefinitionByValue'] != 'undefined', 'missing Wasm export: xxxxGetAttrDefinitionByValue');
-  assert(typeof wasmExports['iterateOverInstances'] != 'undefined', 'missing Wasm export: iterateOverInstances');
-  assert(typeof wasmExports['sdaiGetAggrByIterator'] != 'undefined', 'missing Wasm export: sdaiGetAggrByIterator');
-  assert(typeof wasmExports['internalSetLink'] != 'undefined', 'missing Wasm export: internalSetLink');
-  assert(typeof wasmExports['internalAddAggrLink'] != 'undefined', 'missing Wasm export: internalAddAggrLink');
-  assert(typeof wasmExports['engiGetNotReferedAggr'] != 'undefined', 'missing Wasm export: engiGetNotReferedAggr');
-  assert(typeof wasmExports['engiGetAttributeAggr'] != 'undefined', 'missing Wasm export: engiGetAttributeAggr');
-  assert(typeof wasmExports['sdaiErrorQuery'] != 'undefined', 'missing Wasm export: sdaiErrorQuery');
-  assert(typeof wasmExports['InitializeMultiThreading'] != 'undefined', 'missing Wasm export: InitializeMultiThreading');
-  assert(typeof wasmExports['CreateOwlModelMultiThreadingWrapper'] != 'undefined', 'missing Wasm export: CreateOwlModelMultiThreadingWrapper');
-  assert(typeof wasmExports['owlGetModel'] != 'undefined', 'missing Wasm export: owlGetModel');
-  assert(typeof wasmExports['owlConnectModel'] != 'undefined', 'missing Wasm export: owlConnectModel');
-  assert(typeof wasmExports['owlGetInstance'] != 'undefined', 'missing Wasm export: owlGetInstance');
-  assert(typeof wasmExports['owlMaterialInstance'] != 'undefined', 'missing Wasm export: owlMaterialInstance');
-  assert(typeof wasmExports['owlBuildInstance'] != 'undefined', 'missing Wasm export: owlBuildInstance');
-  assert(typeof wasmExports['owlBuildInstanceMT'] != 'undefined', 'missing Wasm export: owlBuildInstanceMT');
-  assert(typeof wasmExports['owlBuildInstanceInContext'] != 'undefined', 'missing Wasm export: owlBuildInstanceInContext');
-  assert(typeof wasmExports['owlBuildInstanceInContextMT'] != 'undefined', 'missing Wasm export: owlBuildInstanceInContextMT');
-  assert(typeof wasmExports['engiInstanceUsesSegmentation'] != 'undefined', 'missing Wasm export: engiInstanceUsesSegmentation');
-  assert(typeof wasmExports['owlBuildInstances'] != 'undefined', 'missing Wasm export: owlBuildInstances');
-  assert(typeof wasmExports['owlGetMappedItem'] != 'undefined', 'missing Wasm export: owlGetMappedItem');
-  assert(typeof wasmExports['getInstanceDerivedPropertiesInModelling'] != 'undefined', 'missing Wasm export: getInstanceDerivedPropertiesInModelling');
-  assert(typeof wasmExports['getInstanceDerivedBoundingBox'] != 'undefined', 'missing Wasm export: getInstanceDerivedBoundingBox');
-  assert(typeof wasmExports['getInstanceTransformationMatrix'] != 'undefined', 'missing Wasm export: getInstanceTransformationMatrix');
-  assert(typeof wasmExports['getInstanceDerivedTransformationMatrix'] != 'undefined', 'missing Wasm export: getInstanceDerivedTransformationMatrix');
-  assert(typeof wasmExports['internalGetBoundingBox'] != 'undefined', 'missing Wasm export: internalGetBoundingBox');
-  assert(typeof wasmExports['internalGetCenter'] != 'undefined', 'missing Wasm export: internalGetCenter');
-  assert(typeof wasmExports['getRootAxis2Placement'] != 'undefined', 'missing Wasm export: getRootAxis2Placement');
-  assert(typeof wasmExports['getGlobalPlacement'] != 'undefined', 'missing Wasm export: getGlobalPlacement');
-  assert(typeof wasmExports['engiGetAggrElement'] != 'undefined', 'missing Wasm export: engiGetAggrElement');
-  assert(typeof wasmExports['setGlobalPlacement'] != 'undefined', 'missing Wasm export: setGlobalPlacement');
-  assert(typeof wasmExports['getTimeStamp'] != 'undefined', 'missing Wasm export: getTimeStamp');
-  assert(typeof wasmExports['setInstanceReference'] != 'undefined', 'missing Wasm export: setInstanceReference');
-  assert(typeof wasmExports['getInstanceReference'] != 'undefined', 'missing Wasm export: getInstanceReference');
-  assert(typeof wasmExports['inferenceInstance'] != 'undefined', 'missing Wasm export: inferenceInstance');
-  assert(typeof wasmExports['sdaiValidateSchemaInstance'] != 'undefined', 'missing Wasm export: sdaiValidateSchemaInstance');
-  assert(typeof wasmExports['engiGetAggrUnknownElement'] != 'undefined', 'missing Wasm export: engiGetAggrUnknownElement');
-  assert(typeof wasmExports['engiGetEntityAttributeByIndex'] != 'undefined', 'missing Wasm export: engiGetEntityAttributeByIndex');
-  assert(typeof wasmExports['iterateOverProperties'] != 'undefined', 'missing Wasm export: iterateOverProperties');
-  assert(typeof wasmExports['engiGetEntityAttributeIndex'] != 'undefined', 'missing Wasm export: engiGetEntityAttributeIndex');
-  assert(typeof wasmExports['engiGetAttrIndexBN'] != 'undefined', 'missing Wasm export: engiGetAttrIndexBN');
-  assert(typeof wasmExports['engiGetAttrIndexExBN'] != 'undefined', 'missing Wasm export: engiGetAttrIndexExBN');
-  assert(typeof wasmExports['engiGetEntityAttributeIndexEx'] != 'undefined', 'missing Wasm export: engiGetEntityAttributeIndexEx');
-  assert(typeof wasmExports['engiGetEntityArgumentName'] != 'undefined', 'missing Wasm export: engiGetEntityArgumentName');
-  assert(typeof wasmExports['engiGetAttrNameByIndex'] != 'undefined', 'missing Wasm export: engiGetAttrNameByIndex');
-  assert(typeof wasmExports['engiGetEntityArgumentType'] != 'undefined', 'missing Wasm export: engiGetEntityArgumentType');
-  assert(typeof wasmExports['engiGetAttrTypeByIndex'] != 'undefined', 'missing Wasm export: engiGetAttrTypeByIndex');
-  assert(typeof wasmExports['engiGetAttrOptional'] != 'undefined', 'missing Wasm export: engiGetAttrOptional');
-  assert(typeof wasmExports['engiGetAttrOptionalBN'] != 'undefined', 'missing Wasm export: engiGetAttrOptionalBN');
-  assert(typeof wasmExports['engiGetAttrInverse'] != 'undefined', 'missing Wasm export: engiGetAttrInverse');
-  assert(typeof wasmExports['engiGetAttrInverseBN'] != 'undefined', 'missing Wasm export: engiGetAttrInverseBN');
-  assert(typeof wasmExports['engiAttrIsInverse'] != 'undefined', 'missing Wasm export: engiAttrIsInverse');
-  assert(typeof wasmExports['engiGetAttrDomain'] != 'undefined', 'missing Wasm export: engiGetAttrDomain');
-  assert(typeof wasmExports['engiGetAttrDomainBN'] != 'undefined', 'missing Wasm export: engiGetAttrDomainBN');
-  assert(typeof wasmExports['engiGetAttributeTraits'] != 'undefined', 'missing Wasm export: engiGetAttributeTraits');
-  assert(typeof wasmExports['engiGetEntityNoArguments'] != 'undefined', 'missing Wasm export: engiGetEntityNoArguments');
-  assert(typeof wasmExports['engiGetArgumentType'] != 'undefined', 'missing Wasm export: engiGetArgumentType');
-  assert(typeof wasmExports['engiGetAttributeType'] != 'undefined', 'missing Wasm export: engiGetAttributeType');
-  assert(typeof wasmExports['engiGetEntityArgumentIndex'] != 'undefined', 'missing Wasm export: engiGetEntityArgumentIndex');
-  assert(typeof wasmExports['engiGetEntityArgument'] != 'undefined', 'missing Wasm export: engiGetEntityArgument');
-  assert(typeof wasmExports['sdaiGetADBTypePathx'] != 'undefined', 'missing Wasm export: sdaiGetADBTypePathx');
-  assert(typeof wasmExports['xxxxOpenModelByStream'] != 'undefined', 'missing Wasm export: xxxxOpenModelByStream');
-  assert(typeof wasmExports['sdaiplusGetAggregationType'] != 'undefined', 'missing Wasm export: sdaiplusGetAggregationType');
-  assert(typeof wasmExports['xxxxGetAttrType'] != 'undefined', 'missing Wasm export: xxxxGetAttrType');
-  assert(typeof wasmExports['xxxxGetAttrTypeBN'] != 'undefined', 'missing Wasm export: xxxxGetAttrTypeBN');
-  assert(typeof wasmExports['GetSPFFHeaderItemUnicode'] != 'undefined', 'missing Wasm export: GetSPFFHeaderItemUnicode');
-  assert(typeof wasmExports['engiGetAttrIndex'] != 'undefined', 'missing Wasm export: engiGetAttrIndex');
-  assert(typeof wasmExports['engiGetAttrIndexEx'] != 'undefined', 'missing Wasm export: engiGetAttrIndexEx');
-  assert(typeof wasmExports['xxxxGetAttrNameByIndex'] != 'undefined', 'missing Wasm export: xxxxGetAttrNameByIndex');
-  assert(typeof wasmExports['validateSetOptions'] != 'undefined', 'missing Wasm export: validateSetOptions');
-  assert(typeof wasmExports['validateGetOptions'] != 'undefined', 'missing Wasm export: validateGetOptions');
-  assert(typeof wasmExports['validateModel'] != 'undefined', 'missing Wasm export: validateModel');
-  assert(typeof wasmExports['validateInstance'] != 'undefined', 'missing Wasm export: validateInstance');
-  assert(typeof wasmExports['validateFreeResults'] != 'undefined', 'missing Wasm export: validateFreeResults');
-  assert(typeof wasmExports['validateGetFirstIssue'] != 'undefined', 'missing Wasm export: validateGetFirstIssue');
-  assert(typeof wasmExports['validateGetNextIssue'] != 'undefined', 'missing Wasm export: validateGetNextIssue');
-  assert(typeof wasmExports['validateGetStatus'] != 'undefined', 'missing Wasm export: validateGetStatus');
-  assert(typeof wasmExports['validateGetIssueType'] != 'undefined', 'missing Wasm export: validateGetIssueType');
-  assert(typeof wasmExports['validateGetInstance'] != 'undefined', 'missing Wasm export: validateGetInstance');
-  assert(typeof wasmExports['validateGetInstanceRelated'] != 'undefined', 'missing Wasm export: validateGetInstanceRelated');
-  assert(typeof wasmExports['validateGetEntity'] != 'undefined', 'missing Wasm export: validateGetEntity');
-  assert(typeof wasmExports['validateGetAttr'] != 'undefined', 'missing Wasm export: validateGetAttr');
-  assert(typeof wasmExports['validateGetAggrLevel'] != 'undefined', 'missing Wasm export: validateGetAggrLevel');
-  assert(typeof wasmExports['validateGetAggrIndArray'] != 'undefined', 'missing Wasm export: validateGetAggrIndArray');
-  assert(typeof wasmExports['validateGetIssueLevel'] != 'undefined', 'missing Wasm export: validateGetIssueLevel');
-  assert(typeof wasmExports['validateGetDescription'] != 'undefined', 'missing Wasm export: validateGetDescription');
-  assert(typeof wasmExports['initializeModellingInstance'] != 'undefined', 'missing Wasm export: initializeModellingInstance');
-  assert(typeof wasmExports['finalizeModelling'] != 'undefined', 'missing Wasm export: finalizeModelling');
-  assert(typeof wasmExports['getInstanceInModelling'] != 'undefined', 'missing Wasm export: getInstanceInModelling');
-  assert(typeof wasmExports['setVertexOffset'] != 'undefined', 'missing Wasm export: setVertexOffset');
-  assert(typeof wasmExports['setFormat'] != 'undefined', 'missing Wasm export: setFormat');
-  assert(typeof wasmExports['getConceptualFaceCnt'] != 'undefined', 'missing Wasm export: getConceptualFaceCnt');
-  assert(typeof wasmExports['getConceptualFaceEx'] != 'undefined', 'missing Wasm export: getConceptualFaceEx');
-  assert(typeof wasmExports['createGeometryConversion'] != 'undefined', 'missing Wasm export: createGeometryConversion');
-  assert(typeof wasmExports['convertInstance'] != 'undefined', 'missing Wasm export: convertInstance');
-  assert(typeof wasmExports['initializeModellingInstanceEx'] != 'undefined', 'missing Wasm export: initializeModellingInstanceEx');
-  assert(typeof wasmExports['exportModellingAsOWL'] != 'undefined', 'missing Wasm export: exportModellingAsOWL');
-  assert(typeof wasmExports['malloc'] != 'undefined', 'missing Wasm export: malloc');
-  assert(typeof wasmExports['free'] != 'undefined', 'missing Wasm export: free');
-  assert(typeof wasmExports['strerror'] != 'undefined', 'missing Wasm export: strerror');
-  assert(typeof wasmExports['fflush'] != 'undefined', 'missing Wasm export: fflush');
-  assert(typeof wasmExports['emscripten_stack_get_end'] != 'undefined', 'missing Wasm export: emscripten_stack_get_end');
-  assert(typeof wasmExports['emscripten_stack_get_base'] != 'undefined', 'missing Wasm export: emscripten_stack_get_base');
-  assert(typeof wasmExports['__trap'] != 'undefined', 'missing Wasm export: __trap');
-  assert(typeof wasmExports['emscripten_stack_init'] != 'undefined', 'missing Wasm export: emscripten_stack_init');
-  assert(typeof wasmExports['emscripten_stack_get_free'] != 'undefined', 'missing Wasm export: emscripten_stack_get_free');
-  assert(typeof wasmExports['_emscripten_stack_restore'] != 'undefined', 'missing Wasm export: _emscripten_stack_restore');
-  assert(typeof wasmExports['_emscripten_stack_alloc'] != 'undefined', 'missing Wasm export: _emscripten_stack_alloc');
-  assert(typeof wasmExports['emscripten_stack_get_current'] != 'undefined', 'missing Wasm export: emscripten_stack_get_current');
-  assert(typeof wasmExports['__cxa_decrement_exception_refcount'] != 'undefined', 'missing Wasm export: __cxa_decrement_exception_refcount');
-  assert(typeof wasmExports['__cxa_increment_exception_refcount'] != 'undefined', 'missing Wasm export: __cxa_increment_exception_refcount');
-  assert(typeof wasmExports['__thrown_object_from_unwind_exception'] != 'undefined', 'missing Wasm export: __thrown_object_from_unwind_exception');
-  assert(typeof wasmExports['__get_exception_message'] != 'undefined', 'missing Wasm export: __get_exception_message');
-  assert(typeof wasmExports['__set_stack_limits'] != 'undefined', 'missing Wasm export: __set_stack_limits');
-  assert(typeof wasmExports['memory'] != 'undefined', 'missing Wasm export: memory');
-  assert(typeof wasmExports['__indirect_function_table'] != 'undefined', 'missing Wasm export: __indirect_function_table');
-  assert(typeof wasmExports['__cpp_exception'] != 'undefined', 'missing Wasm export: __cpp_exception');
+  assert(typeof wasmExports['__getTypeName'] !== 'undefined', 'missing Wasm export: __getTypeName');
+  assert(typeof wasmExports['GetRevision'] !== 'undefined', 'missing Wasm export: GetRevision');
+  assert(typeof wasmExports['GetRevisionW'] !== 'undefined', 'missing Wasm export: GetRevisionW');
+  assert(typeof wasmExports['GetProtection'] !== 'undefined', 'missing Wasm export: GetProtection');
+  assert(typeof wasmExports['GetEnvironment'] !== 'undefined', 'missing Wasm export: GetEnvironment');
+  assert(typeof wasmExports['GetEnvironmentW'] !== 'undefined', 'missing Wasm export: GetEnvironmentW');
+  assert(typeof wasmExports['SetAssertionFile'] !== 'undefined', 'missing Wasm export: SetAssertionFile');
+  assert(typeof wasmExports['SetAssertionFileW'] !== 'undefined', 'missing Wasm export: SetAssertionFileW');
+  assert(typeof wasmExports['GetAssertionFile'] !== 'undefined', 'missing Wasm export: GetAssertionFile');
+  assert(typeof wasmExports['GetAssertionFileW'] !== 'undefined', 'missing Wasm export: GetAssertionFileW');
+  assert(typeof wasmExports['SetCharacterSerialization'] !== 'undefined', 'missing Wasm export: SetCharacterSerialization');
+  assert(typeof wasmExports['GetCharacterSerialization'] !== 'undefined', 'missing Wasm export: GetCharacterSerialization');
+  assert(typeof wasmExports['SetModellingStyle'] !== 'undefined', 'missing Wasm export: SetModellingStyle');
+  assert(typeof wasmExports['GetModellingStyle'] !== 'undefined', 'missing Wasm export: GetModellingStyle');
+  assert(typeof wasmExports['AbortModel'] !== 'undefined', 'missing Wasm export: AbortModel');
+  assert(typeof wasmExports['GetSessionMetaInfo'] !== 'undefined', 'missing Wasm export: GetSessionMetaInfo');
+  assert(typeof wasmExports['GetModelMetaInfo'] !== 'undefined', 'missing Wasm export: GetModelMetaInfo');
+  assert(typeof wasmExports['GetInstanceMetaInfo'] !== 'undefined', 'missing Wasm export: GetInstanceMetaInfo');
+  assert(typeof wasmExports['GetSmoothness'] !== 'undefined', 'missing Wasm export: GetSmoothness');
+  assert(typeof wasmExports['AddState'] !== 'undefined', 'missing Wasm export: AddState');
+  assert(typeof wasmExports['GetModel'] !== 'undefined', 'missing Wasm export: GetModel');
+  assert(typeof wasmExports['OrderedHandles'] !== 'undefined', 'missing Wasm export: OrderedHandles');
+  assert(typeof wasmExports['PeelArray'] !== 'undefined', 'missing Wasm export: PeelArray');
+  assert(typeof wasmExports['SetInternalCheck'] !== 'undefined', 'missing Wasm export: SetInternalCheck');
+  assert(typeof wasmExports['GetInternalCheck'] !== 'undefined', 'missing Wasm export: GetInternalCheck');
+  assert(typeof wasmExports['GetInternalCheckIssueCnt'] !== 'undefined', 'missing Wasm export: GetInternalCheckIssueCnt');
+  assert(typeof wasmExports['GetInternalCheckIssue'] !== 'undefined', 'missing Wasm export: GetInternalCheckIssue');
+  assert(typeof wasmExports['GetInternalCheckIssueW'] !== 'undefined', 'missing Wasm export: GetInternalCheckIssueW');
+  assert(typeof wasmExports['ValidateResource'] !== 'undefined', 'missing Wasm export: ValidateResource');
+  assert(typeof wasmExports['CloseSession'] !== 'undefined', 'missing Wasm export: CloseSession');
+  assert(typeof wasmExports['CleanMemory'] !== 'undefined', 'missing Wasm export: CleanMemory');
+  assert(typeof wasmExports['ClearCache'] !== 'undefined', 'missing Wasm export: ClearCache');
+  assert(typeof wasmExports['AllocModelMemory'] !== 'undefined', 'missing Wasm export: AllocModelMemory');
+  assert(typeof wasmExports['SetExternalReferenceData'] !== 'undefined', 'missing Wasm export: SetExternalReferenceData');
+  assert(typeof wasmExports['GetExternalReferenceData'] !== 'undefined', 'missing Wasm export: GetExternalReferenceData');
+  assert(typeof wasmExports['GetExternalReferenceDataId'] !== 'undefined', 'missing Wasm export: GetExternalReferenceDataId');
+  assert(typeof wasmExports['CreateModel'] !== 'undefined', 'missing Wasm export: CreateModel');
+  assert(typeof wasmExports['OpenModel'] !== 'undefined', 'missing Wasm export: OpenModel');
+  assert(typeof wasmExports['OpenModelW'] !== 'undefined', 'missing Wasm export: OpenModelW');
+  assert(typeof wasmExports['OpenModelS'] !== 'undefined', 'missing Wasm export: OpenModelS');
+  assert(typeof wasmExports['OpenModelA'] !== 'undefined', 'missing Wasm export: OpenModelA');
+  assert(typeof wasmExports['ImportModel'] !== 'undefined', 'missing Wasm export: ImportModel');
+  assert(typeof wasmExports['ImportModelW'] !== 'undefined', 'missing Wasm export: ImportModelW');
+  assert(typeof wasmExports['ImportModelS'] !== 'undefined', 'missing Wasm export: ImportModelS');
+  assert(typeof wasmExports['ImportModelA'] !== 'undefined', 'missing Wasm export: ImportModelA');
+  assert(typeof wasmExports['SaveInstanceTree'] !== 'undefined', 'missing Wasm export: SaveInstanceTree');
+  assert(typeof wasmExports['SaveInstanceTreeW'] !== 'undefined', 'missing Wasm export: SaveInstanceTreeW');
+  assert(typeof wasmExports['SaveInstanceTreeS'] !== 'undefined', 'missing Wasm export: SaveInstanceTreeS');
+  assert(typeof wasmExports['SaveInstanceTreeA'] !== 'undefined', 'missing Wasm export: SaveInstanceTreeA');
+  assert(typeof wasmExports['SaveInstanceNetwork'] !== 'undefined', 'missing Wasm export: SaveInstanceNetwork');
+  assert(typeof wasmExports['SaveInstanceNetworkW'] !== 'undefined', 'missing Wasm export: SaveInstanceNetworkW');
+  assert(typeof wasmExports['SaveInstanceNetworkS'] !== 'undefined', 'missing Wasm export: SaveInstanceNetworkS');
+  assert(typeof wasmExports['SaveInstanceNetworkA'] !== 'undefined', 'missing Wasm export: SaveInstanceNetworkA');
+  assert(typeof wasmExports['SaveModel'] !== 'undefined', 'missing Wasm export: SaveModel');
+  assert(typeof wasmExports['SaveModelW'] !== 'undefined', 'missing Wasm export: SaveModelW');
+  assert(typeof wasmExports['SaveModelS'] !== 'undefined', 'missing Wasm export: SaveModelS');
+  assert(typeof wasmExports['SaveModelA'] !== 'undefined', 'missing Wasm export: SaveModelA');
+  assert(typeof wasmExports['SetOverrideFileIO'] !== 'undefined', 'missing Wasm export: SetOverrideFileIO');
+  assert(typeof wasmExports['GetOverrideFileIO'] !== 'undefined', 'missing Wasm export: GetOverrideFileIO');
+  assert(typeof wasmExports['CopyInstanceTree'] !== 'undefined', 'missing Wasm export: CopyInstanceTree');
+  assert(typeof wasmExports['CopyInstanceNetwork'] !== 'undefined', 'missing Wasm export: CopyInstanceNetwork');
+  assert(typeof wasmExports['EncodeBase64'] !== 'undefined', 'missing Wasm export: EncodeBase64');
+  assert(typeof wasmExports['EncodeBase64W'] !== 'undefined', 'missing Wasm export: EncodeBase64W');
+  assert(typeof wasmExports['DecodeBase64'] !== 'undefined', 'missing Wasm export: DecodeBase64');
+  assert(typeof wasmExports['DecodeBase64W'] !== 'undefined', 'missing Wasm export: DecodeBase64W');
+  assert(typeof wasmExports['CopyModel'] !== 'undefined', 'missing Wasm export: CopyModel');
+  assert(typeof wasmExports['CloseModel'] !== 'undefined', 'missing Wasm export: CloseModel');
+  assert(typeof wasmExports['IsModel'] !== 'undefined', 'missing Wasm export: IsModel');
+  assert(typeof wasmExports['CreateClass'] !== 'undefined', 'missing Wasm export: CreateClass');
+  assert(typeof wasmExports['CreateClassW'] !== 'undefined', 'missing Wasm export: CreateClassW');
+  assert(typeof wasmExports['GetClassByName'] !== 'undefined', 'missing Wasm export: GetClassByName');
+  assert(typeof wasmExports['GetClassByNameW'] !== 'undefined', 'missing Wasm export: GetClassByNameW');
+  assert(typeof wasmExports['GetClassesByIterator'] !== 'undefined', 'missing Wasm export: GetClassesByIterator');
+  assert(typeof wasmExports['SetClassParent'] !== 'undefined', 'missing Wasm export: SetClassParent');
+  assert(typeof wasmExports['SetClassParentEx'] !== 'undefined', 'missing Wasm export: SetClassParentEx');
+  assert(typeof wasmExports['UnsetClassParent'] !== 'undefined', 'missing Wasm export: UnsetClassParent');
+  assert(typeof wasmExports['UnsetClassParentEx'] !== 'undefined', 'missing Wasm export: UnsetClassParentEx');
+  assert(typeof wasmExports['IsClassAncestor'] !== 'undefined', 'missing Wasm export: IsClassAncestor');
+  assert(typeof wasmExports['GetClassParentsByIterator'] !== 'undefined', 'missing Wasm export: GetClassParentsByIterator');
+  assert(typeof wasmExports['SetNameOfClass'] !== 'undefined', 'missing Wasm export: SetNameOfClass');
+  assert(typeof wasmExports['SetNameOfClassW'] !== 'undefined', 'missing Wasm export: SetNameOfClassW');
+  assert(typeof wasmExports['SetNameOfClassEx'] !== 'undefined', 'missing Wasm export: SetNameOfClassEx');
+  assert(typeof wasmExports['SetNameOfClassWEx'] !== 'undefined', 'missing Wasm export: SetNameOfClassWEx');
+  assert(typeof wasmExports['GetNameOfClass'] !== 'undefined', 'missing Wasm export: GetNameOfClass');
+  assert(typeof wasmExports['GetNameOfClassW'] !== 'undefined', 'missing Wasm export: GetNameOfClassW');
+  assert(typeof wasmExports['GetNameOfClassEx'] !== 'undefined', 'missing Wasm export: GetNameOfClassEx');
+  assert(typeof wasmExports['GetNameOfClassWEx'] !== 'undefined', 'missing Wasm export: GetNameOfClassWEx');
+  assert(typeof wasmExports['GetClassPropertyByIterator'] !== 'undefined', 'missing Wasm export: GetClassPropertyByIterator');
+  assert(typeof wasmExports['GetClassPropertyByIteratorEx'] !== 'undefined', 'missing Wasm export: GetClassPropertyByIteratorEx');
+  assert(typeof wasmExports['SetClassPropertyCardinalityRestriction'] !== 'undefined', 'missing Wasm export: SetClassPropertyCardinalityRestriction');
+  assert(typeof wasmExports['SetClassPropertyCardinalityRestrictionEx'] !== 'undefined', 'missing Wasm export: SetClassPropertyCardinalityRestrictionEx');
+  assert(typeof wasmExports['GetClassPropertyCardinalityRestriction'] !== 'undefined', 'missing Wasm export: GetClassPropertyCardinalityRestriction');
+  assert(typeof wasmExports['GetClassPropertyCardinalityRestrictionEx'] !== 'undefined', 'missing Wasm export: GetClassPropertyCardinalityRestrictionEx');
+  assert(typeof wasmExports['GetClassPropertyAggregatedCardinalityRestriction'] !== 'undefined', 'missing Wasm export: GetClassPropertyAggregatedCardinalityRestriction');
+  assert(typeof wasmExports['GetClassPropertyAggregatedCardinalityRestrictionEx'] !== 'undefined', 'missing Wasm export: GetClassPropertyAggregatedCardinalityRestrictionEx');
+  assert(typeof wasmExports['GetGeometryClass'] !== 'undefined', 'missing Wasm export: GetGeometryClass');
+  assert(typeof wasmExports['GetGeometryClassEx'] !== 'undefined', 'missing Wasm export: GetGeometryClassEx');
+  assert(typeof wasmExports['IsClass'] !== 'undefined', 'missing Wasm export: IsClass');
+  assert(typeof wasmExports['CreateProperty'] !== 'undefined', 'missing Wasm export: CreateProperty');
+  assert(typeof wasmExports['CreatePropertyW'] !== 'undefined', 'missing Wasm export: CreatePropertyW');
+  assert(typeof wasmExports['GetPropertyByName'] !== 'undefined', 'missing Wasm export: GetPropertyByName');
+  assert(typeof wasmExports['GetPropertyByNameW'] !== 'undefined', 'missing Wasm export: GetPropertyByNameW');
+  assert(typeof wasmExports['GetPropertiesByIterator'] !== 'undefined', 'missing Wasm export: GetPropertiesByIterator');
+  assert(typeof wasmExports['SetPropertyRangeRestriction'] !== 'undefined', 'missing Wasm export: SetPropertyRangeRestriction');
+  assert(typeof wasmExports['SetPropertyRangeRestrictionEx'] !== 'undefined', 'missing Wasm export: SetPropertyRangeRestrictionEx');
+  assert(typeof wasmExports['GetRangeRestrictionsByIterator'] !== 'undefined', 'missing Wasm export: GetRangeRestrictionsByIterator');
+  assert(typeof wasmExports['GetRangeRestrictionsByIteratorEx'] !== 'undefined', 'missing Wasm export: GetRangeRestrictionsByIteratorEx');
+  assert(typeof wasmExports['GetPropertyParentsByIterator'] !== 'undefined', 'missing Wasm export: GetPropertyParentsByIterator');
+  assert(typeof wasmExports['SetNameOfProperty'] !== 'undefined', 'missing Wasm export: SetNameOfProperty');
+  assert(typeof wasmExports['SetNameOfPropertyW'] !== 'undefined', 'missing Wasm export: SetNameOfPropertyW');
+  assert(typeof wasmExports['SetNameOfPropertyEx'] !== 'undefined', 'missing Wasm export: SetNameOfPropertyEx');
+  assert(typeof wasmExports['SetNameOfPropertyWEx'] !== 'undefined', 'missing Wasm export: SetNameOfPropertyWEx');
+  assert(typeof wasmExports['GetNameOfProperty'] !== 'undefined', 'missing Wasm export: GetNameOfProperty');
+  assert(typeof wasmExports['GetNameOfPropertyW'] !== 'undefined', 'missing Wasm export: GetNameOfPropertyW');
+  assert(typeof wasmExports['GetNameOfPropertyEx'] !== 'undefined', 'missing Wasm export: GetNameOfPropertyEx');
+  assert(typeof wasmExports['GetNameOfPropertyWEx'] !== 'undefined', 'missing Wasm export: GetNameOfPropertyWEx');
+  assert(typeof wasmExports['SetPropertyType'] !== 'undefined', 'missing Wasm export: SetPropertyType');
+  assert(typeof wasmExports['GetPropertyType'] !== 'undefined', 'missing Wasm export: GetPropertyType');
+  assert(typeof wasmExports['SetPropertyTypeEx'] !== 'undefined', 'missing Wasm export: SetPropertyTypeEx');
+  assert(typeof wasmExports['GetPropertyTypeEx'] !== 'undefined', 'missing Wasm export: GetPropertyTypeEx');
+  assert(typeof wasmExports['RemoveProperty'] !== 'undefined', 'missing Wasm export: RemoveProperty');
+  assert(typeof wasmExports['RemovePropertyEx'] !== 'undefined', 'missing Wasm export: RemovePropertyEx');
+  assert(typeof wasmExports['IsProperty'] !== 'undefined', 'missing Wasm export: IsProperty');
+  assert(typeof wasmExports['CreateInstance'] !== 'undefined', 'missing Wasm export: CreateInstance');
+  assert(typeof wasmExports['CreateInstanceW'] !== 'undefined', 'missing Wasm export: CreateInstanceW');
+  assert(typeof wasmExports['CreateInstanceEx'] !== 'undefined', 'missing Wasm export: CreateInstanceEx');
+  assert(typeof wasmExports['CreateInstanceWEx'] !== 'undefined', 'missing Wasm export: CreateInstanceWEx');
+  assert(typeof wasmExports['GetInstancesByIterator'] !== 'undefined', 'missing Wasm export: GetInstancesByIterator');
+  assert(typeof wasmExports['GetInstanceClass'] !== 'undefined', 'missing Wasm export: GetInstanceClass');
+  assert(typeof wasmExports['GetInstanceClassEx'] !== 'undefined', 'missing Wasm export: GetInstanceClassEx');
+  assert(typeof wasmExports['GetInstanceClassByIterator'] !== 'undefined', 'missing Wasm export: GetInstanceClassByIterator');
+  assert(typeof wasmExports['GetInstanceClassByIteratorEx'] !== 'undefined', 'missing Wasm export: GetInstanceClassByIteratorEx');
+  assert(typeof wasmExports['GetInstanceGeometryClass'] !== 'undefined', 'missing Wasm export: GetInstanceGeometryClass');
+  assert(typeof wasmExports['GetInstanceGeometryClassEx'] !== 'undefined', 'missing Wasm export: GetInstanceGeometryClassEx');
+  assert(typeof wasmExports['SetInstanceClass'] !== 'undefined', 'missing Wasm export: SetInstanceClass');
+  assert(typeof wasmExports['SetInstanceClassEx'] !== 'undefined', 'missing Wasm export: SetInstanceClassEx');
+  assert(typeof wasmExports['UnsetInstanceClass'] !== 'undefined', 'missing Wasm export: UnsetInstanceClass');
+  assert(typeof wasmExports['UnsetInstanceClassEx'] !== 'undefined', 'missing Wasm export: UnsetInstanceClassEx');
+  assert(typeof wasmExports['GetInstancePropertyByIterator'] !== 'undefined', 'missing Wasm export: GetInstancePropertyByIterator');
+  assert(typeof wasmExports['GetInstancePropertyByIteratorEx'] !== 'undefined', 'missing Wasm export: GetInstancePropertyByIteratorEx');
+  assert(typeof wasmExports['GetInstanceInverseReferencesByIterator'] !== 'undefined', 'missing Wasm export: GetInstanceInverseReferencesByIterator');
+  assert(typeof wasmExports['GetInstanceReferencesByIterator'] !== 'undefined', 'missing Wasm export: GetInstanceReferencesByIterator');
+  assert(typeof wasmExports['ConsolidateInstanceTree'] !== 'undefined', 'missing Wasm export: ConsolidateInstanceTree');
+  assert(typeof wasmExports['SetNameOfInstance'] !== 'undefined', 'missing Wasm export: SetNameOfInstance');
+  assert(typeof wasmExports['SetNameOfInstanceW'] !== 'undefined', 'missing Wasm export: SetNameOfInstanceW');
+  assert(typeof wasmExports['SetNameOfInstanceEx'] !== 'undefined', 'missing Wasm export: SetNameOfInstanceEx');
+  assert(typeof wasmExports['SetNameOfInstanceWEx'] !== 'undefined', 'missing Wasm export: SetNameOfInstanceWEx');
+  assert(typeof wasmExports['GetNameOfInstance'] !== 'undefined', 'missing Wasm export: GetNameOfInstance');
+  assert(typeof wasmExports['GetNameOfInstanceW'] !== 'undefined', 'missing Wasm export: GetNameOfInstanceW');
+  assert(typeof wasmExports['GetNameOfInstanceEx'] !== 'undefined', 'missing Wasm export: GetNameOfInstanceEx');
+  assert(typeof wasmExports['GetNameOfInstanceWEx'] !== 'undefined', 'missing Wasm export: GetNameOfInstanceWEx');
+  assert(typeof wasmExports['SetDatatypeProperty'] !== 'undefined', 'missing Wasm export: SetDatatypeProperty');
+  assert(typeof wasmExports['SetDatatypePropertyEx'] !== 'undefined', 'missing Wasm export: SetDatatypePropertyEx');
+  assert(typeof wasmExports['GetDatatypeProperty'] !== 'undefined', 'missing Wasm export: GetDatatypeProperty');
+  assert(typeof wasmExports['GetDatatypePropertyEx'] !== 'undefined', 'missing Wasm export: GetDatatypePropertyEx');
+  assert(typeof wasmExports['SetObjectProperty'] !== 'undefined', 'missing Wasm export: SetObjectProperty');
+  assert(typeof wasmExports['SetObjectPropertyEx'] !== 'undefined', 'missing Wasm export: SetObjectPropertyEx');
+  assert(typeof wasmExports['GetObjectProperty'] !== 'undefined', 'missing Wasm export: GetObjectProperty');
+  assert(typeof wasmExports['GetObjectPropertyEx'] !== 'undefined', 'missing Wasm export: GetObjectPropertyEx');
+  assert(typeof wasmExports['CreateInstanceInContextStructure'] !== 'undefined', 'missing Wasm export: CreateInstanceInContextStructure');
+  assert(typeof wasmExports['DestroyInstanceInContextStructure'] !== 'undefined', 'missing Wasm export: DestroyInstanceInContextStructure');
+  assert(typeof wasmExports['InstanceInContextChild'] !== 'undefined', 'missing Wasm export: InstanceInContextChild');
+  assert(typeof wasmExports['InstanceInContextNext'] !== 'undefined', 'missing Wasm export: InstanceInContextNext');
+  assert(typeof wasmExports['InstanceInContextIsUpdated'] !== 'undefined', 'missing Wasm export: InstanceInContextIsUpdated');
+  assert(typeof wasmExports['RemoveInstance'] !== 'undefined', 'missing Wasm export: RemoveInstance');
+  assert(typeof wasmExports['RemoveInstanceRecursively'] !== 'undefined', 'missing Wasm export: RemoveInstanceRecursively');
+  assert(typeof wasmExports['RemoveInstances'] !== 'undefined', 'missing Wasm export: RemoveInstances');
+  assert(typeof wasmExports['IsInstance'] !== 'undefined', 'missing Wasm export: IsInstance');
+  assert(typeof wasmExports['CalculateInstance'] !== 'undefined', 'missing Wasm export: CalculateInstance');
+  assert(typeof wasmExports['UpdateInstance'] !== 'undefined', 'missing Wasm export: UpdateInstance');
+  assert(typeof wasmExports['IsUpToDate'] !== 'undefined', 'missing Wasm export: IsUpToDate');
+  assert(typeof wasmExports['SetPropertyDerived'] !== 'undefined', 'missing Wasm export: SetPropertyDerived');
+  assert(typeof wasmExports['GetPropertyDerived'] !== 'undefined', 'missing Wasm export: GetPropertyDerived');
+  assert(typeof wasmExports['GetClassModificationMark'] !== 'undefined', 'missing Wasm export: GetClassModificationMark');
+  assert(typeof wasmExports['UpdateClassModificationMark'] !== 'undefined', 'missing Wasm export: UpdateClassModificationMark');
+  assert(typeof wasmExports['InferenceInstance'] !== 'undefined', 'missing Wasm export: InferenceInstance');
+  assert(typeof wasmExports['UpdateInstanceVertexBuffer'] !== 'undefined', 'missing Wasm export: UpdateInstanceVertexBuffer');
+  assert(typeof wasmExports['UpdateInstanceVertexBufferTrimmed'] !== 'undefined', 'missing Wasm export: UpdateInstanceVertexBufferTrimmed');
+  assert(typeof wasmExports['UpdateInstanceIndexBuffer'] !== 'undefined', 'missing Wasm export: UpdateInstanceIndexBuffer');
+  assert(typeof wasmExports['UpdateInstanceIndexBufferTrimmed'] !== 'undefined', 'missing Wasm export: UpdateInstanceIndexBufferTrimmed');
+  assert(typeof wasmExports['UpdateInstanceTransformationBuffer'] !== 'undefined', 'missing Wasm export: UpdateInstanceTransformationBuffer');
+  assert(typeof wasmExports['ClearedInstanceExternalBuffers'] !== 'undefined', 'missing Wasm export: ClearedInstanceExternalBuffers');
+  assert(typeof wasmExports['ClearedExternalBuffers'] !== 'undefined', 'missing Wasm export: ClearedExternalBuffers');
+  assert(typeof wasmExports['GetConceptualFaceCnt'] !== 'undefined', 'missing Wasm export: GetConceptualFaceCnt');
+  assert(typeof wasmExports['GetConceptualFaceDiscriminator'] !== 'undefined', 'missing Wasm export: GetConceptualFaceDiscriminator');
+  assert(typeof wasmExports['GetConceptualFaceDiscriminatorW'] !== 'undefined', 'missing Wasm export: GetConceptualFaceDiscriminatorW');
+  assert(typeof wasmExports['GetConceptualFace'] !== 'undefined', 'missing Wasm export: GetConceptualFace');
+  assert(typeof wasmExports['GetConceptualFaceMatrix'] !== 'undefined', 'missing Wasm export: GetConceptualFaceMatrix');
+  assert(typeof wasmExports['GetConceptualFaceMaterial'] !== 'undefined', 'missing Wasm export: GetConceptualFaceMaterial');
+  assert(typeof wasmExports['GetConceptualFaceOriginCnt'] !== 'undefined', 'missing Wasm export: GetConceptualFaceOriginCnt');
+  assert(typeof wasmExports['GetConceptualFaceOrigin'] !== 'undefined', 'missing Wasm export: GetConceptualFaceOrigin');
+  assert(typeof wasmExports['GetConceptualFaceOriginEx'] !== 'undefined', 'missing Wasm export: GetConceptualFaceOriginEx');
+  assert(typeof wasmExports['GetConceptualFaceXYZ2UV'] !== 'undefined', 'missing Wasm export: GetConceptualFaceXYZ2UV');
+  assert(typeof wasmExports['GetConceptualFaceUV2XYZ'] !== 'undefined', 'missing Wasm export: GetConceptualFaceUV2XYZ');
+  assert(typeof wasmExports['GetFaceCnt'] !== 'undefined', 'missing Wasm export: GetFaceCnt');
+  assert(typeof wasmExports['GetFace'] !== 'undefined', 'missing Wasm export: GetFace');
+  assert(typeof wasmExports['GetDependingPropertyCnt'] !== 'undefined', 'missing Wasm export: GetDependingPropertyCnt');
+  assert(typeof wasmExports['GetDependingProperty'] !== 'undefined', 'missing Wasm export: GetDependingProperty');
+  assert(typeof wasmExports['SetFormat'] !== 'undefined', 'missing Wasm export: SetFormat');
+  assert(typeof wasmExports['GetFormat'] !== 'undefined', 'missing Wasm export: GetFormat');
+  assert(typeof wasmExports['GetVertexDataOffset'] !== 'undefined', 'missing Wasm export: GetVertexDataOffset');
+  assert(typeof wasmExports['SetBehavior'] !== 'undefined', 'missing Wasm export: SetBehavior');
+  assert(typeof wasmExports['GetBehavior'] !== 'undefined', 'missing Wasm export: GetBehavior');
+  assert(typeof wasmExports['SetVertexBufferTransformation'] !== 'undefined', 'missing Wasm export: SetVertexBufferTransformation');
+  assert(typeof wasmExports['GetVertexBufferTransformation'] !== 'undefined', 'missing Wasm export: GetVertexBufferTransformation');
+  assert(typeof wasmExports['SetIndexBufferOffset'] !== 'undefined', 'missing Wasm export: SetIndexBufferOffset');
+  assert(typeof wasmExports['GetIndexBufferOffset'] !== 'undefined', 'missing Wasm export: GetIndexBufferOffset');
+  assert(typeof wasmExports['SetVertexBufferOffset'] !== 'undefined', 'missing Wasm export: SetVertexBufferOffset');
+  assert(typeof wasmExports['GetVertexBufferOffset'] !== 'undefined', 'missing Wasm export: GetVertexBufferOffset');
+  assert(typeof wasmExports['SetDefaultColor'] !== 'undefined', 'missing Wasm export: SetDefaultColor');
+  assert(typeof wasmExports['GetDefaultColor'] !== 'undefined', 'missing Wasm export: GetDefaultColor');
+  assert(typeof wasmExports['CheckConsistency'] !== 'undefined', 'missing Wasm export: CheckConsistency');
+  assert(typeof wasmExports['CheckInstanceConsistency'] !== 'undefined', 'missing Wasm export: CheckInstanceConsistency');
+  assert(typeof wasmExports['IsDuplicate'] !== 'undefined', 'missing Wasm export: IsDuplicate');
+  assert(typeof wasmExports['GetPerimeter'] !== 'undefined', 'missing Wasm export: GetPerimeter');
+  assert(typeof wasmExports['GetArea'] !== 'undefined', 'missing Wasm export: GetArea');
+  assert(typeof wasmExports['GetVolume'] !== 'undefined', 'missing Wasm export: GetVolume');
+  assert(typeof wasmExports['GetCenter'] !== 'undefined', 'missing Wasm export: GetCenter');
+  assert(typeof wasmExports['GetCentroid'] !== 'undefined', 'missing Wasm export: GetCentroid');
+  assert(typeof wasmExports['GetConceptualFacePerimeter'] !== 'undefined', 'missing Wasm export: GetConceptualFacePerimeter');
+  assert(typeof wasmExports['GetConceptualFaceArea'] !== 'undefined', 'missing Wasm export: GetConceptualFaceArea');
+  assert(typeof wasmExports['SetBoundingBoxReference'] !== 'undefined', 'missing Wasm export: SetBoundingBoxReference');
+  assert(typeof wasmExports['GetBoundingBox'] !== 'undefined', 'missing Wasm export: GetBoundingBox');
+  assert(typeof wasmExports['GetRelativeTransformation'] !== 'undefined', 'missing Wasm export: GetRelativeTransformation');
+  assert(typeof wasmExports['GetDistance'] !== 'undefined', 'missing Wasm export: GetDistance');
+  assert(typeof wasmExports['GetVertexColor'] !== 'undefined', 'missing Wasm export: GetVertexColor');
+  assert(typeof wasmExports['GetConceptualFaceEx'] !== 'undefined', 'missing Wasm export: GetConceptualFaceEx');
+  assert(typeof wasmExports['GetTriangles'] !== 'undefined', 'missing Wasm export: GetTriangles');
+  assert(typeof wasmExports['GetLines'] !== 'undefined', 'missing Wasm export: GetLines');
+  assert(typeof wasmExports['GetPoints'] !== 'undefined', 'missing Wasm export: GetPoints');
+  assert(typeof wasmExports['GetPropertyRestrictionsConsolidated'] !== 'undefined', 'missing Wasm export: GetPropertyRestrictionsConsolidated');
+  assert(typeof wasmExports['IsGeometryType'] !== 'undefined', 'missing Wasm export: IsGeometryType');
+  assert(typeof wasmExports['SetObjectTypeProperty'] !== 'undefined', 'missing Wasm export: SetObjectTypeProperty');
+  assert(typeof wasmExports['GetObjectTypeProperty'] !== 'undefined', 'missing Wasm export: GetObjectTypeProperty');
+  assert(typeof wasmExports['SetDataTypeProperty'] !== 'undefined', 'missing Wasm export: SetDataTypeProperty');
+  assert(typeof wasmExports['GetDataTypeProperty'] !== 'undefined', 'missing Wasm export: GetDataTypeProperty');
+  assert(typeof wasmExports['InstanceCopyCreated'] !== 'undefined', 'missing Wasm export: InstanceCopyCreated');
+  assert(typeof wasmExports['GetPropertyByNameAndType'] !== 'undefined', 'missing Wasm export: GetPropertyByNameAndType');
+  assert(typeof wasmExports['GetParentsByIterator'] !== 'undefined', 'missing Wasm export: GetParentsByIterator');
+  assert(typeof wasmExports['_Z17GetConceptualFacexxPxS_'] !== 'undefined', 'missing Wasm export: _Z17GetConceptualFacexxPxS_');
+  assert(typeof wasmExports['_Z9Intersectxx'] !== 'undefined', 'missing Wasm export: _Z9Intersectxx');
+  assert(typeof wasmExports['SetSPFFHeader'] !== 'undefined', 'missing Wasm export: SetSPFFHeader');
+  assert(typeof wasmExports['SetSPFFHeaderItem'] !== 'undefined', 'missing Wasm export: SetSPFFHeaderItem');
+  assert(typeof wasmExports['GetSPFFHeaderItem'] !== 'undefined', 'missing Wasm export: GetSPFFHeaderItem');
+  assert(typeof wasmExports['GetDateTime'] !== 'undefined', 'missing Wasm export: GetDateTime');
+  assert(typeof wasmExports['GetDateTimeW'] !== 'undefined', 'missing Wasm export: GetDateTimeW');
+  assert(typeof wasmExports['GetLibraryIdentifier'] !== 'undefined', 'missing Wasm export: GetLibraryIdentifier');
+  assert(typeof wasmExports['GetLibraryIdentifierW'] !== 'undefined', 'missing Wasm export: GetLibraryIdentifierW');
+  assert(typeof wasmExports['GetSchemaName'] !== 'undefined', 'missing Wasm export: GetSchemaName');
+  assert(typeof wasmExports['GetSchemaNameW'] !== 'undefined', 'missing Wasm export: GetSchemaNameW');
+  assert(typeof wasmExports['engiSetMappingSupport'] !== 'undefined', 'missing Wasm export: engiSetMappingSupport');
+  assert(typeof wasmExports['engiGetMappingSupport'] !== 'undefined', 'missing Wasm export: engiGetMappingSupport');
+  assert(typeof wasmExports['sdaiCreateModelBN'] !== 'undefined', 'missing Wasm export: sdaiCreateModelBN');
+  assert(typeof wasmExports['sdaiOpenModelBN'] !== 'undefined', 'missing Wasm export: sdaiOpenModelBN');
+  assert(typeof wasmExports['sdaiCreateModelBNUnicode'] !== 'undefined', 'missing Wasm export: sdaiCreateModelBNUnicode');
+  assert(typeof wasmExports['sdaiOpenModelBNUnicode'] !== 'undefined', 'missing Wasm export: sdaiOpenModelBNUnicode');
+  assert(typeof wasmExports['engiOpenModelByStream'] !== 'undefined', 'missing Wasm export: engiOpenModelByStream');
+  assert(typeof wasmExports['engiOpenModelByArray'] !== 'undefined', 'missing Wasm export: engiOpenModelByArray');
+  assert(typeof wasmExports['sdaiSaveModelBN'] !== 'undefined', 'missing Wasm export: sdaiSaveModelBN');
+  assert(typeof wasmExports['sdaiSaveModelBNUnicode'] !== 'undefined', 'missing Wasm export: sdaiSaveModelBNUnicode');
+  assert(typeof wasmExports['engiSaveModelByStream'] !== 'undefined', 'missing Wasm export: engiSaveModelByStream');
+  assert(typeof wasmExports['engiSaveModelByArray'] !== 'undefined', 'missing Wasm export: engiSaveModelByArray');
+  assert(typeof wasmExports['sdaiSaveModelAsXmlBN'] !== 'undefined', 'missing Wasm export: sdaiSaveModelAsXmlBN');
+  assert(typeof wasmExports['sdaiSaveModelAsXmlBNUnicode'] !== 'undefined', 'missing Wasm export: sdaiSaveModelAsXmlBNUnicode');
+  assert(typeof wasmExports['sdaiSaveModelAsSimpleXmlBN'] !== 'undefined', 'missing Wasm export: sdaiSaveModelAsSimpleXmlBN');
+  assert(typeof wasmExports['sdaiSaveModelAsSimpleXmlBNUnicode'] !== 'undefined', 'missing Wasm export: sdaiSaveModelAsSimpleXmlBNUnicode');
+  assert(typeof wasmExports['sdaiSaveModelAsJsonBN'] !== 'undefined', 'missing Wasm export: sdaiSaveModelAsJsonBN');
+  assert(typeof wasmExports['sdaiSaveModelAsJsonBNUnicode'] !== 'undefined', 'missing Wasm export: sdaiSaveModelAsJsonBNUnicode');
+  assert(typeof wasmExports['engiSaveSchemaBN'] !== 'undefined', 'missing Wasm export: engiSaveSchemaBN');
+  assert(typeof wasmExports['engiSaveSchemaBNUnicode'] !== 'undefined', 'missing Wasm export: engiSaveSchemaBNUnicode');
+  assert(typeof wasmExports['sdaiCloseModel'] !== 'undefined', 'missing Wasm export: sdaiCloseModel');
+  assert(typeof wasmExports['setPrecisionDoubleExport'] !== 'undefined', 'missing Wasm export: setPrecisionDoubleExport');
+  assert(typeof wasmExports['engiGetNextTypeDeclarationIterator'] !== 'undefined', 'missing Wasm export: engiGetNextTypeDeclarationIterator');
+  assert(typeof wasmExports['engiGetTypeDeclarationFromIterator'] !== 'undefined', 'missing Wasm export: engiGetTypeDeclarationFromIterator');
+  assert(typeof wasmExports['engiGetSchemaScriptDeclarationByIterator'] !== 'undefined', 'missing Wasm export: engiGetSchemaScriptDeclarationByIterator');
+  assert(typeof wasmExports['engiGetDeclarationType'] !== 'undefined', 'missing Wasm export: engiGetDeclarationType');
+  assert(typeof wasmExports['engiGetEnumerationElement'] !== 'undefined', 'missing Wasm export: engiGetEnumerationElement');
+  assert(typeof wasmExports['engiGetSelectElement'] !== 'undefined', 'missing Wasm export: engiGetSelectElement');
+  assert(typeof wasmExports['engiGetDefinedType'] !== 'undefined', 'missing Wasm export: engiGetDefinedType');
+  assert(typeof wasmExports['engiGetScriptText'] !== 'undefined', 'missing Wasm export: engiGetScriptText');
+  assert(typeof wasmExports['engiEvaluateScriptExpression'] !== 'undefined', 'missing Wasm export: engiEvaluateScriptExpression');
+  assert(typeof wasmExports['sdaiGetEntity'] !== 'undefined', 'missing Wasm export: sdaiGetEntity');
+  assert(typeof wasmExports['sdaiGetComplexEntity'] !== 'undefined', 'missing Wasm export: sdaiGetComplexEntity');
+  assert(typeof wasmExports['sdaiGetComplexEntityBN'] !== 'undefined', 'missing Wasm export: sdaiGetComplexEntityBN');
+  assert(typeof wasmExports['engiGetEntityModel'] !== 'undefined', 'missing Wasm export: engiGetEntityModel');
+  assert(typeof wasmExports['engiGetEntityAttributePosition'] !== 'undefined', 'missing Wasm export: engiGetEntityAttributePosition');
+  assert(typeof wasmExports['engiGetEntityCount'] !== 'undefined', 'missing Wasm export: engiGetEntityCount');
+  assert(typeof wasmExports['engiGetEntityElement'] !== 'undefined', 'missing Wasm export: engiGetEntityElement');
+  assert(typeof wasmExports['sdaiGetEntityExtent'] !== 'undefined', 'missing Wasm export: sdaiGetEntityExtent');
+  assert(typeof wasmExports['sdaiGetEntityExtentBN'] !== 'undefined', 'missing Wasm export: sdaiGetEntityExtentBN');
+  assert(typeof wasmExports['engiGetEntityNameEx'] !== 'undefined', 'missing Wasm export: engiGetEntityNameEx');
+  assert(typeof wasmExports['engiGetEntityName'] !== 'undefined', 'missing Wasm export: engiGetEntityName');
+  assert(typeof wasmExports['engiGetEntityNoAttributes'] !== 'undefined', 'missing Wasm export: engiGetEntityNoAttributes');
+  assert(typeof wasmExports['engiGetEntityNoAttributesEx'] !== 'undefined', 'missing Wasm export: engiGetEntityNoAttributesEx');
+  assert(typeof wasmExports['engiGetEntityParent'] !== 'undefined', 'missing Wasm export: engiGetEntityParent');
+  assert(typeof wasmExports['engiGetEntityNoParents'] !== 'undefined', 'missing Wasm export: engiGetEntityNoParents');
+  assert(typeof wasmExports['engiGetEntityParentEx'] !== 'undefined', 'missing Wasm export: engiGetEntityParentEx');
+  assert(typeof wasmExports['engiIsParentOf'] !== 'undefined', 'missing Wasm export: engiIsParentOf');
+  assert(typeof wasmExports['engiGetAttrDerived'] !== 'undefined', 'missing Wasm export: engiGetAttrDerived');
+  assert(typeof wasmExports['engiGetAttrDerivedBN'] !== 'undefined', 'missing Wasm export: engiGetAttrDerivedBN');
+  assert(typeof wasmExports['engiIsAttrInverse'] !== 'undefined', 'missing Wasm export: engiIsAttrInverse');
+  assert(typeof wasmExports['engiIsAttrInverseBN'] !== 'undefined', 'missing Wasm export: engiIsAttrInverseBN');
+  assert(typeof wasmExports['engiIsAttrOptional'] !== 'undefined', 'missing Wasm export: engiIsAttrOptional');
+  assert(typeof wasmExports['engiIsAttrOptionalBN'] !== 'undefined', 'missing Wasm export: engiIsAttrOptionalBN');
+  assert(typeof wasmExports['engiGetAttrRedeclarationByIterator'] !== 'undefined', 'missing Wasm export: engiGetAttrRedeclarationByIterator');
+  assert(typeof wasmExports['engiGetAttrDomainName'] !== 'undefined', 'missing Wasm export: engiGetAttrDomainName');
+  assert(typeof wasmExports['engiGetAttrDomainNameBN'] !== 'undefined', 'missing Wasm export: engiGetAttrDomainNameBN');
+  assert(typeof wasmExports['engiIsEntityAbstract'] !== 'undefined', 'missing Wasm export: engiIsEntityAbstract');
+  assert(typeof wasmExports['engiGetEntityIsAbstract'] !== 'undefined', 'missing Wasm export: engiGetEntityIsAbstract');
+  assert(typeof wasmExports['engiIsEntityAbstractBN'] !== 'undefined', 'missing Wasm export: engiIsEntityAbstractBN');
+  assert(typeof wasmExports['engiGetEntityIsAbstractBN'] !== 'undefined', 'missing Wasm export: engiGetEntityIsAbstractBN');
+  assert(typeof wasmExports['engiGetEnumerationValue'] !== 'undefined', 'missing Wasm export: engiGetEnumerationValue');
+  assert(typeof wasmExports['engiGetEntityAttributeByIterator'] !== 'undefined', 'missing Wasm export: engiGetEntityAttributeByIterator');
+  assert(typeof wasmExports['sdaiGetInstanceType'] !== 'undefined', 'missing Wasm export: sdaiGetInstanceType');
+  assert(typeof wasmExports['engiGetAggregationDefinition'] !== 'undefined', 'missing Wasm export: engiGetAggregationDefinition');
+  assert(typeof wasmExports['engiGetEntityUniqueRuleByIterator'] !== 'undefined', 'missing Wasm export: engiGetEntityUniqueRuleByIterator');
+  assert(typeof wasmExports['engiGetEntityUniqueRuleAttributeByIterator'] !== 'undefined', 'missing Wasm export: engiGetEntityUniqueRuleAttributeByIterator');
+  assert(typeof wasmExports['engiGetEntityWhereRuleByIterator'] !== 'undefined', 'missing Wasm export: engiGetEntityWhereRuleByIterator');
+  assert(typeof wasmExports['sdaiGetADBType'] !== 'undefined', 'missing Wasm export: sdaiGetADBType');
+  assert(typeof wasmExports['sdaiGetADBTypePath'] !== 'undefined', 'missing Wasm export: sdaiGetADBTypePath');
+  assert(typeof wasmExports['sdaiGetADBValue'] !== 'undefined', 'missing Wasm export: sdaiGetADBValue');
+  assert(typeof wasmExports['sdaiPutADBValue'] !== 'undefined', 'missing Wasm export: sdaiPutADBValue');
+  assert(typeof wasmExports['sdaiCreateEmptyADB'] !== 'undefined', 'missing Wasm export: sdaiCreateEmptyADB');
+  assert(typeof wasmExports['sdaiCreateADB'] !== 'undefined', 'missing Wasm export: sdaiCreateADB');
+  assert(typeof wasmExports['sdaiDeleteADB'] !== 'undefined', 'missing Wasm export: sdaiDeleteADB');
+  assert(typeof wasmExports['sdaiGetAggrByIndex'] !== 'undefined', 'missing Wasm export: sdaiGetAggrByIndex');
+  assert(typeof wasmExports['sdaiPutAggrByIndex'] !== 'undefined', 'missing Wasm export: sdaiPutAggrByIndex');
+  assert(typeof wasmExports['engiGetAggrType'] !== 'undefined', 'missing Wasm export: engiGetAggrType');
+  assert(typeof wasmExports['engiGetAggrTypex'] !== 'undefined', 'missing Wasm export: engiGetAggrTypex');
+  assert(typeof wasmExports['sdaiGetAttr'] !== 'undefined', 'missing Wasm export: sdaiGetAttr');
+  assert(typeof wasmExports['sdaiGetAttrBN'] !== 'undefined', 'missing Wasm export: sdaiGetAttrBN');
+  assert(typeof wasmExports['sdaiGetAttrDefinition'] !== 'undefined', 'missing Wasm export: sdaiGetAttrDefinition');
+  assert(typeof wasmExports['sdaiGetAttrBNUnicode'] !== 'undefined', 'missing Wasm export: sdaiGetAttrBNUnicode');
+  assert(typeof wasmExports['sdaiGetStringAttrBN'] !== 'undefined', 'missing Wasm export: sdaiGetStringAttrBN');
+  assert(typeof wasmExports['sdaiGetInstanceAttrBN'] !== 'undefined', 'missing Wasm export: sdaiGetInstanceAttrBN');
+  assert(typeof wasmExports['sdaiGetAggregationAttrBN'] !== 'undefined', 'missing Wasm export: sdaiGetAggregationAttrBN');
+  assert(typeof wasmExports['engiGetAttrTraits'] !== 'undefined', 'missing Wasm export: engiGetAttrTraits');
+  assert(typeof wasmExports['engiGetAttrName'] !== 'undefined', 'missing Wasm export: engiGetAttrName');
+  assert(typeof wasmExports['engiGetAttrDefiningEntity'] !== 'undefined', 'missing Wasm export: engiGetAttrDefiningEntity');
+  assert(typeof wasmExports['engiIsAttrExplicit'] !== 'undefined', 'missing Wasm export: engiIsAttrExplicit');
+  assert(typeof wasmExports['engiIsAttrExplicitBN'] !== 'undefined', 'missing Wasm export: engiIsAttrExplicitBN');
+  assert(typeof wasmExports['sdaiGetInstanceModel'] !== 'undefined', 'missing Wasm export: sdaiGetInstanceModel');
+  assert(typeof wasmExports['sdaiGetMemberCount'] !== 'undefined', 'missing Wasm export: sdaiGetMemberCount');
+  assert(typeof wasmExports['sdaiIsKindOf'] !== 'undefined', 'missing Wasm export: sdaiIsKindOf');
+  assert(typeof wasmExports['sdaiIsKindOfBN'] !== 'undefined', 'missing Wasm export: sdaiIsKindOfBN');
+  assert(typeof wasmExports['engiGetAttrType'] !== 'undefined', 'missing Wasm export: engiGetAttrType');
+  assert(typeof wasmExports['engiGetAttrTypeBN'] !== 'undefined', 'missing Wasm export: engiGetAttrTypeBN');
+  assert(typeof wasmExports['engiGetExpressAttrType'] !== 'undefined', 'missing Wasm export: engiGetExpressAttrType');
+  assert(typeof wasmExports['engiGetAttrAggregation'] !== 'undefined', 'missing Wasm export: engiGetAttrAggregation');
+  assert(typeof wasmExports['engiGetInstanceAttrType'] !== 'undefined', 'missing Wasm export: engiGetInstanceAttrType');
+  assert(typeof wasmExports['engiGetInstanceAttrTypeBN'] !== 'undefined', 'missing Wasm export: engiGetInstanceAttrTypeBN');
+  assert(typeof wasmExports['sdaiIsInstanceOf'] !== 'undefined', 'missing Wasm export: sdaiIsInstanceOf');
+  assert(typeof wasmExports['sdaiIsInstanceOfBN'] !== 'undefined', 'missing Wasm export: sdaiIsInstanceOfBN');
+  assert(typeof wasmExports['sdaiIsEqual'] !== 'undefined', 'missing Wasm export: sdaiIsEqual');
+  assert(typeof wasmExports['sdaiValidateAttribute'] !== 'undefined', 'missing Wasm export: sdaiValidateAttribute');
+  assert(typeof wasmExports['sdaiValidateAttributeBN'] !== 'undefined', 'missing Wasm export: sdaiValidateAttributeBN');
+  assert(typeof wasmExports['engiGetInstanceClassInfo'] !== 'undefined', 'missing Wasm export: engiGetInstanceClassInfo');
+  assert(typeof wasmExports['engiGetInstanceClassInfoUC'] !== 'undefined', 'missing Wasm export: engiGetInstanceClassInfoUC');
+  assert(typeof wasmExports['engiGetInstanceMetaInfo'] !== 'undefined', 'missing Wasm export: engiGetInstanceMetaInfo');
+  assert(typeof wasmExports['sdaiFindInstanceUsers'] !== 'undefined', 'missing Wasm export: sdaiFindInstanceUsers');
+  assert(typeof wasmExports['sdaiFindInstanceUsedIn'] !== 'undefined', 'missing Wasm export: sdaiFindInstanceUsedIn');
+  assert(typeof wasmExports['sdaiFindInstanceUsedInBN'] !== 'undefined', 'missing Wasm export: sdaiFindInstanceUsedInBN');
+  assert(typeof wasmExports['sdaiPrepend'] !== 'undefined', 'missing Wasm export: sdaiPrepend');
+  assert(typeof wasmExports['sdaiAppend'] !== 'undefined', 'missing Wasm export: sdaiAppend');
+  assert(typeof wasmExports['sdaiAdd'] !== 'undefined', 'missing Wasm export: sdaiAdd');
+  assert(typeof wasmExports['sdaiInsertByIndex'] !== 'undefined', 'missing Wasm export: sdaiInsertByIndex');
+  assert(typeof wasmExports['sdaiInsertBefore'] !== 'undefined', 'missing Wasm export: sdaiInsertBefore');
+  assert(typeof wasmExports['sdaiInsertAfter'] !== 'undefined', 'missing Wasm export: sdaiInsertAfter');
+  assert(typeof wasmExports['sdaiCreateAggr'] !== 'undefined', 'missing Wasm export: sdaiCreateAggr');
+  assert(typeof wasmExports['sdaiCreateAggrBN'] !== 'undefined', 'missing Wasm export: sdaiCreateAggrBN');
+  assert(typeof wasmExports['sdaiCreateNPL'] !== 'undefined', 'missing Wasm export: sdaiCreateNPL');
+  assert(typeof wasmExports['sdaiDeleteNPL'] !== 'undefined', 'missing Wasm export: sdaiDeleteNPL');
+  assert(typeof wasmExports['sdaiCreateNestedAggr'] !== 'undefined', 'missing Wasm export: sdaiCreateNestedAggr');
+  assert(typeof wasmExports['sdaiCreateNestedAggrByIndexADB'] !== 'undefined', 'missing Wasm export: sdaiCreateNestedAggrByIndexADB');
+  assert(typeof wasmExports['sdaiCreateNestedAggrByIndex'] !== 'undefined', 'missing Wasm export: sdaiCreateNestedAggrByIndex');
+  assert(typeof wasmExports['sdaiInsertNestedAggrByIndex'] !== 'undefined', 'missing Wasm export: sdaiInsertNestedAggrByIndex');
+  assert(typeof wasmExports['sdaiInsertNestedAggrByIndexADB'] !== 'undefined', 'missing Wasm export: sdaiInsertNestedAggrByIndexADB');
+  assert(typeof wasmExports['sdaiCreateNestedAggrByItr'] !== 'undefined', 'missing Wasm export: sdaiCreateNestedAggrByItr');
+  assert(typeof wasmExports['sdaiCreateNestedAggrByItrADB'] !== 'undefined', 'missing Wasm export: sdaiCreateNestedAggrByItrADB');
+  assert(typeof wasmExports['sdaiInsertNestedAggrBefore'] !== 'undefined', 'missing Wasm export: sdaiInsertNestedAggrBefore');
+  assert(typeof wasmExports['sdaiInsertNestedAggrBeforeADB'] !== 'undefined', 'missing Wasm export: sdaiInsertNestedAggrBeforeADB');
+  assert(typeof wasmExports['sdaiInsertNestedAggrAfter'] !== 'undefined', 'missing Wasm export: sdaiInsertNestedAggrAfter');
+  assert(typeof wasmExports['sdaiInsertNestedAggrAfterADB'] !== 'undefined', 'missing Wasm export: sdaiInsertNestedAggrAfterADB');
+  assert(typeof wasmExports['sdaiCreateNestedAggrADB'] !== 'undefined', 'missing Wasm export: sdaiCreateNestedAggrADB');
+  assert(typeof wasmExports['sdaiRemoveByIndex'] !== 'undefined', 'missing Wasm export: sdaiRemoveByIndex');
+  assert(typeof wasmExports['sdaiRemoveByIterator'] !== 'undefined', 'missing Wasm export: sdaiRemoveByIterator');
+  assert(typeof wasmExports['sdaiRemove'] !== 'undefined', 'missing Wasm export: sdaiRemove');
+  assert(typeof wasmExports['sdaiTestArrayByIndex'] !== 'undefined', 'missing Wasm export: sdaiTestArrayByIndex');
+  assert(typeof wasmExports['sdaiTestArrayByItr'] !== 'undefined', 'missing Wasm export: sdaiTestArrayByItr');
+  assert(typeof wasmExports['sdaiCreateInstance'] !== 'undefined', 'missing Wasm export: sdaiCreateInstance');
+  assert(typeof wasmExports['sdaiCreateInstanceBN'] !== 'undefined', 'missing Wasm export: sdaiCreateInstanceBN');
+  assert(typeof wasmExports['sdaiCreateComplexInstance'] !== 'undefined', 'missing Wasm export: sdaiCreateComplexInstance');
+  assert(typeof wasmExports['sdaiCreateComplexInstanceBN'] !== 'undefined', 'missing Wasm export: sdaiCreateComplexInstanceBN');
+  assert(typeof wasmExports['sdaiDeleteInstance'] !== 'undefined', 'missing Wasm export: sdaiDeleteInstance');
+  assert(typeof wasmExports['sdaiPutADBTypePath'] !== 'undefined', 'missing Wasm export: sdaiPutADBTypePath');
+  assert(typeof wasmExports['sdaiPutAttr'] !== 'undefined', 'missing Wasm export: sdaiPutAttr');
+  assert(typeof wasmExports['sdaiPutAttrBN'] !== 'undefined', 'missing Wasm export: sdaiPutAttrBN');
+  assert(typeof wasmExports['sdaiUnsetAttr'] !== 'undefined', 'missing Wasm export: sdaiUnsetAttr');
+  assert(typeof wasmExports['sdaiUnsetAttrBN'] !== 'undefined', 'missing Wasm export: sdaiUnsetAttrBN');
+  assert(typeof wasmExports['engiSetComment'] !== 'undefined', 'missing Wasm export: engiSetComment');
+  assert(typeof wasmExports['engiGetInstanceLocalId'] !== 'undefined', 'missing Wasm export: engiGetInstanceLocalId');
+  assert(typeof wasmExports['sdaiTestAttr'] !== 'undefined', 'missing Wasm export: sdaiTestAttr');
+  assert(typeof wasmExports['sdaiTestAttrBN'] !== 'undefined', 'missing Wasm export: sdaiTestAttrBN');
+  assert(typeof wasmExports['sdaiCreateInstanceEI'] !== 'undefined', 'missing Wasm export: sdaiCreateInstanceEI');
+  assert(typeof wasmExports['sdaiCreateInstanceBNEI'] !== 'undefined', 'missing Wasm export: sdaiCreateInstanceBNEI');
+  assert(typeof wasmExports['sdaiCreateIterator'] !== 'undefined', 'missing Wasm export: sdaiCreateIterator');
+  assert(typeof wasmExports['sdaiDeleteIterator'] !== 'undefined', 'missing Wasm export: sdaiDeleteIterator');
+  assert(typeof wasmExports['sdaiBeginning'] !== 'undefined', 'missing Wasm export: sdaiBeginning');
+  assert(typeof wasmExports['sdaiNext'] !== 'undefined', 'missing Wasm export: sdaiNext');
+  assert(typeof wasmExports['sdaiPrevious'] !== 'undefined', 'missing Wasm export: sdaiPrevious');
+  assert(typeof wasmExports['sdaiEnd'] !== 'undefined', 'missing Wasm export: sdaiEnd');
+  assert(typeof wasmExports['sdaiIsMember'] !== 'undefined', 'missing Wasm export: sdaiIsMember');
+  assert(typeof wasmExports['sdaiGetAggrElementBoundByItr'] !== 'undefined', 'missing Wasm export: sdaiGetAggrElementBoundByItr');
+  assert(typeof wasmExports['sdaiGetAggrElementBoundByIndex'] !== 'undefined', 'missing Wasm export: sdaiGetAggrElementBoundByIndex');
+  assert(typeof wasmExports['sdaiGetLowerBound'] !== 'undefined', 'missing Wasm export: sdaiGetLowerBound');
+  assert(typeof wasmExports['sdaiGetUpperBound'] !== 'undefined', 'missing Wasm export: sdaiGetUpperBound');
+  assert(typeof wasmExports['sdaiGetLowerIndex'] !== 'undefined', 'missing Wasm export: sdaiGetLowerIndex');
+  assert(typeof wasmExports['sdaiGetUpperIndex'] !== 'undefined', 'missing Wasm export: sdaiGetUpperIndex');
+  assert(typeof wasmExports['sdaiUnsetArrayByIndex'] !== 'undefined', 'missing Wasm export: sdaiUnsetArrayByIndex');
+  assert(typeof wasmExports['sdaiUnsetArrayByItr'] !== 'undefined', 'missing Wasm export: sdaiUnsetArrayByItr');
+  assert(typeof wasmExports['sdaiPutAggrByIterator'] !== 'undefined', 'missing Wasm export: sdaiPutAggrByIterator');
+  assert(typeof wasmExports['sdaiReindexArray'] !== 'undefined', 'missing Wasm export: sdaiReindexArray');
+  assert(typeof wasmExports['sdaiResetArrayIndex'] !== 'undefined', 'missing Wasm export: sdaiResetArrayIndex');
+  assert(typeof wasmExports['engiEnableDerivedAttributes'] !== 'undefined', 'missing Wasm export: engiEnableDerivedAttributes');
+  assert(typeof wasmExports['engiEvaluateAllDerivedAttributes'] !== 'undefined', 'missing Wasm export: engiEvaluateAllDerivedAttributes');
+  assert(typeof wasmExports['engiIsComplexEntity'] !== 'undefined', 'missing Wasm export: engiIsComplexEntity');
+  assert(typeof wasmExports['setSegmentation'] !== 'undefined', 'missing Wasm export: setSegmentation');
+  assert(typeof wasmExports['getSegmentation'] !== 'undefined', 'missing Wasm export: getSegmentation');
+  assert(typeof wasmExports['setEpsilon'] !== 'undefined', 'missing Wasm export: setEpsilon');
+  assert(typeof wasmExports['getEpsilon'] !== 'undefined', 'missing Wasm export: getEpsilon');
+  assert(typeof wasmExports['circleSegments'] !== 'undefined', 'missing Wasm export: circleSegments');
+  assert(typeof wasmExports['setMaximumSegmentationLength'] !== 'undefined', 'missing Wasm export: setMaximumSegmentationLength');
+  assert(typeof wasmExports['getProjectUnitConversionFactor'] !== 'undefined', 'missing Wasm export: getProjectUnitConversionFactor');
+  assert(typeof wasmExports['getProjectUnitConversionFactorW'] !== 'undefined', 'missing Wasm export: getProjectUnitConversionFactorW');
+  assert(typeof wasmExports['getUnitInstanceConversionFactor'] !== 'undefined', 'missing Wasm export: getUnitInstanceConversionFactor');
+  assert(typeof wasmExports['getUnitInstanceConversionFactorW'] !== 'undefined', 'missing Wasm export: getUnitInstanceConversionFactorW');
+  assert(typeof wasmExports['setBRepProperties'] !== 'undefined', 'missing Wasm export: setBRepProperties');
+  assert(typeof wasmExports['cleanMemory'] !== 'undefined', 'missing Wasm export: cleanMemory');
+  assert(typeof wasmExports['internalGetP21Line'] !== 'undefined', 'missing Wasm export: internalGetP21Line');
+  assert(typeof wasmExports['internalForceInstanceFromP21Line'] !== 'undefined', 'missing Wasm export: internalForceInstanceFromP21Line');
+  assert(typeof wasmExports['internalGetInstanceFromP21Line'] !== 'undefined', 'missing Wasm export: internalGetInstanceFromP21Line');
+  assert(typeof wasmExports['internalGetXMLID'] !== 'undefined', 'missing Wasm export: internalGetXMLID');
+  assert(typeof wasmExports['setStringUnicode'] !== 'undefined', 'missing Wasm export: setStringUnicode');
+  assert(typeof wasmExports['getStringUnicode'] !== 'undefined', 'missing Wasm export: getStringUnicode');
+  assert(typeof wasmExports['engiSetStringEncoding'] !== 'undefined', 'missing Wasm export: engiSetStringEncoding');
+  assert(typeof wasmExports['setFilter'] !== 'undefined', 'missing Wasm export: setFilter');
+  assert(typeof wasmExports['getFilter'] !== 'undefined', 'missing Wasm export: getFilter');
+  assert(typeof wasmExports['setSerialization'] !== 'undefined', 'missing Wasm export: setSerialization');
+  assert(typeof wasmExports['getSerialization'] !== 'undefined', 'missing Wasm export: getSerialization');
+  assert(typeof wasmExports['xxxxGetEntityAndSubTypesExtent'] !== 'undefined', 'missing Wasm export: xxxxGetEntityAndSubTypesExtent');
+  assert(typeof wasmExports['xxxxGetEntityAndSubTypesExtentBN'] !== 'undefined', 'missing Wasm export: xxxxGetEntityAndSubTypesExtentBN');
+  assert(typeof wasmExports['xxxxGetAllInstances'] !== 'undefined', 'missing Wasm export: xxxxGetAllInstances');
+  assert(typeof wasmExports['xxxxGetInstancesUsing'] !== 'undefined', 'missing Wasm export: xxxxGetInstancesUsing');
+  assert(typeof wasmExports['xxxxDeleteFromAggregation'] !== 'undefined', 'missing Wasm export: xxxxDeleteFromAggregation');
+  assert(typeof wasmExports['xxxxGetAttrDefinitionByValue'] !== 'undefined', 'missing Wasm export: xxxxGetAttrDefinitionByValue');
+  assert(typeof wasmExports['iterateOverInstances'] !== 'undefined', 'missing Wasm export: iterateOverInstances');
+  assert(typeof wasmExports['sdaiGetAggrByIterator'] !== 'undefined', 'missing Wasm export: sdaiGetAggrByIterator');
+  assert(typeof wasmExports['internalSetLink'] !== 'undefined', 'missing Wasm export: internalSetLink');
+  assert(typeof wasmExports['internalAddAggrLink'] !== 'undefined', 'missing Wasm export: internalAddAggrLink');
+  assert(typeof wasmExports['engiGetNotReferedAggr'] !== 'undefined', 'missing Wasm export: engiGetNotReferedAggr');
+  assert(typeof wasmExports['engiGetAttributeAggr'] !== 'undefined', 'missing Wasm export: engiGetAttributeAggr');
+  assert(typeof wasmExports['sdaiErrorQuery'] !== 'undefined', 'missing Wasm export: sdaiErrorQuery');
+  assert(typeof wasmExports['InitializeMultiThreading'] !== 'undefined', 'missing Wasm export: InitializeMultiThreading');
+  assert(typeof wasmExports['CreateOwlModelMultiThreadingWrapper'] !== 'undefined', 'missing Wasm export: CreateOwlModelMultiThreadingWrapper');
+  assert(typeof wasmExports['owlGetModel'] !== 'undefined', 'missing Wasm export: owlGetModel');
+  assert(typeof wasmExports['owlConnectModel'] !== 'undefined', 'missing Wasm export: owlConnectModel');
+  assert(typeof wasmExports['owlGetInstance'] !== 'undefined', 'missing Wasm export: owlGetInstance');
+  assert(typeof wasmExports['owlMaterialInstance'] !== 'undefined', 'missing Wasm export: owlMaterialInstance');
+  assert(typeof wasmExports['owlBuildInstance'] !== 'undefined', 'missing Wasm export: owlBuildInstance');
+  assert(typeof wasmExports['owlBuildInstanceMT'] !== 'undefined', 'missing Wasm export: owlBuildInstanceMT');
+  assert(typeof wasmExports['owlBuildInstanceInContext'] !== 'undefined', 'missing Wasm export: owlBuildInstanceInContext');
+  assert(typeof wasmExports['owlBuildInstanceInContextMT'] !== 'undefined', 'missing Wasm export: owlBuildInstanceInContextMT');
+  assert(typeof wasmExports['engiInstanceUsesSegmentation'] !== 'undefined', 'missing Wasm export: engiInstanceUsesSegmentation');
+  assert(typeof wasmExports['owlBuildInstances'] !== 'undefined', 'missing Wasm export: owlBuildInstances');
+  assert(typeof wasmExports['owlGetMappedItem'] !== 'undefined', 'missing Wasm export: owlGetMappedItem');
+  assert(typeof wasmExports['getInstanceDerivedPropertiesInModelling'] !== 'undefined', 'missing Wasm export: getInstanceDerivedPropertiesInModelling');
+  assert(typeof wasmExports['getInstanceDerivedBoundingBox'] !== 'undefined', 'missing Wasm export: getInstanceDerivedBoundingBox');
+  assert(typeof wasmExports['getInstanceTransformationMatrix'] !== 'undefined', 'missing Wasm export: getInstanceTransformationMatrix');
+  assert(typeof wasmExports['getInstanceDerivedTransformationMatrix'] !== 'undefined', 'missing Wasm export: getInstanceDerivedTransformationMatrix');
+  assert(typeof wasmExports['internalGetBoundingBox'] !== 'undefined', 'missing Wasm export: internalGetBoundingBox');
+  assert(typeof wasmExports['internalGetCenter'] !== 'undefined', 'missing Wasm export: internalGetCenter');
+  assert(typeof wasmExports['getRootAxis2Placement'] !== 'undefined', 'missing Wasm export: getRootAxis2Placement');
+  assert(typeof wasmExports['getGlobalPlacement'] !== 'undefined', 'missing Wasm export: getGlobalPlacement');
+  assert(typeof wasmExports['setGlobalPlacement'] !== 'undefined', 'missing Wasm export: setGlobalPlacement');
+  assert(typeof wasmExports['getTimeStamp'] !== 'undefined', 'missing Wasm export: getTimeStamp');
+  assert(typeof wasmExports['setInstanceReference'] !== 'undefined', 'missing Wasm export: setInstanceReference');
+  assert(typeof wasmExports['getInstanceReference'] !== 'undefined', 'missing Wasm export: getInstanceReference');
+  assert(typeof wasmExports['inferenceInstance'] !== 'undefined', 'missing Wasm export: inferenceInstance');
+  assert(typeof wasmExports['sdaiValidateSchemaInstance'] !== 'undefined', 'missing Wasm export: sdaiValidateSchemaInstance');
+  assert(typeof wasmExports['engiGetAggrUnknownElement'] !== 'undefined', 'missing Wasm export: engiGetAggrUnknownElement');
+  assert(typeof wasmExports['engiGetEntityAttributeByIndex'] !== 'undefined', 'missing Wasm export: engiGetEntityAttributeByIndex');
+  assert(typeof wasmExports['iterateOverProperties'] !== 'undefined', 'missing Wasm export: iterateOverProperties');
+  assert(typeof wasmExports['engiGetEntityAttributeIndex'] !== 'undefined', 'missing Wasm export: engiGetEntityAttributeIndex');
+  assert(typeof wasmExports['engiGetAttrIndexBN'] !== 'undefined', 'missing Wasm export: engiGetAttrIndexBN');
+  assert(typeof wasmExports['engiGetEntityAttributeIndexEx'] !== 'undefined', 'missing Wasm export: engiGetEntityAttributeIndexEx');
+  assert(typeof wasmExports['engiGetAttrIndexExBN'] !== 'undefined', 'missing Wasm export: engiGetAttrIndexExBN');
+  assert(typeof wasmExports['engiGetEntityArgumentName'] !== 'undefined', 'missing Wasm export: engiGetEntityArgumentName');
+  assert(typeof wasmExports['engiGetAttrNameByIndex'] !== 'undefined', 'missing Wasm export: engiGetAttrNameByIndex');
+  assert(typeof wasmExports['engiGetEntityArgumentType'] !== 'undefined', 'missing Wasm export: engiGetEntityArgumentType');
+  assert(typeof wasmExports['engiGetAttrTypeByIndex'] !== 'undefined', 'missing Wasm export: engiGetAttrTypeByIndex');
+  assert(typeof wasmExports['engiGetAttrOptional'] !== 'undefined', 'missing Wasm export: engiGetAttrOptional');
+  assert(typeof wasmExports['engiGetAttrOptionalBN'] !== 'undefined', 'missing Wasm export: engiGetAttrOptionalBN');
+  assert(typeof wasmExports['engiGetAttrInverse'] !== 'undefined', 'missing Wasm export: engiGetAttrInverse');
+  assert(typeof wasmExports['engiGetAttrInverseBN'] !== 'undefined', 'missing Wasm export: engiGetAttrInverseBN');
+  assert(typeof wasmExports['engiAttrIsInverse'] !== 'undefined', 'missing Wasm export: engiAttrIsInverse');
+  assert(typeof wasmExports['engiGetAttrDomain'] !== 'undefined', 'missing Wasm export: engiGetAttrDomain');
+  assert(typeof wasmExports['engiGetAttrDomainBN'] !== 'undefined', 'missing Wasm export: engiGetAttrDomainBN');
+  assert(typeof wasmExports['engiGetAttributeTraits'] !== 'undefined', 'missing Wasm export: engiGetAttributeTraits');
+  assert(typeof wasmExports['engiGetEntityNoArguments'] !== 'undefined', 'missing Wasm export: engiGetEntityNoArguments');
+  assert(typeof wasmExports['engiGetArgumentType'] !== 'undefined', 'missing Wasm export: engiGetArgumentType');
+  assert(typeof wasmExports['engiGetAttributeType'] !== 'undefined', 'missing Wasm export: engiGetAttributeType');
+  assert(typeof wasmExports['engiGetEntityArgumentIndex'] !== 'undefined', 'missing Wasm export: engiGetEntityArgumentIndex');
+  assert(typeof wasmExports['engiGetAggrElement'] !== 'undefined', 'missing Wasm export: engiGetAggrElement');
+  assert(typeof wasmExports['engiGetEntityArgument'] !== 'undefined', 'missing Wasm export: engiGetEntityArgument');
+  assert(typeof wasmExports['sdaiGetADBTypePathx'] !== 'undefined', 'missing Wasm export: sdaiGetADBTypePathx');
+  assert(typeof wasmExports['xxxxOpenModelByStream'] !== 'undefined', 'missing Wasm export: xxxxOpenModelByStream');
+  assert(typeof wasmExports['sdaiplusGetAggregationType'] !== 'undefined', 'missing Wasm export: sdaiplusGetAggregationType');
+  assert(typeof wasmExports['xxxxGetAttrType'] !== 'undefined', 'missing Wasm export: xxxxGetAttrType');
+  assert(typeof wasmExports['xxxxGetAttrTypeBN'] !== 'undefined', 'missing Wasm export: xxxxGetAttrTypeBN');
+  assert(typeof wasmExports['GetSPFFHeaderItemUnicode'] !== 'undefined', 'missing Wasm export: GetSPFFHeaderItemUnicode');
+  assert(typeof wasmExports['engiGetAttrIndex'] !== 'undefined', 'missing Wasm export: engiGetAttrIndex');
+  assert(typeof wasmExports['engiGetAttrIndexEx'] !== 'undefined', 'missing Wasm export: engiGetAttrIndexEx');
+  assert(typeof wasmExports['xxxxGetAttrNameByIndex'] !== 'undefined', 'missing Wasm export: xxxxGetAttrNameByIndex');
+  assert(typeof wasmExports['validateSetOptions'] !== 'undefined', 'missing Wasm export: validateSetOptions');
+  assert(typeof wasmExports['validateGetOptions'] !== 'undefined', 'missing Wasm export: validateGetOptions');
+  assert(typeof wasmExports['validateModel'] !== 'undefined', 'missing Wasm export: validateModel');
+  assert(typeof wasmExports['validateInstance'] !== 'undefined', 'missing Wasm export: validateInstance');
+  assert(typeof wasmExports['validateFreeResults'] !== 'undefined', 'missing Wasm export: validateFreeResults');
+  assert(typeof wasmExports['validateGetFirstIssue'] !== 'undefined', 'missing Wasm export: validateGetFirstIssue');
+  assert(typeof wasmExports['validateGetNextIssue'] !== 'undefined', 'missing Wasm export: validateGetNextIssue');
+  assert(typeof wasmExports['validateGetStatus'] !== 'undefined', 'missing Wasm export: validateGetStatus');
+  assert(typeof wasmExports['validateGetIssueType'] !== 'undefined', 'missing Wasm export: validateGetIssueType');
+  assert(typeof wasmExports['validateGetInstance'] !== 'undefined', 'missing Wasm export: validateGetInstance');
+  assert(typeof wasmExports['validateGetInstanceRelated'] !== 'undefined', 'missing Wasm export: validateGetInstanceRelated');
+  assert(typeof wasmExports['validateGetEntity'] !== 'undefined', 'missing Wasm export: validateGetEntity');
+  assert(typeof wasmExports['validateGetAttr'] !== 'undefined', 'missing Wasm export: validateGetAttr');
+  assert(typeof wasmExports['validateGetAggrLevel'] !== 'undefined', 'missing Wasm export: validateGetAggrLevel');
+  assert(typeof wasmExports['validateGetAggrIndArray'] !== 'undefined', 'missing Wasm export: validateGetAggrIndArray');
+  assert(typeof wasmExports['validateGetIssueLevel'] !== 'undefined', 'missing Wasm export: validateGetIssueLevel');
+  assert(typeof wasmExports['validateGetDescription'] !== 'undefined', 'missing Wasm export: validateGetDescription');
+  assert(typeof wasmExports['initializeModellingInstance'] !== 'undefined', 'missing Wasm export: initializeModellingInstance');
+  assert(typeof wasmExports['finalizeModelling'] !== 'undefined', 'missing Wasm export: finalizeModelling');
+  assert(typeof wasmExports['getInstanceInModelling'] !== 'undefined', 'missing Wasm export: getInstanceInModelling');
+  assert(typeof wasmExports['setVertexOffset'] !== 'undefined', 'missing Wasm export: setVertexOffset');
+  assert(typeof wasmExports['setFormat'] !== 'undefined', 'missing Wasm export: setFormat');
+  assert(typeof wasmExports['getConceptualFaceCnt'] !== 'undefined', 'missing Wasm export: getConceptualFaceCnt');
+  assert(typeof wasmExports['getConceptualFaceEx'] !== 'undefined', 'missing Wasm export: getConceptualFaceEx');
+  assert(typeof wasmExports['createGeometryConversion'] !== 'undefined', 'missing Wasm export: createGeometryConversion');
+  assert(typeof wasmExports['convertInstance'] !== 'undefined', 'missing Wasm export: convertInstance');
+  assert(typeof wasmExports['initializeModellingInstanceEx'] !== 'undefined', 'missing Wasm export: initializeModellingInstanceEx');
+  assert(typeof wasmExports['exportModellingAsOWL'] !== 'undefined', 'missing Wasm export: exportModellingAsOWL');
+  assert(typeof wasmExports['malloc'] !== 'undefined', 'missing Wasm export: malloc');
+  assert(typeof wasmExports['free'] !== 'undefined', 'missing Wasm export: free');
+  assert(typeof wasmExports['strerror'] !== 'undefined', 'missing Wasm export: strerror');
+  assert(typeof wasmExports['fflush'] !== 'undefined', 'missing Wasm export: fflush');
+  assert(typeof wasmExports['emscripten_stack_get_end'] !== 'undefined', 'missing Wasm export: emscripten_stack_get_end');
+  assert(typeof wasmExports['emscripten_stack_get_base'] !== 'undefined', 'missing Wasm export: emscripten_stack_get_base');
+  assert(typeof wasmExports['__trap'] !== 'undefined', 'missing Wasm export: __trap');
+  assert(typeof wasmExports['emscripten_stack_init'] !== 'undefined', 'missing Wasm export: emscripten_stack_init');
+  assert(typeof wasmExports['emscripten_stack_get_free'] !== 'undefined', 'missing Wasm export: emscripten_stack_get_free');
+  assert(typeof wasmExports['_emscripten_stack_restore'] !== 'undefined', 'missing Wasm export: _emscripten_stack_restore');
+  assert(typeof wasmExports['_emscripten_stack_alloc'] !== 'undefined', 'missing Wasm export: _emscripten_stack_alloc');
+  assert(typeof wasmExports['emscripten_stack_get_current'] !== 'undefined', 'missing Wasm export: emscripten_stack_get_current');
+  assert(typeof wasmExports['__cxa_decrement_exception_refcount'] !== 'undefined', 'missing Wasm export: __cxa_decrement_exception_refcount');
+  assert(typeof wasmExports['__cxa_increment_exception_refcount'] !== 'undefined', 'missing Wasm export: __cxa_increment_exception_refcount');
+  assert(typeof wasmExports['__thrown_object_from_unwind_exception'] !== 'undefined', 'missing Wasm export: __thrown_object_from_unwind_exception');
+  assert(typeof wasmExports['__get_exception_message'] !== 'undefined', 'missing Wasm export: __get_exception_message');
+  assert(typeof wasmExports['__set_stack_limits'] !== 'undefined', 'missing Wasm export: __set_stack_limits');
+  assert(typeof wasmExports['memory'] !== 'undefined', 'missing Wasm export: memory');
+  assert(typeof wasmExports['__indirect_function_table'] !== 'undefined', 'missing Wasm export: __indirect_function_table');
+  assert(typeof wasmExports['__cpp_exception'] !== 'undefined', 'missing Wasm export: __cpp_exception');
   ___getTypeName = createExportWrapper('__getTypeName', wasmExports['__getTypeName'], 1);
   _GetRevision = Module['_GetRevision'] = createExportWrapper('GetRevision', wasmExports['GetRevision'], 1);
   _GetRevisionW = Module['_GetRevisionW'] = createExportWrapper('GetRevisionW', wasmExports['GetRevisionW'], 1);
@@ -9340,8 +8939,11 @@ function assignWasmExports(wasmExports) {
   _SetSPFFHeaderItem = Module['_SetSPFFHeaderItem'] = createExportWrapper('SetSPFFHeaderItem', wasmExports['SetSPFFHeaderItem'], 5);
   _GetSPFFHeaderItem = Module['_GetSPFFHeaderItem'] = createExportWrapper('GetSPFFHeaderItem', wasmExports['GetSPFFHeaderItem'], 5);
   _GetDateTime = Module['_GetDateTime'] = createExportWrapper('GetDateTime', wasmExports['GetDateTime'], 2);
+  _GetDateTimeW = Module['_GetDateTimeW'] = createExportWrapper('GetDateTimeW', wasmExports['GetDateTimeW'], 2);
   _GetLibraryIdentifier = Module['_GetLibraryIdentifier'] = createExportWrapper('GetLibraryIdentifier', wasmExports['GetLibraryIdentifier'], 1);
+  _GetLibraryIdentifierW = Module['_GetLibraryIdentifierW'] = createExportWrapper('GetLibraryIdentifierW', wasmExports['GetLibraryIdentifierW'], 1);
   _GetSchemaName = Module['_GetSchemaName'] = createExportWrapper('GetSchemaName', wasmExports['GetSchemaName'], 2);
+  _GetSchemaNameW = Module['_GetSchemaNameW'] = createExportWrapper('GetSchemaNameW', wasmExports['GetSchemaNameW'], 2);
   _engiSetMappingSupport = Module['_engiSetMappingSupport'] = createExportWrapper('engiSetMappingSupport', wasmExports['engiSetMappingSupport'], 2);
   _engiGetMappingSupport = Module['_engiGetMappingSupport'] = createExportWrapper('engiGetMappingSupport', wasmExports['engiGetMappingSupport'], 1);
   _sdaiCreateModelBN = Module['_sdaiCreateModelBN'] = createExportWrapper('sdaiCreateModelBN', wasmExports['sdaiCreateModelBN'], 3);
@@ -9429,7 +9031,7 @@ function assignWasmExports(wasmExports) {
   _sdaiGetInstanceAttrBN = Module['_sdaiGetInstanceAttrBN'] = createExportWrapper('sdaiGetInstanceAttrBN', wasmExports['sdaiGetInstanceAttrBN'], 2);
   _sdaiGetAggregationAttrBN = Module['_sdaiGetAggregationAttrBN'] = createExportWrapper('sdaiGetAggregationAttrBN', wasmExports['sdaiGetAggregationAttrBN'], 2);
   _engiGetAttrTraits = Module['_engiGetAttrTraits'] = createExportWrapper('engiGetAttrTraits', wasmExports['engiGetAttrTraits'], 9);
-  _engiGetAttrName = Module['_engiGetAttrName'] = createExportWrapper('engiGetAttrName', wasmExports['engiGetAttrName'], 1);
+  _engiGetAttrName = Module['_engiGetAttrName'] = createExportWrapper('engiGetAttrName', wasmExports['engiGetAttrName'], 3);
   _engiGetAttrDefiningEntity = Module['_engiGetAttrDefiningEntity'] = createExportWrapper('engiGetAttrDefiningEntity', wasmExports['engiGetAttrDefiningEntity'], 1);
   _engiIsAttrExplicit = Module['_engiIsAttrExplicit'] = createExportWrapper('engiIsAttrExplicit', wasmExports['engiIsAttrExplicit'], 1);
   _engiIsAttrExplicitBN = Module['_engiIsAttrExplicitBN'] = createExportWrapper('engiIsAttrExplicitBN', wasmExports['engiIsAttrExplicitBN'], 2);
@@ -9575,7 +9177,6 @@ function assignWasmExports(wasmExports) {
   _internalGetCenter = Module['_internalGetCenter'] = createExportWrapper('internalGetCenter', wasmExports['internalGetCenter'], 2);
   _getRootAxis2Placement = Module['_getRootAxis2Placement'] = createExportWrapper('getRootAxis2Placement', wasmExports['getRootAxis2Placement'], 2);
   _getGlobalPlacement = Module['_getGlobalPlacement'] = createExportWrapper('getGlobalPlacement', wasmExports['getGlobalPlacement'], 2);
-  _engiGetAggrElement = Module['_engiGetAggrElement'] = createExportWrapper('engiGetAggrElement', wasmExports['engiGetAggrElement'], 4);
   _setGlobalPlacement = Module['_setGlobalPlacement'] = createExportWrapper('setGlobalPlacement', wasmExports['setGlobalPlacement'], 3);
   _getTimeStamp = Module['_getTimeStamp'] = createExportWrapper('getTimeStamp', wasmExports['getTimeStamp'], 1);
   _setInstanceReference = Module['_setInstanceReference'] = createExportWrapper('setInstanceReference', wasmExports['setInstanceReference'], 2);
@@ -9587,8 +9188,8 @@ function assignWasmExports(wasmExports) {
   _iterateOverProperties = Module['_iterateOverProperties'] = createExportWrapper('iterateOverProperties', wasmExports['iterateOverProperties'], 2);
   _engiGetEntityAttributeIndex = Module['_engiGetEntityAttributeIndex'] = createExportWrapper('engiGetEntityAttributeIndex', wasmExports['engiGetEntityAttributeIndex'], 2);
   _engiGetAttrIndexBN = Module['_engiGetAttrIndexBN'] = createExportWrapper('engiGetAttrIndexBN', wasmExports['engiGetAttrIndexBN'], 2);
-  _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = createExportWrapper('engiGetAttrIndexExBN', wasmExports['engiGetAttrIndexExBN'], 4);
   _engiGetEntityAttributeIndexEx = Module['_engiGetEntityAttributeIndexEx'] = createExportWrapper('engiGetEntityAttributeIndexEx', wasmExports['engiGetEntityAttributeIndexEx'], 4);
+  _engiGetAttrIndexExBN = Module['_engiGetAttrIndexExBN'] = createExportWrapper('engiGetAttrIndexExBN', wasmExports['engiGetAttrIndexExBN'], 4);
   _engiGetEntityArgumentName = Module['_engiGetEntityArgumentName'] = createExportWrapper('engiGetEntityArgumentName', wasmExports['engiGetEntityArgumentName'], 4);
   _engiGetAttrNameByIndex = Module['_engiGetAttrNameByIndex'] = createExportWrapper('engiGetAttrNameByIndex', wasmExports['engiGetAttrNameByIndex'], 4);
   _engiGetEntityArgumentType = Module['_engiGetEntityArgumentType'] = createExportWrapper('engiGetEntityArgumentType', wasmExports['engiGetEntityArgumentType'], 3);
@@ -9605,6 +9206,7 @@ function assignWasmExports(wasmExports) {
   _engiGetArgumentType = Module['_engiGetArgumentType'] = createExportWrapper('engiGetArgumentType', wasmExports['engiGetArgumentType'], 1);
   _engiGetAttributeType = Module['_engiGetAttributeType'] = createExportWrapper('engiGetAttributeType', wasmExports['engiGetAttributeType'], 1);
   _engiGetEntityArgumentIndex = Module['_engiGetEntityArgumentIndex'] = createExportWrapper('engiGetEntityArgumentIndex', wasmExports['engiGetEntityArgumentIndex'], 2);
+  _engiGetAggrElement = Module['_engiGetAggrElement'] = createExportWrapper('engiGetAggrElement', wasmExports['engiGetAggrElement'], 4);
   _engiGetEntityArgument = Module['_engiGetEntityArgument'] = createExportWrapper('engiGetEntityArgument', wasmExports['engiGetEntityArgument'], 2);
   _sdaiGetADBTypePathx = Module['_sdaiGetADBTypePathx'] = createExportWrapper('sdaiGetADBTypePathx', wasmExports['sdaiGetADBTypePathx'], 3);
   _xxxxOpenModelByStream = Module['_xxxxOpenModelByStream'] = createExportWrapper('xxxxOpenModelByStream', wasmExports['xxxxOpenModelByStream'], 3);
@@ -9732,8 +9334,6 @@ var wasmImports = {
   _embind_register_void: __embind_register_void,
   /** @export */
   _emval_create_invoker: __emval_create_invoker,
-  /** @export */
-  _emval_decref: __emval_decref,
   /** @export */
   _emval_invoke: __emval_invoke,
   /** @export */

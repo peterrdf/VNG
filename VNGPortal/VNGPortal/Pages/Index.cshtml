@@ -138,7 +138,13 @@
         messageDiv.appendChild(title);
 
         const iframe = document.createElement("iframe");
-        iframe.src = `/viewer/viewer.html?workflowId=${encodeURIComponent(view.workflowId)}&model=${encodeURIComponent(view.model)}`;
+            const params = new URLSearchParams({
+            workflowId: view.workflowId,
+            model: view.model,
+            zoomTo: `${view.zoomToX},${view.zoomToY}`,
+            view: view.view
+        });
+        iframe.src = `/viewer/viewer.html?${params}`;
         iframe.className = "w-100 border rounded";
         iframe.style.height = "600px";
         iframe.style.display = "block";

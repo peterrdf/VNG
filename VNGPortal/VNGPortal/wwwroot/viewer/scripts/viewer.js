@@ -1393,6 +1393,71 @@ var Viewer = function () {
     }
 
     /**
+     * Zoom to an X/Y point from a named view (X/Z orbit convention, same as zoomToXZ)
+     * view: 'top' | 'bottom' | 'front' | 'back' | 'left' | 'right'
+     * extent (optional): world-space size of the area to keep visible around the point
+     */
+    Viewer.prototype.zoomToViewXY = function (x, y, view, extent) {
+        try {
+            if (!Number.isFinite(x) || !Number.isFinite(y)) {
+                window.logErr("[Viewer.zoomToViewXY] Invalid point. Zoom operation aborted.");
+                return;
+            }
+
+            // View name => X/Z rotation angles (same values as the faces in zoomToXZ)
+            const views = {
+                front: { x: -90, z: 0 },    // looking along +Y
+                right: { x: -90, z: 90 },   // looking along -X
+                back: { x: -90, z: 180 },   // looking along -Y
+                left: { x: -90, z: 270 },   // looking along +X
+                top: { x: -180, z: 0 },     // looking down
+                bottom: { x: 0, z: 0 }      // looking up
+            };
+
+            const viewName = (view || 'top').toString().trim().toLowerCase();
+            const selectedView = views[viewName];
+            if (!selectedView) {
+                window.logErr(`[Viewer.zoomToViewXY] Unknown view '${view}'. Supported: ${Object.keys(views).join(', ')}`);
+                return;
+            }
+
+            // The point has no Z => use the middle of the model height
+            const z = (this._worldDimensions.Zmin + this._worldDimensions.Zmax) / 2;
+
+            // Rotate around the point
+            this._rotationCenter = vec3.fromValues(x, y, z);
+
+            // View = rotation only; the camera stays on the default -Z axis
+            this._rotateQuat = fromEulerXZ(selectedView.x, selectedView.z);
+
+            // Viewing distance: fit the requested extent into the frustum
+            const visibleExtent = (Number.isFinite(extent) && extent > 0)
+                ? extent
+                : this._worldDimensions.MaxDistance * 0.1;
+            const fovY = 45 * (Math.PI / 180); // keep in sync with setProjectionMatrix
+            const tanV = Math.tan(fovY / 2);
+            const tanH = tanV * (gl.canvas.width / gl.canvas.height);
+            const PADDING = 1.15;
+            let distance = (visibleExtent / 2 * PADDING) / Math.min(tanV, tanH);
+
+            // Same limits as _zoom(), so the first mouse wheel step doesn't jump
+            const MIN_DISTANCE = this._worldDimensions.MaxDistance * 0.015;
+            const MAX_DISTANCE = this._worldDimensions.MaxDistance * 5;
+            distance = Math.max(MIN_DISTANCE, Math.min(distance, MAX_DISTANCE));
+
+            this._targetVector = vec3.fromValues(x, y, z);
+            this._eyeVector = vec3.fromValues(x, y, z - distance);
+            this._upVector = vec3.fromValues(0, 1, 0);
+
+            window.logInfo(`[Viewer.zoomToViewXY] Point=(${x.toFixed(4)}, ${y}, ${z.toFixed(4).toFixed(4)}), view=${viewName}, distance=${distance.toFixed(4)}`);
+
+            PENDING_DRAW_SCENE = true;
+        } catch (e) {
+            window.logErr(e);
+        }
+    }
+
+    /**
      * Reset data and view
      */
     Viewer.prototype.reset = function () {

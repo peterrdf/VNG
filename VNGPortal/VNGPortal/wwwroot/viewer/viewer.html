@@ -131,10 +131,20 @@
                 g_viewer._model.Xmax = g_viewer._worldDimensions.Xmax = model.Xmax;
                 g_viewer._model.Ymax = g_viewer._worldDimensions.Ymax = model.Ymax;
                 g_viewer._model.Zmax = g_viewer._worldDimensions.Zmax = model.Zmax;
+                g_viewer._model.lengthUnit = model.lengthUnit;
+                g_viewer._model.vbOffsetX = model.vbOffsetX;
+                g_viewer._model.vbOffsetY = model.vbOffsetY;
+                g_viewer._model.vbOffsetZ = model.vbOffsetZ;
+                g_viewer._model.originalBoundingSphereDiameter = model.originalBoundingSphereDiameter;
+                g_viewer._model.originalScaleFactor = model.originalScaleFactor;
                 g_viewer._model.boundingSphereDiameter = g_viewer._worldDimensions.MaxDistance = model.boundingSphereDiameter;
                 g_viewer._model.scaleFactor = model.scaleFactor;
                 window.logInfo(`[beginLoadModel] Model: ${g_viewer._model.name}`);
                 window.logInfo(`[beginLoadModel] Xmin=${g_viewer._worldDimensions.Xmin}, Xmax=${g_viewer._worldDimensions.Xmax}, Ymin=${g_viewer._worldDimensions.Ymin}, Ymax=${g_viewer._worldDimensions.Ymax}, Zmin=${g_viewer._worldDimensions.Zmin}, Zmax=${g_viewer._worldDimensions.Zmax}`);
+                window.logInfo(`[beginLoadModel] Length Unit=${g_viewer._model.lengthUnit.toFixed(4)}`);
+                window.logInfo(`[beginLoadModel] VB Offset X=${g_viewer._model.vbOffsetX}, VB Offset Y=${g_viewer._model.vbOffsetY}, VB Offset Z=${g_viewer._model.vbOffsetZ}`);
+                window.logInfo(`[beginLoadModel] Original Bounding Sphere Diameter=${g_viewer._model.originalBoundingSphereDiameter}`);
+                window.logInfo(`[beginLoadModel] Original Scale Factor=${g_viewer._model.originalScaleFactor}`);
                 window.logInfo(`[beginLoadModel] Max distance=${g_viewer._worldDimensions.MaxDistance}`);
                 window.logInfo(`[beginLoadModel] Scale factor=${g_viewer._scaleFactor}`);
             }
@@ -772,6 +782,28 @@
 
                                 await loadModelWASM(wasmFSModel);
                                 await loadDecorationModelsWASM();
+
+                                // zoomTo=x,y
+                                const zoomToParam = urlParams.get('zoomTo');
+                                if (zoomToParam) {
+                                    const parts = zoomToParam.split(',').map(s => parseFloat(s.trim()));
+                                    let zoomToX = parts[0];
+                                    let zoomToY = parts[1];
+
+                                    if (parts.length === 2 && Number.isFinite(zoomToX) && Number.isFinite(zoomToY)) {
+                                        window.logInfo(`[zoomToViewXY] x=${zoomToX}, y=${zoomToY}`);
+                                        const view = urlParams.get('view') || 'top';
+                                        zoomToX *= g_viewer._model.lengthUnit;
+                                        zoomToX += g_viewer._model.vbOffsetX * g_viewer._model.lengthUnit;
+                                        zoomToX /= g_viewer._model.originalScaleFactor;
+                                        zoomToY *= g_viewer._model.lengthUnit;
+                                        zoomToY += g_viewer._model.vbOffsetY * g_viewer._model.lengthUnit;
+                                        zoomToY /= g_viewer._model.originalScaleFactor;
+                                        g_viewer.zoomToViewXY(zoomToX, zoomToY, view);
+                                    } else {
+                                        window.logWarn(`Invalid zoomTo parameter: ${zoomToParam}`);
+                                    }
+                                }
                             }).catch(e => {
                                 window.logErr(e);
                             });

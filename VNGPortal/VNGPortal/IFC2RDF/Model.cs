@@ -348,13 +348,17 @@ namespace VNGPortal.IFC2RDF
                     return;
                 }
 
+#pragma warning disable CS8604, CS8600 // Converting null literal or possible null value to non-nullable type.
                 double[] transformationMatrix = null;
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
                 double[] startVector = new double[3];
                 double[] endVector = new double[3];
+#pragma warning disable CS8604, CS8600 // Possible null reference argument.
                 if (!RDF.Engine.GetBoundingBox(iInstance, transformationMatrix, startVector, endVector))
                 {
                     return;
                 }
+#pragma warning restore CS8604 // Possible null reference argument.
 
                 RDF.Engine.SetVertexBufferOffset(
                     Instance,

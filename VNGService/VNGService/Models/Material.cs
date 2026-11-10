@@ -46,7 +46,7 @@ namespace VNGService.Models
               RDF.Engine.GetPropertyByName(owlModel, "diffuse"),
               ref owlColorComponentInstance,
               1);
-            double transparency = 0.05;
+            double transparency = 0.35;
             RDF.Engine.SetDatatypeProperty(
                 owlColorInstance,
                 RDF.Engine.GetPropertyByName(owlModel, "transparency"),
@@ -97,7 +97,7 @@ namespace VNGService.Models
               RDF.Engine.GetPropertyByName(owlModel, "diffuse"),
               ref owlColorComponentInstance,
               1);
-            double transparency = 0.05;
+            double transparency = 0.35;
             RDF.Engine.SetDatatypeProperty(
                 owlColorInstance,
                 RDF.Engine.GetPropertyByName(owlModel, "transparency"),
@@ -150,7 +150,7 @@ namespace VNGService.Models
               RDF.Engine.GetPropertyByName(owlModel, "diffuse"),
               ref owlColorComponentInstance,
               1);
-            double transparency = 0.05;
+            double transparency = 0.35;
             RDF.Engine.SetDatatypeProperty(
                 owlColorInstance,
                 RDF.Engine.GetPropertyByName(owlModel, "transparency"),
@@ -203,7 +203,7 @@ namespace VNGService.Models
               RDF.Engine.GetPropertyByName(owlModel, "diffuse"),
               ref owlColorComponentInstance,
               1);
-            double transparency = 0.05;
+            double transparency = 0.35;
             RDF.Engine.SetDatatypeProperty(
                 owlColorInstance,
                 RDF.Engine.GetPropertyByName(owlModel, "transparency"),

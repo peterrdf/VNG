@@ -791,15 +791,14 @@
                                     let zoomToY = parts[1];
 
                                     if (parts.length === 2 && Number.isFinite(zoomToX) && Number.isFinite(zoomToY)) {
-                                        window.logInfo(`[zoomToXZ] x=${zoomToX}, y=${zoomToY}`);
                                         zoomToX += g_viewer._model.vbOffsetX;
                                         zoomToX /= g_viewer._model.originalScaleFactor;
                                         zoomToY += g_viewer._model.vbOffsetY;
                                         zoomToY /= g_viewer._model.originalScaleFactor;
 
-                                        const extent = g_viewer._model.boundingSphereDiameter * 0.1;
+                                        const extent = g_viewer._model.boundingSphereDiameter * 0.0075;
                                         g_viewer.zoomToXZ(
-                                            zoomToX - extent, zoomToY - extent, g_viewer._model.Zmin,
+                                            zoomToX, zoomToY, g_viewer._model.Zmin,
                                             zoomToX + extent, zoomToY + extent, g_viewer._model.Zmax);
                                     } else {
                                         window.logWarn(`Invalid zoomTo parameter: ${zoomToParam}`);

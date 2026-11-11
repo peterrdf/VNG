@@ -330,18 +330,6 @@
 			</parameters>
 		</step>
 		<step>
-			<name><![CDATA[Validate BBoxes]]></name>
-			<description>
-				<![CDATA[
-			        Validates that every wall has a realistic physical size — not too small and not too large.
-			    ]]>
-			</description>
-			<type><![CDATA[SHACL]]></type>
-			<parameters>
-				<shapeRef><![CDATA[ValidateBBoxes-IfcWall]]></shapeRef>
-			</parameters>
-		</step>
-		<step>
 			<name><![CDATA[Validate Model BBox]]></name>
 			<description>
 				<![CDATA[

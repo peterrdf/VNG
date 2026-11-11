@@ -283,6 +283,136 @@ namespace VNGService.Pages
             }
         }
 
+        public IActionResult OnPostCreateScale([FromForm] string base64Content, [FromForm] double _11, [FromForm] double _22, [FromForm] double _33)
+        {
+            var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
+            System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
+
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
+
+            try
+            {
+                long owlRootInstance = Engine.ImportModel(owlModel, modelPath);
+
+                //
+                // Scale
+                //
+                long owlMatrixInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Matrix"));
+                List<double> vecMatrix = new List<double>
+                {
+                    _11,    // _11
+                    0.0,    // _12
+                    0.0,    // _13
+                    0.0,    // _21
+                    _22,    // _22
+                    0.0,    // _23
+                    0.0,    // _31
+                    0.0,    // _32
+                    _33,    // _33
+                    0.0,    // _41
+                    0.0,    // _42
+                    0.0,    // _43
+                };
+                Engine.SetDatatypeProperty(
+                    owlMatrixInstance,
+                    Engine.GetPropertyByName(owlModel, "coordinates"),
+                    vecMatrix.ToArray(),
+                    vecMatrix.Count);
+
+                long owlTransformationInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Transformation"));
+                Engine.SetObjectProperty(
+                    owlTransformationInstance,
+                    Engine.GetPropertyByName(owlModel, "matrix"),
+                    owlMatrixInstance);
+
+                Engine.SetObjectProperty(
+                    owlTransformationInstance,
+                    Engine.GetPropertyByName(owlModel, "object"),
+                    owlRootInstance);
+
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlTransformationInstance, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
+
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error Scaling model.");
+                throw;
+            }
+            finally
+            {
+                Engine.CloseModel(owlModel);
+                System.IO.File.Delete(modelPath);
+            }
+        }
+
+        public IActionResult OnPostCreateCollection([FromForm] string base64Contents)
+        {
+            if (string.IsNullOrWhiteSpace(base64Contents))
+            {
+                return BadRequest("base64Contents is required.");
+            }
+
+            var contents = base64Contents.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var modelPaths = new List<string>();
+
+            long owlModel = Engine.CreateModel();
+            Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
+
+            try
+            {
+                var owlInstances = new List<long>();
+                foreach (var content in contents)
+                {
+                    var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");
+                    modelPaths.Add(modelPath);
+                    System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(content));
+
+                    owlInstances.Add(Engine.ImportModel(owlModel, modelPath));
+                }
+
+                long owlCollectionInstance = Engine.CreateInstance(Engine.GetClassByName(owlModel, "Collection"));
+                long[] arOwlInstances = owlInstances.ToArray();
+                Engine.SetObjectProperty(
+                    owlCollectionInstance,
+                    Engine.GetPropertyByName(owlModel, "objects"),
+                    arOwlInstances,
+                    arOwlInstances.Length);
+
+                using var memoryStream = new MemoryStream();
+                Engine.SaveInstanceTreeS(owlCollectionInstance, (value, size) =>
+                {
+                    byte[] buffer = new byte[size];
+                    Marshal.Copy(value, buffer, 0, (int)size);
+
+                    memoryStream.Write(buffer, 0, (int)size);
+                }, 20000);
+
+                return new JsonResult(new { Geometry = System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer(), 0, (int)memoryStream.Length) });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating Collection model.");
+                throw;
+            }
+            finally
+            {
+                Engine.CloseModel(owlModel);
+                foreach (var modelPath in modelPaths)
+                {
+                    System.IO.File.Delete(modelPath);
+                }
+            }
+        }
+
         public IActionResult OnPostCreateRotation([FromForm] string base64Content, [FromForm] double alpha, [FromForm] double beta, [FromForm] double gamma)
         {
             var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{Guid.NewGuid()}.bin");

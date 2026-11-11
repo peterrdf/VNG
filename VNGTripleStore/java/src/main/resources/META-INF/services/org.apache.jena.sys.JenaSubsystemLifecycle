@@ -21,3 +21,5 @@ org.vng.VolumeInit
 org.vng.DistanceInit
 org.vng.ContentInit
 org.vng.LengthInit
+org.vng.ScaleInit
+org.vng.CollectionInit

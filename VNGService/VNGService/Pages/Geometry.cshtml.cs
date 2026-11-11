@@ -166,7 +166,7 @@ namespace VNGService.Pages
                 {
                     for (int i = 0; i < base64Datas.Length; i++)
                     {
-                        long owlInstanceInputTwo = ImportBase64Model(owlModel, modelsDir, base64Content2);
+                        long owlInstanceInputTwo = ImportBase64Model(owlModel, modelsDir, base64Datas[i]);
                         if (owlInstanceInputTwo == 0)
                         {
                             _logger.LogError($"Failed to import the second model at index {i}.");
@@ -175,7 +175,7 @@ namespace VNGService.Pages
                         }
 
                         topologicalRelation = GetTopologicalRelation(owlModel, owlInstanceInputOne, owlInstanceInputTwo);
-                        if (topologicalRelation != "DISJOINT")
+                        if (topologicalRelation == "CONTAINED BY")
                         {
                             break;
                         }
@@ -234,7 +234,7 @@ namespace VNGService.Pages
                     }
                     else
                     {
-                        topologicalRelation = "CONTAINS";
+                        topologicalRelation = "CONTAINS";                        
                     }
                 }
                 else

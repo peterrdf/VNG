@@ -203,9 +203,9 @@ namespace TestVNGPortal
                 _currentTestName = Path.GetFileName(ifcFile);
                 _textBoxLog.AppendText($"Running: {ifcFile}\r\n");
                 _streamLog?.Write(Encoding.UTF8.GetBytes("***************************************************************************************************\r\n"));
-                _streamLog?.Write(Encoding.UTF8.GetBytes($"Running: {ifcFile} ({index + 1}/{files.Count})\r\n"));
+                _streamLog?.Write(Encoding.UTF8.GetBytes($"Running ({index + 1}/{files.Count}): {ifcFile}\r\n"));
                 _streamTests?.Write(Encoding.UTF8.GetBytes("***************************************************************************************************\r\n"));
-                _streamTests?.Write(Encoding.UTF8.GetBytes($"Running: {ifcFile} ({index + 1}/{files.Count})\r\n"));
+                _streamTests?.Write(Encoding.UTF8.GetBytes($"Running ({index + 1}/{files.Count}): {ifcFile}\r\n"));
 
                 _taskCompletion = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -233,7 +233,26 @@ namespace TestVNGPortal
                 _textBoxLog.AppendText($"Task finished with status: {finalStatus}\r\n");
                 _streamLog?.Write(Encoding.UTF8.GetBytes($"Task finished with status: {finalStatus}\r\n\r\n"));
 
-                // #todo Summary
+                // Summary
+                int OK = 0;
+                int FAILED = 0;
+                foreach (var (testName, hasError) in _testResults)
+                {
+                    if (hasError)
+                    {
+                        FAILED++;
+                    }
+                    else
+                    {
+                        OK++;
+                    }
+                }
+
+                _streamLog?.Write(Encoding.UTF8.GetBytes($"Total: {_testResults.Count}, OK: {OK}, FAILED: {FAILED}\r\n"));
+                _streamTests?.Write(Encoding.UTF8.GetBytes($"-------------------------------------------------------\r\n"));
+                _streamTests?.Write(Encoding.UTF8.GetBytes($"Total: {_testResults.Count}, OK: {OK}, FAILED: {FAILED}\r\n"));
+                _streamTests?.Write(Encoding.UTF8.GetBytes($"-------------------------------------------------------\r\n"));
+                _streamTests?.Flush();
             } // for (int index = 0; index < files.Count; index++)
 
             _textBoxLog.AppendText("All tasks finished.\r\n");
@@ -317,6 +336,8 @@ namespace TestVNGPortal
                 bool hasError = false;
                 if (type?.Contains("SHACL Validation Report", StringComparison.InvariantCultureIgnoreCase) == true)
                 {
+                    _testResults.Add(new Tuple<string, bool>(type ?? "Unknown", hasError));
+
                     if (result?.IndexOf("sh:Violation") != -1)
                     {                        
                         hasError = true;
@@ -330,6 +351,8 @@ namespace TestVNGPortal
                 }
                 else if (type?.Contains("IDS Validation Report", StringComparison.InvariantCultureIgnoreCase) == true)
                 {
+                    _testResults.Add(new Tuple<string, bool>(type ?? "Unknown", hasError));
+
                     if (result?.IndexOf("ERROR") != -1)
                     {                        
                         hasError = true;
@@ -339,8 +362,7 @@ namespace TestVNGPortal
                     _streamTests?.Write(Encoding.UTF8.GetBytes($"Test: '{type}' {(hasError ? "FAILED" : "OK")}\r\n"));
                     _streamTests?.Flush();
                 }
-
-                _testResults.Add(new Tuple<string, bool>(type ?? "Unknown", hasError));
+                
                 _streamLog?.Write(Encoding.UTF8.GetBytes($"Model ({_currentTestIndex}/{_ifcFiles.Count}): '{_currentTestName}', Test: '{type}' {(hasError ? "FAILED" : "OK")}\r\n"));
                 _streamLog?.Flush();
             });

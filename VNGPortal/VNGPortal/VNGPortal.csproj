@@ -226,7 +226,7 @@
 		<None Update="SeedData\SPARQL\insert-ifc4-add2-ontology.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\nsert-topological-relations-ifcwall-ifcroof.ttl">
+		<None Update="SeedData\SPARQL\insert-topological-relations-ifcwall-ifcroof.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SPARQL\RetrieveBuildingElements.xml">

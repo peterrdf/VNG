@@ -358,6 +358,9 @@ namespace TestVNGPortal
                     {                        
                         hasError = true;
                         _textBoxLog.AppendText($"SHACL Validation Report:\r\n{result}\r\n");
+
+                        _streamLog?.Write(Encoding.UTF8.GetBytes($"SHACL Validation Report:\r\n{result}\r\n"));
+                        _streamLog?.Flush();
                     }
 
                     _testResults.Add(new Tuple<string, bool>(type ?? "Unknown", hasError));
@@ -370,7 +373,10 @@ namespace TestVNGPortal
                     if (result?.IndexOf("ERROR") != -1)
                     {                        
                         hasError = true;
-                        _textBoxLog?.AppendText($"IDS Validation Report:\r\n{result}\r\n");                        
+                        _textBoxLog?.AppendText($"IDS Validation Report:\r\n{result}\r\n");
+
+                        _streamLog?.Write(Encoding.UTF8.GetBytes($"SHACL Validation Report:\r\n{result}\r\n"));
+                        _streamLog?.Flush();
                     }
 
                     _testResults.Add(new Tuple<string, bool>(type ?? "Unknown", hasError));

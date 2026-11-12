@@ -176,7 +176,7 @@
 			</description>
 			<type><![CDATA[SPARQL]]></type>
 			<parameters>
-				<queryRef><![CDATA[InsertTopologicalRelations]]></queryRef>
+				<queryRef><![CDATA[InsertTopologicalRelations-IfcWall-IfcRoof]]></queryRef>
 			</parameters>
 		</step>
 		<step>

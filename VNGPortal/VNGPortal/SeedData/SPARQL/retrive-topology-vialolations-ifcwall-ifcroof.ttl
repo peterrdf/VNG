@@ -5,7 +5,7 @@ PREFIX geom:    <https://vng.nl/geometry/>
 
 SELECT ?ifcElement ?globalIdValue ?base64Data ?topologicalRelation
 WHERE {
-        VALUES ?ifcType { ifc:IfcWall }
+        VALUES ?ifcType { ifc:IfcWall ifc:IfcRoof }
 
         ?ifcElement     rdf:type               		?ifcType ;
                         ifc:globalId_IfcRoot   		?globalIdNode .

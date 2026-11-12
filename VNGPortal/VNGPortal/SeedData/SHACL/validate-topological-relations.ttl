@@ -5,7 +5,8 @@
 
 geom:GeometryShape
     a sh:NodeShape ;
-	sh:targetSubjectsOf geom:globalId ;
+	sh:targetClass ifc:IfcWall, ifc:IfcRoof ;
+    sh:targetSubjectsOf geom:globalId ;
 
     sh:sparql [
         sh:prefixes [

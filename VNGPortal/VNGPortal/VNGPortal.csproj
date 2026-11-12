@@ -253,7 +253,7 @@
 		<None Update="SeedData\SPARQL\InsertAreas.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\retrive-topological-relation-vialolations.ttl">
+		<None Update="SeedData\SPARQL\retrive-topology-vialolations-ifcwall-ifcroof.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SPARQL\retrive-living-areas.ttl">

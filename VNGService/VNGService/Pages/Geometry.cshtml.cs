@@ -164,6 +164,8 @@ namespace VNGService.Pages
                 var base64Datas = base64Content2.Split('|');
                 if (base64Datas.Length > 1)
                 {
+                    int overlapCount = 0;
+                    int containsCount = 0;
                     for (int i = 0; i < base64Datas.Length; i++)
                     {
                         long owlInstanceInputTwo = ImportBase64Model(owlModel, modelsDir, base64Datas[i]);
@@ -175,10 +177,27 @@ namespace VNGService.Pages
                         }
 
                         topologicalRelation = GetTopologicalRelation(owlModel, owlInstanceInputOne, owlInstanceInputTwo);
-                        if (topologicalRelation == "CONTAINED BY")
+                        if (topologicalRelation.Equals("CONTAINED BY", StringComparison.InvariantCultureIgnoreCase))
                         {
                             break;
                         }
+                        else if (topologicalRelation.Equals("OVERLAP", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            overlapCount++;
+                        }
+                        else if (topologicalRelation.Equals("CONTAINS", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            containsCount++;
+                        }
+                    }
+
+                    if (overlapCount > 0)
+                    {
+                        topologicalRelation = "OVERLAP";
+                    }
+                    else if (containsCount > 0)
+                    {
+                        topologicalRelation = "CONTAINS";
                     }
                 }
                 else

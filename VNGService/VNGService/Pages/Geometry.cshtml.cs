@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RDF;
 using System.Runtime.InteropServices;
+using System.Text;
 using VNGService.Models;
 
 namespace VNGService.Pages
@@ -164,6 +165,13 @@ namespace VNGService.Pages
                 var base64Datas = base64Content2.Split('|');
                 if (base64Datas.Length > 1)
                 {
+                    //#dbg
+                    var debugTopologyFilePath = Path.Combine(modelsDir, $"{Guid.NewGuid():N}_topology_debug.txt");
+                    StreamWriter debugFileWriter = new StreamWriter(debugTopologyFilePath, false, Encoding.UTF8);
+                    debugFileWriter.WriteLine("OBJECT 1");
+                    debugFileWriter.WriteLine(base64Content1);
+                    debugFileWriter.WriteLine("\r\n");
+
                     int overlapCount = 0;
                     int containsCount = 0;
                     for (int i = 0; i < base64Datas.Length; i++)
@@ -184,12 +192,38 @@ namespace VNGService.Pages
                         else if (topologicalRelation.Equals("OVERLAP", StringComparison.InvariantCultureIgnoreCase))
                         {
                             overlapCount++;
+
+                            //#dbg                            
+                            debugFileWriter.WriteLine("OBJECT 2");
+                            debugFileWriter.WriteLine(base64Datas[i]);
+                            debugFileWriter.WriteLine("\r\nOVERLAP\r\n");
                         }
                         else if (topologicalRelation.Equals("CONTAINS", StringComparison.InvariantCultureIgnoreCase))
                         {
                             containsCount++;
+
+                            //#dbg                            
+                            debugFileWriter.WriteLine("OBJECT 2");
+                            debugFileWriter.WriteLine(base64Datas[i]);
+                            debugFileWriter.WriteLine("\r\nCONTAINS\r\n");
                         }
-                    }
+                        else if (topologicalRelation.Equals("DISJOINT", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            //#dbg                            
+                            debugFileWriter.WriteLine("OBJECT 2");
+                            debugFileWriter.WriteLine(base64Datas[i]);
+                            debugFileWriter.WriteLine("\r\nDISJOINT\r\n");
+                        }
+                        else
+                        {
+                            //#dbg
+                            debugFileWriter.WriteLine($"\r\nUNEXPECTED TOPOLOGICAL RELATION '{topologicalRelation}\r\n'");
+                            _logger.LogWarning($"Unexpected topological relation '{topologicalRelation}' for index {i}.");
+                        }
+                    } // for (int i = 0; i < base64Datas.Length; i++) 
+
+                    //#dbg
+                    debugFileWriter.Dispose();
 
                     if (overlapCount > 0)
                     {
@@ -478,7 +512,7 @@ namespace VNGService.Pages
             var modelPath = Path.Combine(modelsDir, $"{Guid.NewGuid():N}.bin");
             try
             {
-                System.IO.File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Content));
+                System.IO.File.WriteAllBytes(modelPath, Encoding.UTF8.GetBytes(base64Content));
                 return Engine.ImportModel(owlModel, modelPath);
             }
             finally

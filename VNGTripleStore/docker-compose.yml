@@ -1,6 +1,6 @@
 services:
   vngtriplestore:
-    image: vngtriplestore:1.18
+    image: vngtriplestore:1.19
     build:
       context: .
       dockerfile: docker/Dockerfile.prebuilt

@@ -1,6 +1,6 @@
 services:
   vngportal:
-    image: vngportal:1.29
+    image: vngportal:1.30
     build:
       context: .
       dockerfile: docker/Dockerfile.prebuilt

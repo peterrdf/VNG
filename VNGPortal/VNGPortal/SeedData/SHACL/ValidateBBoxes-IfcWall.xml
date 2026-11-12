@@ -33,20 +33,7 @@
 				-->
 				<sparql>
 					<id><![CDATA[RetrieveGeometryByGlobalIdTemplate]]></id>
-					<query>
-						<![CDATA[
-PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX geom: <https://vng.nl/geometry/>
-
-SELECT ?globalIdValue ?base64Data
-WHERE {
-    VALUES ?globalIdValue { ###GLOBAL_IDS_LIST### }
-    GRAPH <https://vng.nl/geometries/> {
-    ?geometry   geom:globalId	?globalIdValue ;
-                geom:base64Data	?base64Data .
-    }
-}
-	    ]]>
+					<query uri="retrieve-geometry-by-globalId-template.ttl">
 					</query>
 					<parameters>
 						<templateArgRegExpr><![CDATA[GlobalId=\[(?<globalId>[^\]]+)\]]]></templateArgRegExpr>
@@ -66,22 +53,7 @@ WHERE {
 				-->
 				<sparql>
 					<id><![CDATA[RetriveLivingAreas]]></id>
-					<query>
-						<![CDATA[
-PREFIX dso:    <http://vng.nl/areas/>
-
-SELECT ?id ?group ?geometry
-WHERE {
-  GRAPH <areas.ttl> {
-    ?area	a       dso:area ;
-                  	dso:id    		?id ;
-                  	dso:group  	    ?group ;
-                  	dso:geometry  	?geometry .
-    FILTER(?group = "wonen" || ?group = "gemengd")
-  }
-}
-ORDER BY ?id
-			]]>
+					<query uri="retrive-living-areas.ttl">
 					</query>
 					<geometryVariable><![CDATA[geometry]]></geometryVariable>
 				</sparql>

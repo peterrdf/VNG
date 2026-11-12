@@ -229,6 +229,9 @@
 		<None Update="SeedData\SPARQL\insert-topological-relations-ifcwall-ifcroof.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SPARQL\retrieve-building-elements.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\SPARQL\RetrieveBuildingElements.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
@@ -257,6 +260,9 @@
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SPARQL\retrive-living-areas.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SPARQL\retrieve-geometry-by-globalId-template.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\Workflows\vng_workflow_embedded-1.xml">

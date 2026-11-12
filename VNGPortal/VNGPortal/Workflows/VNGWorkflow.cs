@@ -346,7 +346,7 @@ namespace VNGPortal.Workflows
                                 if (!string.IsNullOrEmpty(result))
                                 {
                                     bool hasViolations = result.IndexOf("sh:Violation") != -1;
-                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "SHACL Validation Report", "", result, hasViolations);
+                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, $"{step.Name} - SHACL Validation Report", "", result, hasViolations);
                                     await CreateSHACLViews(
                                         shaclShape,
                                         result);
@@ -375,7 +375,7 @@ namespace VNGPortal.Workflows
                                 if (exitCode == 0)
                                 {
                                     _logger.LogInformation("Workflow step: '{StepName}' executed successfully.", step.Name);
-                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "IDS Validation Report", "", output, output.IndexOf("ERROR") != -1);
+                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, $"{step.Name} - IDS Validation Report", "", output, output.IndexOf("ERROR") != -1);
                                     await _signalRStatus.SendProgressUpdate(
                                         taskDescriptor.GroupName,
                                         (float)currentStep / stepsCount,
@@ -384,7 +384,7 @@ namespace VNGPortal.Workflows
                                 }
                                 else
                                 {
-                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, "IDS Validation Report", "", output, true);
+                                    await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, $"{step.Name} - IDS Validation Report", "", output, true);
                                 }
                             }
                             break;

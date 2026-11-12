@@ -23,6 +23,7 @@ namespace TestVNGPortal
         private string _dateTimeStamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
         private Stream? _streamLog;
         private Stream? _streamTests;
+        private Stream? _streamSummary;
 
         public TestVNGPortalForm()
         {
@@ -161,7 +162,14 @@ namespace TestVNGPortal
                     _streamTests = null;
                 }
                 _streamTests = new FileStream(Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Tests-{_dateTimeStamp}.txt"), FileMode.Create, FileAccess.Write, FileShare.Read);
-                                
+
+                if (_streamSummary != null)
+                {
+                    _streamSummary.Dispose();
+                    _streamSummary = null;
+                }
+                _streamSummary = new FileStream(Path.Combine(_textBoxIFCModelsFolder.Text, $"Test-VNGPortal-Summary-{_dateTimeStamp}.txt"), FileMode.Create, FileAccess.Write, FileShare.Read);
+
                 await RunWorkflowsAsync();
             }
             catch (Exception ex)
@@ -201,11 +209,15 @@ namespace TestVNGPortal
                 _testResults.Clear();
                 _currentTestIndex = index;
                 _currentTestName = Path.GetFileName(ifcFile);
-                _textBoxLog.AppendText($"Running: {ifcFile}\r\n");
+
+                _textBoxLog.AppendText($"Model: {ifcFile}\r\n");
+
                 _streamLog?.Write(Encoding.UTF8.GetBytes("***************************************************************************************************\r\n"));
-                _streamLog?.Write(Encoding.UTF8.GetBytes($"Running ({index + 1}/{files.Count}): {ifcFile}\r\n"));
+                _streamLog?.Write(Encoding.UTF8.GetBytes($"Model ({index + 1}/{files.Count}): {ifcFile}\r\n"));
+
                 _streamTests?.Write(Encoding.UTF8.GetBytes("***************************************************************************************************\r\n"));
-                _streamTests?.Write(Encoding.UTF8.GetBytes($"Running ({index + 1}/{files.Count}): {ifcFile}\r\n"));
+                _streamTests?.Write(Encoding.UTF8.GetBytes($"Model ({index + 1}/{files.Count}): {ifcFile}\r\n"));
+                _streamTests?.Flush();
 
                 _taskCompletion = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -230,7 +242,9 @@ namespace TestVNGPortal
 
                 // Wait until the server reports a terminal status for this task
                 var finalStatus = await _taskCompletion.Task;
+
                 _textBoxLog.AppendText($"Task finished with status: {finalStatus}\r\n");
+
                 _streamLog?.Write(Encoding.UTF8.GetBytes($"Task finished with status: {finalStatus}\r\n\r\n"));
 
                 // Summary
@@ -249,10 +263,14 @@ namespace TestVNGPortal
                 }
 
                 _streamLog?.Write(Encoding.UTF8.GetBytes($"Total: {_testResults.Count}, OK: {OK}, FAILED: {FAILED}\r\n"));
+
                 _streamTests?.Write(Encoding.UTF8.GetBytes($"-------------------------------------------------------\r\n"));
                 _streamTests?.Write(Encoding.UTF8.GetBytes($"Total: {_testResults.Count}, OK: {OK}, FAILED: {FAILED}\r\n"));
-                _streamTests?.Write(Encoding.UTF8.GetBytes($"-------------------------------------------------------\r\n"));
+                _streamTests?.Write(Encoding.UTF8.GetBytes($"-------------------------------------------------------\r\n\r\n"));
                 _streamTests?.Flush();
+
+                _streamSummary?.Write(Encoding.UTF8.GetBytes($"Model ({index + 1}/{files.Count}): '{_currentTestName}', Total: {_testResults.Count}, OK: {OK}, FAILED: {FAILED}\r\n"));
+                _streamSummary?.Flush();
             } // for (int index = 0; index < files.Count; index++)
 
             _textBoxLog.AppendText("All tasks finished.\r\n");
@@ -336,28 +354,26 @@ namespace TestVNGPortal
                 bool hasError = false;
                 if (type?.Contains("SHACL Validation Report", StringComparison.InvariantCultureIgnoreCase) == true)
                 {
-                    _testResults.Add(new Tuple<string, bool>(type ?? "Unknown", hasError));
-
                     if (result?.IndexOf("sh:Violation") != -1)
                     {                        
                         hasError = true;
                         _textBoxLog.AppendText($"SHACL Validation Report:\r\n{result}\r\n");
-                        _streamLog?.Write(Encoding.UTF8.GetBytes($"SHACL Validation Report:\r\n{result}\r\n"));
-                        _streamLog?.Flush();
                     }
+
+                    _testResults.Add(new Tuple<string, bool>(type ?? "Unknown", hasError));
 
                     _streamTests?.Write(Encoding.UTF8.GetBytes($"Test: '{type}' {(hasError ? "FAILED" : "OK")}\r\n"));
                     _streamTests?.Flush();
                 }
                 else if (type?.Contains("IDS Validation Report", StringComparison.InvariantCultureIgnoreCase) == true)
                 {
-                    _testResults.Add(new Tuple<string, bool>(type ?? "Unknown", hasError));
-
                     if (result?.IndexOf("ERROR") != -1)
                     {                        
                         hasError = true;
                         _textBoxLog?.AppendText($"IDS Validation Report:\r\n{result}\r\n");                        
                     }
+
+                    _testResults.Add(new Tuple<string, bool>(type ?? "Unknown", hasError));
 
                     _streamTests?.Write(Encoding.UTF8.GetBytes($"Test: '{type}' {(hasError ? "FAILED" : "OK")}\r\n"));
                     _streamTests?.Flush();

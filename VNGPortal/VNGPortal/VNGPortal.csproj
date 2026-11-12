@@ -253,6 +253,12 @@
 		<None Update="SeedData\SPARQL\InsertAreas.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\SPARQL\retrive-topological-relation-vialolations.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SPARQL\retrive-living-areas.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\Workflows\vng_workflow_embedded-1.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

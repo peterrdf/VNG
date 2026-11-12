@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using VDS.RDF.Query;
 using VNGPortal.IFC2RDF;
 using VNGPortal.Pages;
 using VNGPortal.Services;
@@ -444,6 +445,10 @@ namespace VNGPortal.Workflows
                 return;
             }
 
+            var isLinuxPlatform = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+            var fileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
+            var sparqlDir = _configuration[$"{fileStorage}:SPARQLDir"]!;
+
             var modelPath = Path.Combine(ModelDir, TaskDescriptor.Model);
 
             double dX = 0.0;
@@ -472,6 +477,15 @@ namespace VNGPortal.Workflows
                             foreach (var geometryQuery in shaclViolationView.Queries)
                             {
                                 string query = geometryQuery.Query;
+                                if (string.IsNullOrEmpty(query) && !string.IsNullOrEmpty(geometryQuery.QueryUri))
+                                {
+                                    // #todo: use http source instead of local file
+                                    var queryFilePath = Path.Combine(sparqlDir, geometryQuery.QueryUri);
+                                    _logger.LogInformation("Loading SPARQL query from file: '{QueryFilePath}'", queryFilePath);
+                                    query = await File.ReadAllTextAsync(queryFilePath);
+                                    _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
+                                }
+
                                 if (string.IsNullOrEmpty(query))
                                 {
                                     throw new Exception($"SPARQL query is empty for SHACL Validation - SPARQL Query: '{shaclShape.Id} - {geometryQuery.Id}'");

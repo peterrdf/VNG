@@ -35,32 +35,7 @@
 				-->
 				<sparql>
 					<id><![CDATA[RetriveTopologicalRelationVialolations]]></id>
-					<query>
-						<![CDATA[
-PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
-PREFIX express: <https://w3id.org/express#>
-PREFIX geom:    <https://vng.nl/geometry/>
-
-SELECT ?ifcElement ?globalIdValue ?base64Data ?topologicalRelation
-WHERE {
-        VALUES ?ifcType { ifc:IfcWall }
-
-        ?ifcElement     rdf:type               		?ifcType ;
-                        ifc:globalId_IfcRoot   		?globalIdNode .
-        ?globalIdNode   rdf:type               		ifc:IfcGloballyUniqueId ;
-                        express:hasString      		?globalIdValue .
-
-        GRAPH <https://vng.nl/geometries/> {
-        ?geometry       rdf:type               		?ifcType ;
-                        geom:globalId          		?globalIdValue ;
-            		    geom:base64Data				?base64Data ;
-                        geom:topologicalRelation    ?topologicalRelation .
-        FILTER(?topologicalRelation != "CONTAINED BY")
-    }
-}
-ORDER BY ?ifcElement
-			]]>
+					<query uri="retrive-topological-relation-vialolations.ttl">
 					</query>
 					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
 				</sparql>
@@ -69,28 +44,13 @@ ORDER BY ?ifcElement
 					Retrieves the living areas to show as context in the 3D view.
 					1. In the graph <areas.ttl> it selects every dso:area with its dso:id,
 					   dso:group and dso:geometry.
-					2. FILTER keeps only areas whose group is "wonen" (residential).
+					2. FILTER keeps only areas whose group is "wonen" (residential) || "gemengd" (mixed).
 					3. The result is ordered by ?id, and the geometry is shown in the 3D view
 					   (geometryVariable = geometry).
 				-->
 				<sparql>
 					<id><![CDATA[RetriveLivingAreas]]></id>
-					<query>
-						<![CDATA[
-PREFIX dso:    <http://vng.nl/areas/>
-
-SELECT ?id ?group ?geometry
-WHERE {
-  GRAPH <areas.ttl> {
-    ?area	a       dso:area ;
-                  	dso:id    		?id ;
-                  	dso:group  	    ?group ;
-                  	dso:geometry  	?geometry .
-    FILTER(?group = "wonen" || ?group = "gemengd")
-  }
-}
-ORDER BY ?id
-			]]>
+					<query uri="retrive-living-areas.ttl">
 					</query>
 					<geometryVariable><![CDATA[geometry]]></geometryVariable>
 				</sparql>

@@ -17,7 +17,7 @@ WHERE {
                         geom:globalId          		?globalIdValue ;
             		    geom:base64Data				?base64Data ;
                         geom:topologicalRelation    ?topologicalRelation .
-        FILTER(?value NOT IN ("CONTAINED BY", "INVALID INPUT"))
+        FILTER(?topologicalRelation NOT IN ("CONTAINED BY", "INVALID INPUT"))
     }
 }
 ORDER BY ?ifcElement

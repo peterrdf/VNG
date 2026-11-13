@@ -23,9 +23,9 @@ geom:GeometryShape
         sh:select """
             SELECT $this ?value ?globalId
             WHERE {
-                $this geom:globalId            ?globalId ;
-                        geom:topologicalRelation ?value .
-                FILTER(?value != "CONTAINED BY")
+                $this geom:globalId              ?globalId ;
+                      geom:topologicalRelation   ?value .
+                FILTER(?value NOT IN ("CONTAINED BY", "INVALID INPUT"))
             }
         """ ;
         sh:message "geom:topologicalRelation is NOT 'CONTAINED BY'. GlobalId: {?globalId}" ;

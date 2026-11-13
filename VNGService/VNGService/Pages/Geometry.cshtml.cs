@@ -162,15 +162,26 @@ namespace VNGService.Pages
                     return new JsonResult(new { TopologicalRelation = "error" });
                 }
 
+                double[]? transformationMatrix = null;
+                double[] startVector = new double[3];
+                double[] endVector = new double[3];
+#pragma warning disable CS8604 // Possible null reference argument.
+                if (!Engine.GetBoundingBox(owlInstanceInputOne, transformationMatrix, startVector, endVector))
+                {
+                    _logger.LogWarning("The first model does not contain geometry.");
+                    return new JsonResult(new { TopologicalRelation = "INVALID INPUT" });
+                }
+#pragma warning restore CS8604 // Possible null reference argument.
+
                 var base64Datas = base64Content2.Split('|');
                 if (base64Datas.Length > 1)
                 {
                     //#dbg
-                    var debugTopologyFilePath = Path.Combine(modelsDir, $"{Guid.NewGuid():N}_topology_debug.txt");
-                    StreamWriter debugFileWriter = new StreamWriter(debugTopologyFilePath, false, Encoding.UTF8);
-                    debugFileWriter.WriteLine("OBJECT 1");
-                    debugFileWriter.WriteLine(base64Content1);
-                    debugFileWriter.WriteLine("\r\n");
+                    //var debugTopologyFilePath = Path.Combine(modelsDir, $"{Guid.NewGuid():N}_topology_debug.txt");
+                    //StreamWriter debugFileWriter = new StreamWriter(debugTopologyFilePath, false, Encoding.UTF8);
+                    //debugFileWriter.WriteLine("OBJECT 1");
+                    //debugFileWriter.WriteLine(base64Content1);
+                    //debugFileWriter.WriteLine("\r\n");
 
                     int overlapCount = 0;
                     int containsCount = 0;
@@ -194,36 +205,36 @@ namespace VNGService.Pages
                             overlapCount++;
 
                             //#dbg                            
-                            debugFileWriter.WriteLine("OBJECT 2");
-                            debugFileWriter.WriteLine(base64Datas[i]);
-                            debugFileWriter.WriteLine("\r\nOVERLAP\r\n");
+                            //debugFileWriter.WriteLine("OBJECT 2");
+                            //debugFileWriter.WriteLine(base64Datas[i]);
+                            //debugFileWriter.WriteLine("\r\nOVERLAP\r\n");
                         }
                         else if (topologicalRelation.Equals("CONTAINS", StringComparison.InvariantCultureIgnoreCase))
                         {
                             containsCount++;
 
                             //#dbg                            
-                            debugFileWriter.WriteLine("OBJECT 2");
-                            debugFileWriter.WriteLine(base64Datas[i]);
-                            debugFileWriter.WriteLine("\r\nCONTAINS\r\n");
+                            //debugFileWriter.WriteLine("OBJECT 2");
+                            //debugFileWriter.WriteLine(base64Datas[i]);
+                            //debugFileWriter.WriteLine("\r\nCONTAINS\r\n");
                         }
                         else if (topologicalRelation.Equals("DISJOINT", StringComparison.InvariantCultureIgnoreCase))
                         {
                             //#dbg                            
-                            debugFileWriter.WriteLine("OBJECT 2");
-                            debugFileWriter.WriteLine(base64Datas[i]);
-                            debugFileWriter.WriteLine("\r\nDISJOINT\r\n");
+                            //debugFileWriter.WriteLine("OBJECT 2");
+                            //debugFileWriter.WriteLine(base64Datas[i]);
+                            //debugFileWriter.WriteLine("\r\nDISJOINT\r\n");
                         }
                         else
                         {
                             //#dbg
-                            debugFileWriter.WriteLine($"\r\nUNEXPECTED TOPOLOGICAL RELATION '{topologicalRelation}\r\n'");
+                            //debugFileWriter.WriteLine($"\r\nUNEXPECTED TOPOLOGICAL RELATION '{topologicalRelation}\r\n'");
                             _logger.LogWarning($"Unexpected topological relation '{topologicalRelation}' for index {i}.");
                         }
                     } // for (int i = 0; i < base64Datas.Length; i++) 
 
                     //#dbg
-                    debugFileWriter.Dispose();
+                    //debugFileWriter.Dispose();
 
                     if (overlapCount > 0)
                     {

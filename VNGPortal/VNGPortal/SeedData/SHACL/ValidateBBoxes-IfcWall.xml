@@ -41,6 +41,7 @@
 						<templateArgName><![CDATA[###GLOBAL_IDS_LIST###]]></templateArgName>
 					</parameters>
 					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
+					<zoomTo>true</zoomTo>
 				</sparql>
 				<!--
 					Explanation (SPARQL):

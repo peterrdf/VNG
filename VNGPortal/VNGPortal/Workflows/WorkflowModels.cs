@@ -168,9 +168,6 @@ public class SHACLShape
 [XmlRoot("sparql")]
 public class SPARQLGeometryQuery : SPARQLQuery
 {
-    [XmlElement("geometryVariable")]
-    public string GeometryVariable { get; set; } = string.Empty;
-
     public static SPARQLGeometryQuery FromXml(XElement e)
     {
         var parameters = new ParameterDictionary();
@@ -188,10 +185,17 @@ public class SPARQLGeometryQuery : SPARQLQuery
             Id = e.Element("id")?.Value.Trim() ?? "",
             QueryElement = SPARQLQueryElement.FromXml(e.Element("query")),
             GeometryVariable = e.Element("geometryVariable")?.Value.Trim() ?? "",
+            ZoomTo = e.Element("zoomTo")?.Value.Trim().ToLower() == "true",
             Parameters = parameters,
             Attributes = AttributeDictionary.FromXElement(e)
         };
     }
+
+    [XmlElement("geometryVariable")]
+    public string GeometryVariable { get; set; } = string.Empty;
+
+    [XmlElement("zoomTo")]
+    public bool ZoomTo { get; set; } = false;
 }
 
 [XmlRoot("sparql")]

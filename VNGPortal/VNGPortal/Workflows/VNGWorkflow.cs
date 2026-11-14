@@ -206,11 +206,6 @@ namespace VNGPortal.Workflows
                                     throw new Exception($"3DVIEW workflow step: '{step.Name}' has no valid geometry queries.");
                                 }
 
-                                // Geo-reference
-                                double dX = 0.0;
-                                double dY = 0.0;
-                                GetGeoReference(modelPath, out dX, out dY);
-
                                 long owlModel = Engine.CreateModel();
                                 Engine.SetOverrideFileIO(owlModel, Engine.flagbit0 + Engine.flagbit4, Engine.flagbit0 + Engine.flagbit4);
                                 try
@@ -234,9 +229,6 @@ namespace VNGPortal.Workflows
                                             Title = "3D View",
                                             WorkflowId = taskDescriptor.TaskId,
                                             Model = viewModel,
-                                            ZoomToX = dX,
-                                            ZoomToY = dY,
-                                            View = "top",
                                             Error = false
                                         });
                                 }
@@ -474,6 +466,7 @@ namespace VNGPortal.Workflows
                         long owlModel = Engine.CreateModel();
                         try
                         {
+                            double[]? modelBBox = null;
                             foreach (var geometryQuery in shaclViolationView.Queries)
                             {
                                 string query = geometryQuery.Query;
@@ -526,8 +519,13 @@ namespace VNGPortal.Workflows
                                 }
 
                                 var queryResult = await SPARQLServer.ExecuteQueryAsync(DatasetName, query);
-                                await SPARQLServer.RetrieveGeometry(queryResult, geometryQuery.GeometryVariable, owlModel);
-                            }
+                                var queryModelBBox =  await SPARQLServer.RetrieveGeometry(queryResult, geometryQuery.GeometryVariable, owlModel);
+                                if (geometryQuery.ZoomTo && (queryModelBBox != null))
+                                {
+                                    modelBBox = queryModelBBox;
+                                }
+                                _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Model Bounding Box: {ModelBBox}", shaclShape.Id, geometryQuery.Id, modelBBox);
+                            } // foreach (var geometryQuery in shaclViolationView.Queries)
 
                             var shaclErrorsModel = $"shacl_errors_{Guid.NewGuid().ToString()}.bin";
                             var shaclErrorsModelPath = Path.Combine(ModelDir, shaclErrorsModel);
@@ -540,10 +538,13 @@ namespace VNGPortal.Workflows
                                     Title = "SHACL Violations View",
                                     WorkflowId = TaskDescriptor.TaskId,
                                     Model = shaclErrorsModel,
-                                    ZoomToX = dX,
-                                    ZoomToY = dY,
-                                    View = "top",
-                                    Error = false
+                                    Error = false,
+                                    ZoomToX1 = modelBBox != null ? modelBBox[0] : 0.0,
+                                    ZoomToY1 = modelBBox != null ? modelBBox[1] : 0.0,
+                                    ZoomToZ1 = modelBBox != null ? modelBBox[2] : 0.0,
+                                    ZoomToX2 = modelBBox != null ? modelBBox[3] : 0.0,
+                                    ZoomToY2 = modelBBox != null ? modelBBox[4] : 0.0,
+                                    ZoomToZ2 = modelBBox != null ? modelBBox[5] : 0.0                                    
                                 });
                         }
                         finally

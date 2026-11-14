@@ -787,19 +787,40 @@
                                 const zoomToParam = urlParams.get('zoomTo');
                                 if (zoomToParam) {
                                     const parts = zoomToParam.split(',').map(s => parseFloat(s.trim()));
-                                    let zoomToX = parts[0];
-                                    let zoomToY = parts[1];
+                                    let zoomToX1 = parts[0];
+                                    let zoomToY1 = parts[1];
+                                    let zoomToZ1 = parts[2];
+                                    let zoomToX2 = parts[3];
+                                    let zoomToY2 = parts[4];
+                                    let zoomToZ2 = parts[5];
 
-                                    if (parts.length === 2 && Number.isFinite(zoomToX) && Number.isFinite(zoomToY)) {
-                                        zoomToX += g_viewer._model.vbOffsetX;
-                                        zoomToX /= g_viewer._model.originalScaleFactor;
-                                        zoomToY += g_viewer._model.vbOffsetY;
-                                        zoomToY /= g_viewer._model.originalScaleFactor;
+                                    if ((parts.length === 6) &&
+                                        Number.isFinite(zoomToX1) && Number.isFinite(zoomToY1) && Number.isFinite(zoomToZ1) &&
+                                        Number.isFinite(zoomToX2) && Number.isFinite(zoomToY2) && Number.isFinite(zoomToZ2)) {
+                                        if ((zoomToX1 + zoomToY1 + zoomToZ1 + zoomToX2 + zoomToY2 + zoomToZ2) === 0) {
+                                            // If all coordinates are zero, do not perform zoomTo
+                                            return;
+                                        }
 
-                                        const extent = g_viewer._model.boundingSphereDiameter * 0.0075;
+                                        // Center the zoomTo coordinates based on the model's offset and scale factor
+                                        zoomToX1 += g_viewer._model.vbOffsetX;
+                                        zoomToX1 /= g_viewer._model.originalScaleFactor;
+                                        zoomToY1 += g_viewer._model.vbOffsetY;
+                                        zoomToY1 /= g_viewer._model.originalScaleFactor;
+                                        zoomToZ1 += g_viewer._model.vbOffsetZ;
+                                        zoomToZ1 /= g_viewer._model.originalScaleFactor;
+
+                                        // Center the zoomTo coordinates based on the model's offset and scale factor
+                                        zoomToX2 += g_viewer._model.vbOffsetX;
+                                        zoomToX2 /= g_viewer._model.originalScaleFactor;
+                                        zoomToY2 += g_viewer._model.vbOffsetY;
+                                        zoomToY2 /= g_viewer._model.originalScaleFactor;
+                                        zoomToZ2 += g_viewer._model.vbOffsetZ;
+                                        zoomToZ2 /= g_viewer._model.originalScaleFactor;
+
                                         g_viewer.zoomToXZ(
-                                            zoomToX, zoomToY, g_viewer._model.Zmin,
-                                            zoomToX + extent, zoomToY + extent, g_viewer._model.Zmax);
+                                            zoomToX1, zoomToY1, zoomToZ1,
+                                            zoomToX2, zoomToY2, zoomToZ2);
                                     } else {
                                         window.logWarn(`Invalid zoomTo parameter: ${zoomToParam}`);
                                     }

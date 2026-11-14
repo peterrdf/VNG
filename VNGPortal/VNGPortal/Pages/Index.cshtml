@@ -141,8 +141,7 @@
             const params = new URLSearchParams({
             workflowId: view.workflowId,
             model: view.model,
-            zoomTo: `${view.zoomToX},${view.zoomToY}`,
-            view: view.view
+            zoomTo: `${view.zoomToX1},${view.zoomToY1},${view.zoomToZ1},${view.zoomToX2},${view.zoomToY2},${view.zoomToZ2}`
         });
         iframe.src = `/viewer/viewer.html?${params}`;
         iframe.className = "w-100 border rounded";

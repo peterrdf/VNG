@@ -291,15 +291,19 @@ namespace VNGPortal.SPARQL
             }
         }
 
-        public async Task<int> RetrieveGeometry(SparqlResultSet resultSet, string geometryField, long owlModel)
+        public async Task<double[]?> RetrieveGeometry(SparqlResultSet resultSet, string geometryField, long owlModel)
         {
             if (resultSet.Count == 0)
             {
-                return await Task.FromResult(0);
+                return await Task.FromResult<double[]?>(null);
             }
 
             try
             {
+                // X/Y/Z min/max values for the entire model
+                double[] modelBBox = { double.MaxValue, double.MaxValue, double.MaxValue, double.MinValue, double.MinValue, double.MinValue };
+                var modelBBoxValid = false;
+
                 var resultId = Guid.NewGuid().ToString();
                 foreach (SparqlResult result in resultSet)
                 {
@@ -317,11 +321,30 @@ namespace VNGPortal.SPARQL
 
                     var modelPath = Path.Combine(Path.GetTempPath(), $"temp_{resultId}.bin");
                     File.WriteAllBytes(modelPath, Convert.FromBase64String(base64Data));
-                    Engine.ImportModel(owlModel, modelPath);
+                    long owlInstance = Engine.ImportModel(owlModel, modelPath);
+
+                    double[]? transformationMatrix = null;
+                    double[] startVector = new double[3];
+                    double[] endVector = new double[3];
+#pragma warning disable CS8604, CS8600 // Possible null reference argument.
+                    if (RDF.Engine.GetBoundingBox(owlInstance, transformationMatrix, startVector, endVector))
+#pragma warning restore CS8604 // Possible null reference argument.
+                    {
+                        modelBBox[0] = Math.Min(modelBBox[0], startVector[0]);
+                        modelBBox[1] = Math.Min(modelBBox[1], startVector[1]);
+                        modelBBox[2] = Math.Min(modelBBox[2], startVector[2]);                        
+                        
+                        modelBBox[3] = Math.Max(modelBBox[3], endVector[0]);
+                        modelBBox[4] = Math.Max(modelBBox[4], endVector[1]);
+                        modelBBox[5] = Math.Max(modelBBox[5], endVector[2]);
+
+                        modelBBoxValid = true;
+                    }
+
                     File.Delete(modelPath);
                 }
 
-                return await Task.FromResult(resultSet.Count);
+                return await Task.FromResult(modelBBoxValid ? modelBBox : null);
             }
             catch (Exception ex)
             {

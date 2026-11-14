@@ -38,6 +38,7 @@
 					<query uri="retrive-topology-vialolations-ifcwall-ifcroof.ttl">
 					</query>
 					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
+					<zoomTo>true</zoomTo>
 				</sparql>
 				<!--
 					Explanation (SPARQL):

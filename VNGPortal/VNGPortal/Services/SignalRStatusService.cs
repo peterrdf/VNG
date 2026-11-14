@@ -28,9 +28,12 @@ namespace VNGPortal.Services
         public string WorkflowId { get; set; } = string.Empty;
         public string Model { get; set; } = string.Empty;
         public bool Error { get; set; } = false;
-        public double ZoomToX { get; set; } = 0.0;
-        public double ZoomToY { get; set; } = 0.0;
-        public string View { get; set; } = "top";
+        public double ZoomToX1 { get; set; } = 0.0;
+        public double ZoomToY1 { get; set; } = 0.0;
+        public double ZoomToZ1 { get; set; } = 0.0;
+        public double ZoomToX2 { get; set; } = 0.0;
+        public double ZoomToY2 { get; set; } = 0.0;
+        public double ZoomToZ2 { get; set; } = 0.0;
     }
 
     public interface ISignalRStatusService
@@ -311,9 +314,15 @@ namespace VNGPortal.Services
             if (connections.Any())
             {
                 await _hubContext.Clients.Group(groupName).SendAsync("Receive3DViewUpdate", 
-                    new { viewUpdate.Title, viewUpdate.WorkflowId, viewUpdate.Model, 
-                        viewUpdate.ZoomToX, viewUpdate.ZoomToY, viewUpdate.View, 
-                        viewUpdate.Error });
+                    new { 
+                        viewUpdate.Title, viewUpdate.WorkflowId, viewUpdate.Model, viewUpdate.Error,
+                        viewUpdate.ZoomToX1, 
+                        viewUpdate.ZoomToY1,
+                        viewUpdate.ZoomToZ1,
+                        viewUpdate.ZoomToX2,
+                        viewUpdate.ZoomToY2,
+                        viewUpdate.ZoomToZ2
+                    });
             }
         }
 

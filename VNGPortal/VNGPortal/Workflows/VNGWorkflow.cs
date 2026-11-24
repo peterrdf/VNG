@@ -44,7 +44,8 @@ namespace VNGPortal.Workflows
             var modelPath = Path.Combine(ModelDir, taskDescriptor.Model);
 
             SPARQLServer = new SPARQL.Server(_logger);
-            DatasetName = "test1"; //#todo modelId or taskId instead of hardcoded "test1"
+            DatasetName = ToDatasetName(taskDescriptor.Model + "-" + taskDescriptor.WorkflowId + "-" + taskDescriptor.TaskId);
+            //DatasetName = "test1"; // Debugging: use a fixed dataset name for testing
 
             //
             // Execute workflow steps

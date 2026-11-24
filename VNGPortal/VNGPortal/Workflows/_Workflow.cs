@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using VNGPortal.Services;
 
 namespace VNGPortal.Workflows
@@ -103,6 +104,9 @@ namespace VNGPortal.Workflows
 
             return Tuple.Create(outputBuilder.ToString(), errorBuilder.ToString(), process.ExitCode);
         }
+
+        public static string ToDatasetName(string value) =>
+            Regex.Replace(value, @"[^A-Za-z0-9_\-]", "_");
         #endregion // Methods
 
         #region Properties

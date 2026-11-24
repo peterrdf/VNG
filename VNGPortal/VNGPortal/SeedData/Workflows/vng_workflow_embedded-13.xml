@@ -5,6 +5,7 @@
 	<description><![CDATA[]]></description>
 	<steps>
 		<step>
+			<id><![CDATA[0]]></id>
 			<name><![CDATA[IDS Validation]]></name>
 			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
@@ -15,6 +16,7 @@
 			</parameters>
 		</step>		
 		<step>
+			<id><![CDATA[1]]></id>
 			<name><![CDATA[IDS Validation]]></name>
 			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
@@ -25,6 +27,7 @@
 			</parameters>
 		</step>		
 		<step>
+			<id><![CDATA[2]]></id>
 			<name><![CDATA[IDS Validation]]></name>
 			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
@@ -35,6 +38,7 @@
 			</parameters>
 		</step>		
 		<step>
+			<id><![CDATA[3]]></id>
 			<name><![CDATA[IDS Validation]]></name>
 			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
@@ -45,6 +49,7 @@
 			</parameters>
 		</step>		
 		<step>
+			<id><![CDATA[4]]></id>
 			<name><![CDATA[IDS Validation]]></name>
 			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
@@ -55,6 +60,7 @@
 			</parameters>
 		</step>		
 		<step>
+			<id><![CDATA[5]]></id>
 			<name><![CDATA[IDS Validation]]></name>
 			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
@@ -65,6 +71,7 @@
 			</parameters>
 		</step>		
 		<step>
+			<id><![CDATA[6]]></id>
 			<name><![CDATA[IDS Validation]]></name>
 			<description><![CDATA[]]></description>
 			<type><![CDATA[IDS]]></type>
@@ -75,16 +82,19 @@
 			</parameters>
 		</step>
 		<step>
+			<id><![CDATA[7]]></id>
 			<name><![CDATA[IFC to RDF conversion]]></name>
 			<description />
 			<type><![CDATA[IFC2RDF]]></type>
 		</step>
 		<step>
+			<id><![CDATA[8]]></id>
 			<name><![CDATA[IFC Geometry to RDF conversion]]></name>
 			<description />
 			<type><![CDATA[IFCGEOMETRY2RDF]]></type>
 		</step>
 		<step>
+			<id><![CDATA[9]]></id>
 			<name><![CDATA[Create SPARQL dataset]]></name>
 			<description />
 			<type><![CDATA[CREATE-SPARQL-DATASET]]></type>

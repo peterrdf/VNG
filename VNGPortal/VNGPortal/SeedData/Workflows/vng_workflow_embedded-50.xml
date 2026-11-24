@@ -5,6 +5,7 @@
 	<description><![CDATA[]]></description>
 	<steps>
 		<step>
+			<id><![CDATA[0]]></id>
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
@@ -36,6 +37,7 @@ WHERE {
 			</parameters>
 		</step>
 		<step>
+			<id><![CDATA[1]]></id>
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
@@ -67,6 +69,7 @@ WHERE {
 			</parameters>
 		</step>
 		<step>
+			<id><![CDATA[2]]></id>
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
@@ -98,6 +101,7 @@ WHERE {
 			</parameters>
 		</step>
 		<step>
+			<id><![CDATA[3]]></id>
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
@@ -129,6 +133,7 @@ WHERE {
 			</parameters>
 		</step>
 		<step>
+			<id><![CDATA[4]]></id>
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
@@ -160,6 +165,7 @@ WHERE {
 			</parameters>
 		</step>
 		<step>
+			<id><![CDATA[5]]></id>
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
@@ -191,6 +197,7 @@ WHERE {
 			</parameters>
 		</step>
 		<step>
+			<id><![CDATA[6]]></id>
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[
@@ -219,6 +226,7 @@ WHERE {
 			</parameters>
 		</step>
 		<step>
+			<id><![CDATA[7]]></id>
 			<name><![CDATA[Geometry Modeling]]></name>
 			<description>
 				<![CDATA[

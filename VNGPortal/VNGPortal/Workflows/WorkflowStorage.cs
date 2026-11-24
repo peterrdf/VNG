@@ -31,10 +31,8 @@ namespace VNGPortal.Workflows
                     if (fileInfo.IsDirectory)
                         return false;
 
-                    if (!fileInfo.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
-                        return false;
-
-                    return true;
+                    return fileInfo.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) ||
+                        fileInfo.Name.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase);
                 });
 
                 List<TaskStatus> xmlTasks = new();
@@ -44,7 +42,18 @@ namespace VNGPortal.Workflows
                     {
                         try
                         {
-                            Workflow? workflow = WorkflowDeserializer.Deserialize(workflowXML.PhysicalPath);
+                            Workflow? workflow = null;
+                            if (Path.GetExtension(workflowXML.PhysicalPath).Equals(".xml", StringComparison.OrdinalIgnoreCase))
+                            {
+                                workflow = WorkflowDeserializer.Deserialize(workflowXML.PhysicalPath);
+                                _logger?.LogInformation("De-serialized workflow from XML file: {WorkflowXML}", workflowXML.PhysicalPath);
+                            }
+                            else if (Path.GetExtension(workflowXML.PhysicalPath).Equals(".ttl", StringComparison.OrdinalIgnoreCase))
+                            {
+                                workflow = WorkflowTurtleDeserializer.Deserialize(workflowXML.PhysicalPath);
+                                _logger?.LogInformation("De-serialized workflow from Turtle file: {WorkflowTurtle}", workflowXML.PhysicalPath);
+                            }
+                            
                             if (workflow != null)
                             {
                                 if (string.IsNullOrWhiteSpace(workflow.Id))
@@ -63,12 +72,12 @@ namespace VNGPortal.Workflows
                             }
                             else
                             {
-                                _logger?.LogWarning("Workflow deserialization returned null for file: {WorkflowXML}", workflowXML.PhysicalPath);
+                                _logger?.LogWarning("Workflow de-serialization returned null for file: {WorkflowXML}", workflowXML.PhysicalPath);
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger?.LogError(ex, "Error deserializing workflow XML file: {WorkflowXML}", workflowXML.PhysicalPath);
+                            _logger?.LogError(ex, "Error de-serializing workflow XML file: {WorkflowXML}", workflowXML.PhysicalPath);
                         }
                     }
                 }

@@ -50,6 +50,12 @@ namespace VNGPortal
                     var destFile = Path.Combine(workflowsDir, Path.GetFileName(sourceFile));
                     File.Copy(sourceFile, destFile, true);
                 }
+
+                foreach (var sourceFile in Directory.EnumerateFiles(seedWorfklowsDir, "*.ttl"))
+                {
+                    var destFile = Path.Combine(workflowsDir, Path.GetFileName(sourceFile));
+                    File.Copy(sourceFile, destFile, true);
+                }
             }
 
             var sparqlDir = builder.Configuration[$"{FileStorage}:SPARQLDir"];

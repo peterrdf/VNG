@@ -265,6 +265,9 @@
 		<None Update="SeedData\SPARQL\retrieve-geometry-by-globalId-template.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="SeedData\Workflows\vng_workflow_embedded-1.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="SeedData\Workflows\vng_workflow_embedded-1.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

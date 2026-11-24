@@ -32,7 +32,7 @@ namespace VNGPortal.Workflows
             var currentStep = 0;
             var stepsCount = _workflow.Steps.Count;
 
-            var isLinuxPlatform = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+            var isLinuxPlatform = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             var fileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
 
             var modelsDir = _configuration[$"{fileStorage}:ModelsDir"]!;
@@ -438,7 +438,7 @@ namespace VNGPortal.Workflows
                 return;
             }
 
-            var isLinuxPlatform = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+            var isLinuxPlatform = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             var fileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
             var sparqlDir = _configuration[$"{fileStorage}:SPARQLDir"]!;
 

@@ -1,0 +1,166 @@
+@prefix wf:   <https://vng.nl/workflow/> .
+
+wf:workflow-1 a wf:Workflow ;
+    wf:id 1 ;
+    wf:name "Regel #1: Gebruiksfunctie komt overeen met bestemming" ;
+    wf:steps (
+        wf:step-0  wf:step-1  wf:step-2  wf:step-3  wf:step-4
+        wf:step-5  wf:step-6  wf:step-7  wf:step-8  wf:step-9
+        wf:step-10 wf:step-11 wf:step-12 wf:step-13 wf:step-14
+        wf:step-15 wf:step-16 wf:step-17 wf:step-18 wf:step-19
+        wf:step-20 wf:step-21 wf:step-22 wf:step-23 wf:step-24
+    ) .
+
+wf:step-0 a wf:Step ;
+    wf:id 0 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "01-9-ILS-voor-Ruimten-in-de-omgevingswet.ids" .
+
+wf:step-1 a wf:Step ;
+    wf:id 1 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "02-9.01a-Georeferentie.ids" .
+
+wf:step-2 a wf:Step ;
+    wf:id 2 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "03-9.01b-Coordinatenstelsel.ids" .
+
+wf:step-3 a wf:Step ;
+    wf:id 3 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "04-9.01c-Projectadres-IFC4X3-ADD2.ids" .
+
+wf:step-4 a wf:Step ;
+    wf:id 4 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "05-9.01d-Perceeladres-IFC4.ids" .
+
+wf:step-5 a wf:Step ;
+    wf:id 5 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "06-9.01e-Gebouwadres-IFC4.ids" .
+
+wf:step-6 a wf:Step ;
+    wf:id 6 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "07-9.02-Project.ids" .
+
+wf:step-7 a wf:Step ;
+    wf:id 7 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "09-9.03b-Bouwwerkperceel.ids" .
+
+wf:step-8 a wf:Step ;
+    wf:id 8 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "10-9.04-Kadastraal-Perceel.ids" .
+
+wf:step-9 a wf:Step ;
+    wf:id 9 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "13-9.06a-Bouwlaag-voorheen-verdieping.ids" .
+
+wf:step-10 a wf:Step ;
+    wf:id 10 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "15-9.07-Gebruikseenheid-voorheen-eigendom-en-gebruikseenheid.ids" .
+
+wf:step-11 a wf:Step ;
+    wf:id 11 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "16-9.08-Gebruiksfunctie.ids" .
+
+wf:step-12 a wf:Step ;
+    wf:id 12 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "17-9.09-Nevengebruiksfunctie.ids" .
+
+wf:step-13 a wf:Step ;
+    wf:id 13 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "25-9.12a-Functieruimte.ids" .
+
+wf:step-14 a wf:Step ;
+    wf:id 14 ;
+    wf:name "IDS Validation" ;
+    wf:type "IDS" ;
+    wf:idsFile "26-9.12b-Verblijfsruimte.ids" .
+
+wf:step-15 a wf:Step ;
+    wf:id 15 ;
+    wf:name "IFC to RDF conversion" ;
+    wf:type "IFC2RDF" .
+
+wf:step-16 a wf:Step ;
+    wf:id 16 ;
+    wf:name "IFC Geometry to RDF conversion" ;
+    wf:type "IFCGEOMETRY2RDF" .
+
+wf:step-17 a wf:Step ;
+    wf:id 17 ;
+    wf:name "Create SPARQL dataset" ;
+    wf:type "CREATE-SPARQL-DATASET" .
+
+wf:step-18 a wf:Step ;
+    wf:id 18 ;
+    wf:name "Insert IFC4ADD2" ;
+    wf:description "Inserts the IFC4ADD2 ontology into the SPARQL dataset." ;
+    wf:type "SPARQL" ;
+    wf:queryRef "InsertIFC4ADD2Ontology" .
+
+wf:step-19 a wf:Step ;
+    wf:id 19 ;
+    wf:name "Insert Areas" ;
+    wf:description "Retrieves residential ('wonen') planning zones based on the location of the building in the IFC model." ;
+    wf:type "SPARQL" ;
+    wf:queryRef "InsertAreas" .
+
+wf:step-20 a wf:Step ;
+    wf:id 20 ;
+    wf:name "Insert BBoxes" ;
+    wf:description "Calculates the 3D bounding box for every geometry." ;
+    wf:type "SPARQL" ;
+    wf:queryRef "InsertBBoxes" .
+
+wf:step-21 a wf:Step ;
+    wf:id 21 ;
+    wf:name "Insert Projections" ;
+    wf:description "Generates a 2D map projection for every 3D geometry." ;
+    wf:type "SPARQL" ;
+    wf:queryRef "InsertProjections" .
+
+wf:step-22 a wf:Step ;
+    wf:id 22 ;
+    wf:name "Insert Topological Relations" ;
+    wf:description "Calculates whether every geometry in the building model spatially overlaps with residential (\"wonen\") planning zones." ;
+    wf:type "SPARQL" ;
+    wf:queryRef "InsertTopologicalRelations-IfcWall-IfcRoof" .
+
+wf:step-23 a wf:Step ;
+    wf:id 23 ;
+    wf:name "Validate Topological Relations" ;
+    wf:description "Validates that every geometry in the building is fully contained within residential (\"wonen\") planning zones." ;
+    wf:type "SHACL" ;
+    wf:shapeRef "ValidateTopologicalRelations" .
+
+wf:step-24 a wf:Step ;
+    wf:id 24 ;
+    wf:name "Validate Model BBox" ;
+    wf:description "Validates that the combined geometry of the entire building has a realistic size — not too small and not too large." ;
+    wf:type "SHACL" ;
+    wf:shapeRef "ValidateModelBBoxes" .

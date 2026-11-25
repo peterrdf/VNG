@@ -9,6 +9,7 @@ wf:workflow-6 a wf:Workflow ;
         wf:step-0  wf:step-1  wf:step-2  wf:step-3  wf:step-4
         wf:step-5  wf:step-6  wf:step-7  wf:step-8  wf:step-9
         wf:step-10 wf:step-11 wf:step-12 wf:step-13 wf:step-14
+        wf:step-15 wf:step-16 wf:step-17
     ) .
 
 wf:step-0 a wf:Step ;
@@ -100,3 +101,18 @@ wf:step-14 a wf:Step ;
     wf:name "IDS Validation" ;
     wf:type "IDS" ;
     wf:idsFile "33-9.17-Tarra-Ruimte.ids" .
+
+wf:step-15 a wf:Step ;
+    wf:id 15 ;
+    wf:name "IFC to RDF conversion" ;
+    wf:type "IFC2RDF" .
+
+wf:step-16 a wf:Step ;
+    wf:id 16 ;
+    wf:name "IFC Geometry to RDF conversion" ;
+    wf:type "IFCGEOMETRY2RDF" .
+
+wf:step-17 a wf:Step ;
+    wf:id 17 ;
+    wf:name "Create SPARQL dataset" ;
+    wf:type "CREATE-SPARQL-DATASET" .

@@ -155,7 +155,7 @@ var Viewer = function () {
      * Visibility
      */
     this._showConceptualFaces = true;
-    this._showConceptualFacesPolygons = false;
+    this._showConceptualFacesPolygons = true;
     this._showLines = true;
     this._showPoints = true;
 
@@ -1516,7 +1516,7 @@ var Viewer = function () {
         this._eyeVector = vec3.fromValues(this._defaultEyeVector[0], this._defaultEyeVector[1], this._defaultEyeVector[2]);
 
         this._showConceptualFaces = true;
-        this._showConceptualFacesPolygons = false;
+        this._showConceptualFacesPolygons = true;
         this._showLines = true;
         this._showPoints = true;
         this._showModelCS = true;

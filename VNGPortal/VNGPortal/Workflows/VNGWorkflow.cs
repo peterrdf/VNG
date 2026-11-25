@@ -444,10 +444,6 @@ namespace VNGPortal.Workflows
 
             var modelPath = Path.Combine(ModelDir, TaskDescriptor.Model);
 
-            double dX = 0.0;
-            double dY = 0.0;
-            GetGeoReference(modelPath, out dX, out dY);
-
             //
             // Violation Views
             //

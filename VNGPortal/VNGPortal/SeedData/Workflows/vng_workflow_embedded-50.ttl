@@ -1,0 +1,253 @@
+@prefix wf:  <https://vng.nl/workflow/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+wf:workflow-50 a wf:Workflow ;
+    wf:id 50 ;
+    wf:name "POC: Geometry Modeling" ;
+    wf:steps (
+        wf:step-0 wf:step-1 wf:step-2 wf:step-3
+        wf:step-4 wf:step-5 wf:step-6 wf:step-7
+        wf:step-8
+    ) .
+
+# ---------------------------------------------------------------- Step 0
+wf:step-0 a wf:Step ;
+    wf:id 0 ;
+    wf:name "Create SPARQL dataset" ;
+    wf:type "CREATE-SPARQL-DATASET" .
+
+# ---------------------------------------------------------------- Step 1
+wf:step-1 a wf:Step ;
+    wf:id 1 ;
+    wf:name "Geometry Modeling" ;
+    wf:description "Union: Cylinder & Cylinder." ;
+    wf:type "3DVIEW" ;
+    wf:queries ( wf:step-1-query-0 ) .
+
+wf:step-1-query-0 a wf:Query ;
+    wf:id "Union" ;
+    wf:geometryVariable "base64Data" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?base64Data
+WHERE {
+    BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+    BIND(3.14159265358979 AS ?pi)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(0 AS ?union)
+    BIND(vng:gmColor(vng:gmBooleanOperation(?a, ?b, ?union), 0.0, 1.0, 0.0) AS ?base64Data)
+}
+""" .
+
+# ---------------------------------------------------------------- Step 2
+wf:step-2 a wf:Step ;
+    wf:id 2 ;
+    wf:name "Geometry Modeling" ;
+    wf:description "Difference: Cylinder & Cylinder." ;
+    wf:type "3DVIEW" ;
+    wf:queries ( wf:step-2-query-0 ) .
+
+wf:step-2-query-0 a wf:Query ;
+    wf:id "Difference" ;
+    wf:geometryVariable "base64Data" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?base64Data
+WHERE {
+    BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+    BIND(3.14159265358979 AS ?pi)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(1 AS ?difference)
+    BIND(vng:gmColor(vng:gmBooleanOperation(?a, ?b, ?difference), 0.0, 0.0, 1.0) AS ?base64Data)
+}
+""" .
+
+# ---------------------------------------------------------------- Step 3
+wf:step-3 a wf:Step ;
+    wf:id 3 ;
+    wf:name "Geometry Modeling" ;
+    wf:description "Union: Sphere & Cylinder." ;
+    wf:type "3DVIEW" ;
+    wf:queries ( wf:step-3-query-0 ) .
+
+wf:step-3-query-0 a wf:Query ;
+    wf:id "Union" ;
+    wf:geometryVariable "base64Data" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?base64Data
+WHERE {
+    BIND(vng:gmSphere(1.0) AS ?a)
+    BIND(3.14159265358979 AS ?pi)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(0 AS ?union)
+    BIND(vng:gmColor(vng:gmBooleanOperation(?a, ?b, ?union), 0.0, 1.0, 0.0) AS ?base64Data)
+}
+""" .
+
+# ---------------------------------------------------------------- Step 4
+wf:step-4 a wf:Step ;
+    wf:id 4 ;
+    wf:name "Geometry Modeling" ;
+    wf:description "Difference: Sphere & Cylinder." ;
+    wf:type "3DVIEW" ;
+    wf:queries ( wf:step-4-query-0 ) .
+
+wf:step-4-query-0 a wf:Query ;
+    wf:id "Union" ;
+    wf:geometryVariable "base64Data" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?base64Data
+WHERE {
+    BIND(vng:gmSphere(1.0) AS ?a)
+    BIND(3.14159265358979 AS ?pi)
+    BIND(vng:gmRotation(vng:gmCylinder(1.0, 1.0), 90 * ?pi / 180.0, 0.0, 0.0) AS ?b)
+    BIND(1 AS ?difference)
+    BIND(vng:gmColor(vng:gmBooleanOperation(?a, ?b, ?difference), 0.0, 0.0, 1.0) AS ?base64Data)
+}
+""" .
+
+# ---------------------------------------------------------------- Step 5
+wf:step-5 a wf:Step ;
+    wf:id 5 ;
+    wf:name "Geometry Modeling" ;
+    wf:description "Union: Box & Cylinder." ;
+    wf:type "3DVIEW" ;
+    wf:queries ( wf:step-5-query-0 ) .
+
+wf:step-5-query-0 a wf:Query ;
+    wf:id "Union" ;
+    wf:geometryVariable "base64Data" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?base64Data
+WHERE {
+    BIND(vng:gmBox(2.0, 2.0, 2.0) AS ?a)
+    BIND(3.14159265358979 AS ?pi)
+    BIND(vng:gmCylinder(1.0, 1.0) AS ?b)
+    BIND(0 AS ?union)
+    BIND(vng:gmColor(vng:gmBooleanOperation(?a, ?b, ?union), 0.0, 1.0, 0.0) AS ?base64Data)
+}
+""" .
+
+# ---------------------------------------------------------------- Step 6
+wf:step-6 a wf:Step ;
+    wf:id 6 ;
+    wf:name "Geometry Modeling" ;
+    wf:description "Difference: Box & Cylinder." ;
+    wf:type "3DVIEW" ;
+    wf:queries ( wf:step-6-query-0 ) .
+
+wf:step-6-query-0 a wf:Query ;
+    wf:id "Difference" ;
+    wf:geometryVariable "base64Data" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?base64Data
+WHERE {
+    BIND(vng:gmBox(2.0, 2.0, 2.0) AS ?a)
+    BIND(3.14159265358979 AS ?pi)
+    BIND(vng:gmCylinder(1.0, 1.0) AS ?b)
+    BIND(1 AS ?difference)
+    BIND(vng:gmColor(vng:gmBooleanOperation(?a, ?b, ?difference), 0.0, 0.0, 1.0) AS ?base64Data)
+}
+""" .
+
+# ---------------------------------------------------------------- Step 7
+wf:step-7 a wf:Step ;
+    wf:id 7 ;
+    wf:name "Geometry Modeling" ;
+    wf:description "Projection: Cylinder." ;
+    wf:type "3DVIEW" ;
+    wf:queries ( wf:step-7-query-0 ) .
+
+wf:step-7-query-0 a wf:Query ;
+    wf:id "Projection: Cylinder" ;
+    wf:geometryVariable "base64Data" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?base64Data
+WHERE {
+    BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+    BIND(vng:gmColor(vng:gmProjection(?a, vng:gmPlane(0.0, 0.0, 1.0, 0.0)), 0.0, 1.0, 0.0) AS ?base64Data)
+}
+""" .
+
+# ---------------------------------------------------------------- Step 8
+wf:step-8 a wf:Step ;
+    wf:id 8 ;
+    wf:name "Geometry Modeling" ;
+    wf:description "Cylinder: Length, Area, Volume & Content." ;
+    wf:type "TEXTVIEW" ;
+    wf:queries (
+        wf:step-8-query-0
+        wf:step-8-query-1
+        wf:step-8-query-2
+        wf:step-8-query-3
+    ) .
+
+# ---------------------------------------------------------------- Queries
+wf:step-8-query-0 a wf:Query ;
+    wf:id "Cylinder: Length." ;
+    wf:valueVariable "length" ;
+    wf:valueVariableLabel "Length" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?length
+WHERE {
+    BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+    BIND(vng:gmLength(?a) AS ?length)
+}
+""" .
+
+wf:step-8-query-1 a wf:Query ;
+    wf:id "Cylinder: Area." ;
+    wf:valueVariable "area" ;
+    wf:valueVariableLabel "Area" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?area
+WHERE {
+    BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+    BIND(vng:gmArea(?a) AS ?area)
+}
+""" .
+
+wf:step-8-query-2 a wf:Query ;
+    wf:id "Cylinder: Volume." ;
+    wf:valueVariable "volume" ;
+    wf:valueVariableLabel "Volume" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?volume
+WHERE {
+    BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+    BIND(vng:gmVolume(?a) AS ?volume)
+}
+""" .
+
+wf:step-8-query-3 a wf:Query ;
+    wf:id "Cylinder: Content." ;
+    wf:valueVariable "content" ;
+    wf:valueVariableLabel "Content" ;
+    wf:query """
+PREFIX vng: <http://vng.nl/geometry-ext.ttl#>
+
+SELECT ?content
+WHERE {
+    BIND(vng:gmCylinder(1.0, 1.0) AS ?a)
+    BIND(vng:gmContent(?a) AS ?content)
+}
+""" .

@@ -271,55 +271,55 @@
 		<None Update="SeedData\Workflows\vng_workflow_embedded-1.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-10.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-10.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-11.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-11.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-12.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-12.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-13.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-13.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-14.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-14.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-15.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-15.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-16.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-16.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-17.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-17.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-2.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-2.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-3.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-3.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-4.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-4.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-5.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-5.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-50.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-50.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-6.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-6.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-7.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-7.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-8.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-8.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\Workflows\vng_workflow_embedded-9.xml">
+		<None Update="SeedData\Workflows\vng_workflow_embedded-9.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

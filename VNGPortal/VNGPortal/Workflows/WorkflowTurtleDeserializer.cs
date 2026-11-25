@@ -1,5 +1,6 @@
 using VDS.RDF;
 using VDS.RDF.Parsing;
+using System.Xml.Linq;
 
 namespace VNGPortal.Workflows;
 
@@ -85,7 +86,52 @@ public static class WorkflowTurtleDeserializer
             }
         }
 
+        var queriesXml = BuildQueriesXml(graph, stepNode);
+        if (queriesXml.Length > 0)
+        {
+            step.Parameters["queries"] = queriesXml;
+        }
+
         return step;
+    }
+
+    /// <summary>
+    /// Rebuilds the inner XML of &lt;queries&gt; (a sequence of &lt;sparql&gt; elements),
+    /// identical in shape to what ParameterDictionary.ReadXml produces from the XML format.
+    /// </summary>
+    private static string BuildQueriesXml(IGraph graph, INode stepNode)
+    {
+        var queriesHead = GetObject(graph, stepNode, "queries");
+        if (queriesHead == null)
+        {
+            return string.Empty;
+        }
+
+        var sparqlElements = new List<XElement>();
+        foreach (var queryNode in graph.GetListItems(queriesHead))
+        {
+            var sparql = new XElement("sparql",
+                new XElement("id", new XCData(GetString(graph, queryNode, "id"))),
+                new XElement("query", new XCData(GetString(graph, queryNode, "query"))));
+
+            AddOptional(graph, queryNode, sparql, "geometryVariable");
+            AddOptional(graph, queryNode, sparql, "zoomTo");
+            AddOptional(graph, queryNode, sparql, "valueVariable");
+            AddOptional(graph, queryNode, sparql, "valueVariableLabel");
+
+            sparqlElements.Add(sparql);
+        }
+
+        return string.Concat(sparqlElements.Select(e => e.ToString()));
+    }
+
+    private static void AddOptional(IGraph graph, INode queryNode, XElement sparql, string localName)
+    {
+        var value = GetString(graph, queryNode, localName);
+        if (value.Length > 0)
+        {
+            sparql.Add(new XElement(localName, new XCData(value)));
+        }
     }
 
     private static INode? GetObject(IGraph graph, INode subject, string localName)

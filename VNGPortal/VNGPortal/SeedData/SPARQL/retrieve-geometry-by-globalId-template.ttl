@@ -1,3 +1,10 @@
+@prefix sp:  <https://vng.nl/sparql/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sp:RetrieveGeometryByGlobalIdTemplate a sp:Query ;
+    sp:id "RetrieveGeometryByGlobalIdTemplate" ;
+    sp:query """
 PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX geom: <https://vng.nl/geometry/>
 
@@ -5,7 +12,8 @@ SELECT ?globalIdValue ?base64Data
 WHERE {
     VALUES ?globalIdValue { ###GLOBAL_IDS_LIST### }
     GRAPH <https://vng.nl/geometries/> {
-    ?geometry   geom:globalId	?globalIdValue ;
-                geom:base64Data	?base64Data .
+        ?geometry   geom:globalId   ?globalIdValue ;
+                    geom:base64Data ?base64Data .
     }
 }
+""" .

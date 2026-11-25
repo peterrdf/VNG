@@ -34,8 +34,8 @@
 					   (geometryVariable = base64Data).
 				-->
 				<sparql>
-					<id><![CDATA[RetriveTopologicalRelationVialolations]]></id>
-					<query uri="retrive-topology-vialolations-ifcwall-ifcroof.ttl">
+					<id><![CDATA[RetrieveTopologicalRelationVialolations]]></id>
+					<query uri="retrieve-topology-vialolations-ifcwall-ifcroof.ttl">
 					</query>
 					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
 					<zoomTo>true</zoomTo>
@@ -50,8 +50,8 @@
 					   (geometryVariable = geometry).
 				-->
 				<sparql>
-					<id><![CDATA[RetriveLivingAreas]]></id>
-					<query uri="retrive-living-areas.ttl">
+					<id><![CDATA[RetrieveLivingAreas]]></id>
+					<query uri="retrieve-living-areas.ttl">
 					</query>
 					<geometryVariable><![CDATA[geometry]]></geometryVariable>
 				</sparql>

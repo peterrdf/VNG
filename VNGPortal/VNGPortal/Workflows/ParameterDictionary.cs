@@ -71,6 +71,7 @@ public class ParameterDictionary : Dictionary<string, string>, IXmlSerializable
         {
             return new List<SPARQLVariableQuery>();
         }
+
         return XElement.Parse($"<{key}>{xml}</{key}>")
             .Elements("sparql")
             .Select(SPARQLVariableQuery.FromXml)

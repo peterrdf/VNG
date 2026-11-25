@@ -106,10 +106,8 @@ namespace VNGPortal.Workflows
                     if (fileInfo.IsDirectory)
                         return false;
 
-                    if (!fileInfo.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
-                        return false;
-
-                    return true;
+                    return fileInfo.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) || 
+                        fileInfo.Name.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase);
                 });
 
                 foreach (var sparqlXML in sparqlXMLs)
@@ -118,7 +116,9 @@ namespace VNGPortal.Workflows
                     {
                         try
                         {
-                            SPARQLQuery? sparqlQuery = SPARQLQueryDeserializer.Deserialize(sparqlXML.PhysicalPath);
+                            SPARQLQuery? sparqlQuery = sparqlXML.PhysicalPath.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase)
+                                ? SPARQLQueryTurtleDeserializer.Deserialize(sparqlXML.PhysicalPath)
+                                : SPARQLQueryDeserializer.Deserialize(sparqlXML.PhysicalPath);
                             if (sparqlQuery != null)
                             {
                                 if (string.IsNullOrWhiteSpace(sparqlQuery.Id))
@@ -168,9 +168,9 @@ namespace VNGPortal.Workflows
                 {
                     if (fileInfo.IsDirectory)
                         return false;
-                    if (!fileInfo.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
-                        return false;
-                    return true;
+
+                    return fileInfo.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) || 
+                       fileInfo.Name.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase);
                 });
 
                 foreach (var shaclXML in shaclXMLs)
@@ -179,7 +179,9 @@ namespace VNGPortal.Workflows
                     {
                         try
                         {
-                            SHACLShape? shaclShape = SHACLShapeDeserializer.Deserialize(shaclXML.PhysicalPath);
+                            SHACLShape? shaclShape = shaclXML.PhysicalPath.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase)
+                                ? SHACLShapeTurtleDeserializer.Deserialize(shaclXML.PhysicalPath)
+                                : SHACLShapeDeserializer.Deserialize(shaclXML.PhysicalPath);
                             if (shaclShape != null)
                             {
                                 if (string.IsNullOrWhiteSpace(shaclShape.Id))

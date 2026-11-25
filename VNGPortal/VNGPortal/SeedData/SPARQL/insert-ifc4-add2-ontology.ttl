@@ -1,2 +1,10 @@
+@prefix sp:  <https://vng.nl/sparql/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sp:InsertIFC4ADD2Ontology a sp:Query ;
+    sp:id "InsertIFC4ADD2Ontology" ;
+    sp:query """
 LOAD <https://raw.githubusercontent.com/openBIMstandards/ifcOWL/master/IFC4_ADD2.ttl>
 INTO GRAPH <https://vng.nl/ontologies/ifc4add2>
+""" .

@@ -1,0 +1,31 @@
+@prefix sp:  <https://vng.nl/sparql/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sp:RetrieveTopologyViolations-IfcWall-IfcRoof a sp:Query ;
+    sp:id "RetrieveTopologyViolations-IfcWall-IfcRoof" ;
+    sp:query """
+PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
+PREFIX express: <https://w3id.org/express#>
+PREFIX geom:    <https://vng.nl/geometry/>
+
+SELECT ?ifcElement ?globalIdValue ?base64Data ?topologicalRelation
+WHERE {
+    VALUES ?ifcType { ifc:IfcWall ifc:IfcRoof }
+
+    ?ifcElement     rdf:type                ?ifcType ;
+                    ifc:globalId_IfcRoot    ?globalIdNode .
+    ?globalIdNode   rdf:type                ifc:IfcGloballyUniqueId ;
+                    express:hasString       ?globalIdValue .
+
+    GRAPH <https://vng.nl/geometries/> {
+        ?geometry   rdf:type                ?ifcType ;
+                    geom:globalId           ?globalIdValue ;
+                    geom:base64Data         ?base64Data ;
+                    geom:topologicalRelation ?topologicalRelation .
+        FILTER(?topologicalRelation NOT IN ("CONTAINED BY", "INVALID INPUT"))
+    }
+}
+ORDER BY ?ifcElement
+""" .

@@ -1,20 +1,28 @@
+@prefix sp:  <https://vng.nl/sparql/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sp:InsertBBoxes a sp:Query ;
+    sp:id "InsertBBoxes" ;
+    sp:query """
 PREFIX geom:    <https://vng.nl/geometry/>
 PREFIX vng:     <http://vng.nl/geometry-ext.ttl#>
 
 INSERT {
-	GRAPH <https://vng.nl/geometries/> {
-		?instance   geom:bboxMinX	?minX ;
-					geom:bboxMinY	?minY ;
-					geom:bboxMinZ	?minZ ;
-					geom:bboxMaxX	?maxX ;
-					geom:bboxMaxY	?maxY ;
-					geom:bboxMaxZ	?maxZ .
-	}
+    GRAPH <https://vng.nl/geometries/> {
+        ?instance   geom:bboxMinX   ?minX ;
+                    geom:bboxMinY   ?minY ;
+                    geom:bboxMinZ   ?minZ ;
+                    geom:bboxMaxX   ?maxX ;
+                    geom:bboxMaxY   ?maxY ;
+                    geom:bboxMaxZ   ?maxZ .
+    }
 }
 WHERE {
-	GRAPH <https://vng.nl/geometries/> {
-		?instance	geom:base64Data	?base64Data .
-	FILTER NOT EXISTS { ?instance geom:bboxMinX ?any }
-	}
-	(?minX ?minY ?minZ ?maxX ?maxY ?maxZ) vng:gmBoundingBox ?base64Data .
+    GRAPH <https://vng.nl/geometries/> {
+        ?instance   geom:base64Data ?base64Data .
+        FILTER NOT EXISTS { ?instance geom:bboxMinX ?any }
+    }
+    (?minX ?minY ?minZ ?maxX ?maxY ?maxZ) vng:gmBoundingBox ?base64Data .
 }
+""" .

@@ -1,3 +1,10 @@
+@prefix sp:  <https://vng.nl/sparql/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sp:RetrieveBuildingElements a sp:Query ;
+    sp:id "RetrieveBuildingElements" ;
+    sp:query """
 PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ifc:     <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#>
@@ -22,3 +29,4 @@ WHERE {
   }
 }
 ORDER BY ?ifcElement
+""" .

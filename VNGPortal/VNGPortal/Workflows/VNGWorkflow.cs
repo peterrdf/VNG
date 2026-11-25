@@ -476,7 +476,8 @@ namespace VNGPortal.Workflows
                                     // #todo: use http source instead of local file
                                     var queryFilePath = Path.Combine(sparqlDir, geometryQuery.QueryUri);
                                     _logger.LogInformation("Loading SPARQL query from file: '{QueryFilePath}'", queryFilePath);
-                                    query = await File.ReadAllTextAsync(queryFilePath);
+                                    var geometryQueryRef = SPARQLGeometryQueryTurtleDeserializer.Deserialize(queryFilePath);
+                                    query = geometryQueryRef?.Query ?? string.Empty;
                                     _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
                                 }
 

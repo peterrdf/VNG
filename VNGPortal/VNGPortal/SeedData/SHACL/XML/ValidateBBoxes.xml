@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shacl>
-	<id><![CDATA[ValidateBBoxes-IfcWall]]></id>
+	<id><![CDATA[ValidateBBoxes]]></id>
 	<!--
 		Explanation (SHACL):
-		This SHACL shape validates the bounding boxes of IFC walls.		
-		1. geom:GeometryShape targets every instance of the class ifc:IfcWall (sh:targetClass).
+		This SHACL shape validates the bounding boxes of geometries.
+		1. geom:GeometryShape targets every subject that has a geom:globalId (sh:targetSubjectsOf).
 		2. A SPARQL-based constraint (sh:sparql) reads the bounding box values
-		   (geom:bboxMinX/Y/Z and geom:bboxMaxX/Y/Z) of each target and calculates the size
+		   (geom:bboxMinX/Y/Z and geom:bboxMaxX/Y/Z) of each geometry and calculates the size
 		   per axis: deltaX = maxX - minX, deltaY = maxY - minY, deltaZ = maxZ - minZ.
-		3. A target is reported as a violation when any delta is smaller than 1 or larger than 100.
+		3. A geometry is reported as a violation when any delta is smaller than 1 or larger than 100.
 		4. The result message contains the GlobalId and the three deltas
 		   ("BBox violation for GlobalId=[...]: deltaX=..., deltaY=..., deltaZ=...").
 		   The 3D view uses the GlobalId=[...] part to find the geometry again.
 		5. The severity is sh:Violation.
 	-->
-	<shape uri="validate-bboxes-ifcwall.ttl">
+	<shape uri="validate-bboxes.ttl">
 	</shape>
 	<views>
 		<view>
@@ -41,7 +41,6 @@
 						<templateArgName><![CDATA[###GLOBAL_IDS_LIST###]]></templateArgName>
 					</parameters>
 					<geometryVariable><![CDATA[base64Data]]></geometryVariable>
-					<zoomTo>true</zoomTo>
 				</sparql>
 				<!--
 					Explanation (SPARQL):
@@ -53,8 +52,8 @@
 					   (geometryVariable = geometry).
 				-->
 				<sparql>
-					<id><![CDATA[RetriveLivingAreas]]></id>
-					<query uri="retrive-living-areas.ttl">
+					<id><![CDATA[RetreveLivingAreas]]></id>
+					<query uri="retrieve-living-areas.ttl">
 					</query>
 					<geometryVariable><![CDATA[geometry]]></geometryVariable>
 				</sparql>

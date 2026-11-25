@@ -187,28 +187,40 @@
 		<None Update="SeedData\SHACL\validate-bboxes-ifcwall.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SHACL\ValidateBBoxes-IfcWall.xml">
+		<None Update="SeedData\SHACL\ValidateBBoxes-IfcWall.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SHACL\validate-height.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SHACL\ValidateHeight.xml">
+		<None Update="SeedData\SHACL\ValidateHeight.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SHACL\validate-model-bboxes.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SHACL\ValidateModelBBoxes.xml">
+		<None Update="SeedData\SHACL\ValidateModelBBoxes.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SHACL\ValidateBBoxes.xml">
+		<None Update="SeedData\SHACL\ValidateBBoxes.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SHACL\validate-topological-relations.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SHACL\ValidateTopologicalRelations.xml">
+		<None Update="SeedData\SHACL\ValidateTopologicalRelations.ttl">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\XML\ValidateBBoxes.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\XML\ValidateHeight.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\XML\ValidateModelBBoxes.xml">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="SeedData\SHACL\XML\ValidateTopologicalRelations.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SPARQL\insert-areas.ttl">
@@ -232,34 +244,34 @@
 		<None Update="SeedData\SPARQL\retrieve-building-elements.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\RetrieveBuildingElements.xml">
+		<None Update="SeedData\SPARQL\XML\RetrieveBuildingElements.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\InsertIFC4ADD2Ontology.xml">
+		<None Update="SeedData\SPARQL\XML\InsertIFC4ADD2Ontology.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SPARQL\RetrieveGeometryByGlobalIdTemplate.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\InsertTopologicalRelations-IfcWall-IfcRoof.xml">
+		<None Update="SeedData\SPARQL\XML\InsertTopologicalRelations-IfcWall-IfcRoof.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\InsertTopologicalRelations.xml">
+		<None Update="SeedData\SPARQL\XML\InsertTopologicalRelations.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\InsertProjections.xml">
+		<None Update="SeedData\SPARQL\XML\InsertProjections.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\InsertBBoxes.xml">
+		<None Update="SeedData\SPARQL\XML\InsertBBoxes.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SPARQL\InsertAreas.xml">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\retrive-topology-vialolations-ifcwall-ifcroof.ttl">
+		<None Update="SeedData\SPARQL\retrieve-topology-vialolations-ifcwall-ifcroof.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="SeedData\SPARQL\retrive-living-areas.ttl">
+		<None Update="SeedData\SPARQL\retrieve-living-areas.ttl">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="SeedData\SPARQL\retrieve-geometry-by-globalId-template.ttl">

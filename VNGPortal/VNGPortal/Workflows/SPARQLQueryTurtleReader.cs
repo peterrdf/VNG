@@ -8,14 +8,6 @@ namespace VNGPortal.Workflows;
 /// </summary>
 public static class SPARQLQueryTurtleReader
 {
-    // Same keys the XML format stores in <parameters>
-    private static readonly string[] ParameterNames =
-    {
-        "templateArgRegExpr",
-        "templateArgRegExprMatch",
-        "templateArgName"
-    };
-
     public static SPARQLGeometryQuery ReadGeometryQuery(IGraph graph, INode queryNode, string ns)
     {
         var query = new SPARQLGeometryQuery
@@ -56,16 +48,6 @@ public static class SPARQLQueryTurtleReader
         if (queryUri.Length > 0)
         {
             query.QueryElement.Attributes["uri"] = queryUri;
-        }
-
-        // <parameters>
-        foreach (var parameterName in ParameterNames)
-        {
-            var value = GetString(graph, queryNode, ns, parameterName);
-            if (value.Length > 0)
-            {
-                query.Parameters[parameterName] = value;
-            }
         }
     }
 

@@ -100,9 +100,6 @@ public class SPARQLQuery
     [XmlIgnore]
     public string? QueryUri => QueryElement.Attributes.GetValueOrDefault("uri");
 
-    [XmlElement("parameters")]
-    public ParameterDictionary Parameters { get; set; } = new ParameterDictionary();
-
     /// <summary>Typed parameters from the Turtle format (sp:parameters).</summary>
     [XmlIgnore]
     public List<SPARQLQueryParameter> ParameterList { get; set; } = new();
@@ -196,7 +193,6 @@ public class SPARQLGeometryQuery : SPARQLQuery
             QueryElement = SPARQLQueryElement.FromXml(e.Element("query")),
             GeometryVariable = e.Element("geometryVariable")?.Value.Trim() ?? "",
             ZoomTo = e.Element("zoomTo")?.Value.Trim().ToLower() == "true",
-            Parameters = parameters,
             Attributes = AttributeDictionary.FromXElement(e)
         };
     }
@@ -235,7 +231,6 @@ public class SPARQLVariableQuery : SPARQLQuery
             QueryElement = SPARQLQueryElement.FromXml(e.Element("query")),
             ValueVariable = e.Element("valueVariable")?.Value.Trim() ?? "",
             ValueVariableLabel = e.Element("valueVariableLabel")?.Value.Trim() ?? "",
-            Parameters = parameters,
             Attributes = AttributeDictionary.FromXElement(e)
         };
     }

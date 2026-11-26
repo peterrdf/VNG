@@ -40,7 +40,8 @@ public static class SPARQLQueryTurtleDeserializer
 
         var sparqlQuery = new SPARQLQuery
         {
-            Id = GetString(graph, queryNode, "id")
+            Id = GetString(graph, queryNode, "id"),
+            Description = GetString(graph, queryNode, "description")
         };
 
         // Same as <query>...</query> text in the XML format (SPARQLQuery.Query trims on read)
@@ -53,7 +54,40 @@ public static class SPARQLQueryTurtleDeserializer
             sparqlQuery.QueryElement.Attributes["uri"] = queryUri;
         }
 
+        // Optional: sp:parameters ( [ ... ] [ ... ] )
+        sparqlQuery.ParameterList = GetParameters(graph, queryNode);
+
         return sparqlQuery;
+    }
+
+    private static List<SPARQLQueryParameter> GetParameters(IGraph graph, INode queryNode)
+    {
+        var result = new List<SPARQLQueryParameter>();
+
+        var predicate = graph.CreateUriNode(new Uri(Ns + "parameters"));
+        var listRoot = graph.GetTriplesWithSubjectPredicate(queryNode, predicate)
+                            .Select(t => t.Object)
+                            .FirstOrDefault();
+
+        if (listRoot == null)
+        {
+            return result;
+        }
+
+        foreach (var item in graph.GetListItems(listRoot))
+        {
+            result.Add(new SPARQLQueryParameter
+            {
+                Type = GetString(graph, item, "type"),
+                Name = GetString(graph, item, "name"),
+                Value = GetString(graph, item, "value"),
+                RegExpr = GetString(graph, item, "regExpr"),
+                RegExprGroup = GetString(graph, item, "regExprGroup"),
+                Target = GetString(graph, item, "target")
+            });
+        }
+
+        return result;
     }
 
     private static string GetString(IGraph graph, INode subject, string localName)

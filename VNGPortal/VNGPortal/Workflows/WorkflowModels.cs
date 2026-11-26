@@ -82,6 +82,9 @@ public class SPARQLQuery
     [XmlElement("id")]
     public string Id { get; set; } = string.Empty;
 
+    [XmlElement("description")]
+    public string? Description { get; set; } = null;
+
     [XmlElement("query")]
     public SPARQLQueryElement QueryElement { get; set; } = new SPARQLQueryElement();
 
@@ -99,6 +102,10 @@ public class SPARQLQuery
 
     [XmlElement("parameters")]
     public ParameterDictionary Parameters { get; set; } = new ParameterDictionary();
+
+    /// <summary>Typed parameters from the Turtle format (sp:parameters).</summary>
+    [XmlIgnore]
+    public List<SPARQLQueryParameter> ParameterList { get; set; } = new();
 
     /// <summary>Attributes of the &lt;sparql&gt; element.</summary>
     [XmlIgnore]
@@ -244,5 +251,27 @@ public class SHACLView
 
     [XmlArray("queries")]
     [XmlArrayItem("sparql")]
-    public List<SPARQLGeometryQuery> Queries { get; set; } = new();
+    public List<SPARQLQuery> Queries { get; set; } = new();
+}
+
+/// <summary>
+/// A typed query parameter from the Turtle format, e.g. type="geometry" value="base64Data".
+/// </summary>
+public class SPARQLQueryParameter
+{
+    /// <summary>"template", "geometry" or "ui".</summary>
+    public string Type { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
+    public string Value { get; set; } = string.Empty;
+
+    /// <summary>Template parameter: regular expression applied to the violation messages.</summary>
+    public string RegExpr { get; set; } = string.Empty;
+
+    /// <summary>Template parameter: named group of <see cref="RegExpr"/> that provides the value.</summary>
+    public string RegExprGroup { get; set; } = string.Empty;
+
+    /// <summary>Template parameter: placeholder in the query text that is replaced.</summary>
+    public string Target { get; set; } = string.Empty;
 }

@@ -4,6 +4,15 @@
 
 sp:RetrieveGeometryByGlobalIdTemplate a sp:Query ;
     sp:id "RetrieveGeometryByGlobalIdTemplate" ;
+    sp:parameters (
+        [ a sp:Parameter ;
+          sp:type "template" ;
+          sp:regExpr "GlobalId=\\[(?<globalId>[^\\]]+)\\]" ;
+          sp:regExprGroup "globalId" ;
+          sp:target "###GLOBAL_IDS_LIST###" ]
+        [ a sp:Parameter ; sp:type "geometry" ; sp:value "base64Data" ]
+        [ a sp:Parameter ; sp:type "ui" ; sp:name "zoomTo" ; sp:value "true" ]
+    ) ;
     sp:query """
 PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX geom: <https://vng.nl/geometry/>

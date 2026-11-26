@@ -3,6 +3,7 @@ using Lucene.Net.Search;
 using Microsoft.Extensions.Logging;
 using RDF;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -464,66 +465,109 @@ namespace VNGPortal.Workflows
                         try
                         {
                             double[]? modelBBox = null;
-                            foreach (var geometryQuery in shaclViolationView.Queries)
+                            foreach (var sparqlQuery in shaclViolationView.Queries)
                             {
-                                string query = geometryQuery.Query;
-                                if (string.IsNullOrEmpty(query) && !string.IsNullOrEmpty(geometryQuery.QueryUri))
+                                var sparqlQueryDefinition = sparqlQuery;
+                                if (sparqlQueryDefinition == null)
+                                {
+                                    _logger.LogWarning("SHACL Violation View: '{ViewId}' has a null SPARQL query definition.", shaclViolationView.Type);
+                                    continue;
+                                }
+
+                                string query = sparqlQueryDefinition.Query;
+                                if (string.IsNullOrEmpty(query) && !string.IsNullOrEmpty(sparqlQueryDefinition.QueryUri))
                                 {
                                     // #todo: use http source instead of local file
-                                    var queryFilePath = Path.Combine(sparqlDir, geometryQuery.QueryUri);
+                                    var queryFilePath = Path.Combine(sparqlDir, sparqlQueryDefinition.QueryUri);
                                     _logger.LogInformation("Loading SPARQL query from file: '{QueryFilePath}'", queryFilePath);
-                                    var geometryQueryRef = SPARQLGeometryQueryTurtleDeserializer.Deserialize(queryFilePath);
-                                    query = geometryQueryRef?.Query ?? string.Empty;
+                                    sparqlQueryDefinition = SPARQLQueryTurtleDeserializer.Deserialize(queryFilePath);
+                                    query = sparqlQueryDefinition?.Query ?? string.Empty;
                                     _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
                                 }
 
                                 if (string.IsNullOrEmpty(query))
                                 {
-                                    throw new Exception($"SPARQL query is empty for SHACL Validation - SPARQL Query: '{shaclShape.Id} - {geometryQuery.Id}'");
+                                    throw new Exception($"SPARQL query is empty for SHACL Validation - SPARQL Query: '{shaclShape.Id} - {sparqlQueryDefinition!.Id}'");
                                 }
-                                _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclShape.Id, geometryQuery.Id, query);
-
-                                string templateArgRegExpr = string.Empty;
-                                if (geometryQuery.Parameters.ContainsKey("templateArgRegExpr"))
-                                {
-                                    templateArgRegExpr = geometryQuery.Parameters["templateArgRegExpr"];
-                                }
-
-                                string templateArgRegExprMatch = string.Empty;
-                                if (geometryQuery.Parameters.ContainsKey("templateArgRegExprMatch"))
-                                {
-                                    templateArgRegExprMatch = geometryQuery.Parameters["templateArgRegExprMatch"];
-                                }
+                                _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclShape.Id, sparqlQueryDefinition!.Id, query);
 
                                 //
                                 // Template Arguments
                                 //
-                                string templateArgName = string.Empty;
-                                if (geometryQuery.Parameters.ContainsKey("templateArgName"))
-                                {
-                                    templateArgName = geometryQuery.Parameters["templateArgName"];
-                                }
 
-                                if (!string.IsNullOrEmpty(templateArgRegExpr) &&
-                                    !string.IsNullOrEmpty(templateArgRegExprMatch) &&
-                                    !string.IsNullOrEmpty(templateArgName))
+                                var templateArgRegExprParam = sparqlQueryDefinition.ParameterList.FirstOrDefault((p) =>
+                                {
+                                    if (p is SPARQLQueryParameter param)
+                                    {
+                                        return param.Type == "template" && param.Name == "regExpr";
+                                    }
+                                    return false;
+                                }, null);
+
+                                var templateArgRegExprMatchParam = sparqlQueryDefinition.ParameterList.FirstOrDefault((p) =>
+                                {
+                                    if (p is SPARQLQueryParameter param)
+                                    {
+                                        return param.Type == "template" && param.Name == "regExprMatch";
+                                    }
+                                    return false;
+                                });
+
+                                var templateArgTargetParam = sparqlQueryDefinition.ParameterList.FirstOrDefault((p) =>
+                                {
+                                    if (p is SPARQLQueryParameter param)
+                                    {
+                                        return param.Type == "template" && param.Name == "target";
+                                    }
+                                    return false;
+                                });
+
+                                if ((templateArgRegExprParam != null) &&
+                                    (templateArgRegExprMatchParam != null) &&
+                                    (templateArgTargetParam != null))
                                 {
                                     var templateArgValue = string.Join(" ",
-                                    Regex.Matches(shaclResult, templateArgRegExpr)
-                                        .Select(m => $"'{m.Groups[templateArgRegExprMatch].Value}'"));
-                                    query = query.Replace(templateArgName, templateArgValue);
-                                    _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Template Argument: '{TemplateArgName}' = '{TemplateArgValue}'", shaclShape.Id, geometryQuery.Id, templateArgName, templateArgValue);
-                                    _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclShape.Id, geometryQuery.Id, query);
+                                    Regex.Matches(shaclResult, templateArgRegExprParam.RegExpr)
+                                        .Select(m => $"'{m.Groups[templateArgRegExprMatchParam.RegExprGroup]}'"));
+                                    query = query.Replace(templateArgTargetParam.Target, templateArgValue);
+                                    _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Template Argument: '{TemplateArgName}' = '{TemplateArgValue}'", shaclShape.Id, sparqlQueryDefinition.Id, templateArgTargetParam.Target, templateArgValue);
+                                    _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclShape.Id, sparqlQueryDefinition.Id, query);
                                 }
 
-                                var queryResult = await SPARQLServer.ExecuteQueryAsync(DatasetName, query);
-                                var queryModelBBox =  await SPARQLServer.RetrieveGeometry(queryResult, geometryQuery.GeometryVariable, owlModel);
-                                if (geometryQuery.ZoomTo && (queryModelBBox != null))
+                                var geometryParam = sparqlQueryDefinition.ParameterList.FirstOrDefault((p) =>
                                 {
-                                    modelBBox = queryModelBBox;
-                                }
-                                _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Model Bounding Box: {ModelBBox}", shaclShape.Id, geometryQuery.Id, modelBBox);
-                            } // foreach (var geometryQuery in shaclViolationView.Queries)
+                                    if (p is SPARQLQueryParameter param)
+                                    {
+                                        return param.Type == "geometry";
+                                    }
+                                    return false;
+                                });
+
+                                if ((geometryParam != null) && !string.IsNullOrEmpty(geometryParam.Value))
+                                {
+                                    var queryResult = await SPARQLServer.ExecuteQueryAsync(DatasetName, query);
+                                    var queryModelBBox = await SPARQLServer.RetrieveGeometry(queryResult, geometryParam.Value, owlModel);
+
+                                    var zoomToParam = sparqlQueryDefinition.ParameterList.FirstOrDefault((p) =>
+                                    {
+                                        if (p is SPARQLQueryParameter param)
+                                        {
+                                            return param.Type == "ui" && param.Name == "zoomTo";
+                                        }
+                                        return false;
+                                    });
+
+                                    if (zoomToParam != null)
+                                    {
+                                        if (zoomToParam.Value.Equals("true", StringComparison.InvariantCultureIgnoreCase) && (queryModelBBox != null))
+                                        {
+                                            modelBBox = queryModelBBox;
+                                        }
+                                    }
+
+                                    _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Model Bounding Box: {ModelBBox}", shaclShape.Id, sparqlQueryDefinition.Id, modelBBox);
+                                } // foreach (var geometryQuery in shaclViolationView.Queries)
+                            }
 
                             var shaclErrorsModel = $"shacl_errors_{Guid.NewGuid().ToString()}.bin";
                             var shaclErrorsModelPath = Path.Combine(ModelDir, shaclErrorsModel);
@@ -542,8 +586,9 @@ namespace VNGPortal.Workflows
                                     ZoomToZ1 = modelBBox != null ? modelBBox[2] : 0.0,
                                     ZoomToX2 = modelBBox != null ? modelBBox[3] : 0.0,
                                     ZoomToY2 = modelBBox != null ? modelBBox[4] : 0.0,
-                                    ZoomToZ2 = modelBBox != null ? modelBBox[5] : 0.0                                    
+                                    ZoomToZ2 = modelBBox != null ? modelBBox[5] : 0.0
                                 });
+
                         }
                         finally
                         {

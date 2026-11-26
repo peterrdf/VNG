@@ -4,6 +4,15 @@
 
 sp:RetrieveLivingAreas a sp:Query ;
     sp:id "RetrieveLivingAreas" ;
+    sp:description """
+        Retrieves the living areas to show as context in the 3D view.
+        1. In the graph <areas.ttl> it selects every dso:area with its dso:id, dso:group and dso:geometry.
+        2. FILTER keeps only areas whose group is "wonen" (residential) || "gemengd" (mixed).
+        3. The result is ordered by ?id, and the geometry is shown in the 3D view (geometryVariable = geometry).
+        """ ;
+    sp:parameters (
+        [ a sp:Parameter ; sp:type "geometry" ; sp:value "geometry" ]
+    ) ;
     sp:query """
 PREFIX dso:    <http://vng.nl/areas/>
 

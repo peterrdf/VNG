@@ -470,7 +470,7 @@ namespace VNGPortal.Workflows
                                 var sparqlQueryDefinition = sparqlQuery;
                                 if (sparqlQueryDefinition == null)
                                 {
-                                    _logger.LogWarning("SHACL Violation View: '{ViewId}' has a null SPARQL query definition.", shaclViolationView.Type);
+                                    _logger.LogWarning("SHACL Violation View: '{ViewId}' has a null SPARQL query definition.", shaclViolationView.Id);
                                     continue;
                                 }
 

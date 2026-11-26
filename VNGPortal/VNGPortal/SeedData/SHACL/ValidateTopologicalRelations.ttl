@@ -17,6 +17,7 @@ This SHACL shape validates the topological relation of geometries to the living 
 
 # ---------------------------------------------------------------- View 0
 shacl:ValidateTopologicalRelations-view-0 a shacl:View ;
+    shacl:id "ValidateTopologicalRelations-view-0" ;
     shacl:type "violation" ;
     shacl:visualization "3dview" ;
     shacl:queries (

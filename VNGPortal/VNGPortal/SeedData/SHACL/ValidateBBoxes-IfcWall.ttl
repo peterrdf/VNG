@@ -17,6 +17,7 @@ This SHACL shape validates the bounding boxes of IFC walls.
 
 # ---------------------------------------------------------------- View 0
 shacl:ValidateBBoxes-IfcWall-view-0 a shacl:View ;
+    shacl:id "ValidateBBoxes-IfcWall-view-0" ;
     shacl:type "violation" ;
     shacl:visualization "3dview" ;
     shacl:queries (

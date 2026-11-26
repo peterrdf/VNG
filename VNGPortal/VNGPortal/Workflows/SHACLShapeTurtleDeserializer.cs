@@ -67,6 +67,7 @@ public static class SHACLShapeTurtleDeserializer
     {
         var view = new SHACLView
         {
+            Id = GetString(graph, viewNode, "id"),
             Type = GetString(graph, viewNode, "type"),
             Visualization = GetString(graph, viewNode, "visualization")
         };

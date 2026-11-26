@@ -238,6 +238,9 @@ public class SPARQLVariableQuery : SPARQLQuery
 
 public class SHACLView
 {
+    [XmlElement("id")]
+    public string Id { get; set; } = string.Empty;
+
     [XmlElement("type")]
     public string Type { get; set; } = string.Empty;
 

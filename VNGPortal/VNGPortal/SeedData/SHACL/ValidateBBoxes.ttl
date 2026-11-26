@@ -17,6 +17,7 @@ This SHACL shape validates the bounding boxes of geometries.
 
 # ---------------------------------------------------------------- View 0
 shacl:ValidateBBoxes-view-0 a shacl:View ;
+    shacl:id "ValidateBBoxes-view-0" ;
     shacl:type "violation" ;
     shacl:visualization "3dview" ;
     shacl:queries (

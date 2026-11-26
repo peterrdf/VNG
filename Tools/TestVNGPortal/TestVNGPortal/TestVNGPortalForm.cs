@@ -100,7 +100,7 @@ namespace TestVNGPortal
             try
             {
                 _workflowsFiles = Directory
-                    .EnumerateFiles(dialog.SelectedPath, "*.xml", SearchOption.AllDirectories)
+                    .EnumerateFiles(dialog.SelectedPath, "*.ttl", SearchOption.AllDirectories)
                     .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
                     .ToList();
             }
@@ -277,7 +277,23 @@ namespace TestVNGPortal
             _streamLog?.Write(Encoding.UTF8.GetBytes("All tasks finished.\r\n"));
         }
 
-        private static string? GetWorkflowId(string xmlFilePath)
+        private static string? GetWorkflowId(string workflowFilePath)
+        {
+            if (workflowFilePath.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+            {
+                return GetWorkflowXMLId(workflowFilePath);
+            }
+            else if (workflowFilePath.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase))
+            {
+                return GetWorkflowTTLId(workflowFilePath);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static string? GetWorkflowXMLId(string xmlFilePath)
         {
             var settings = new XmlReaderSettings
             {
@@ -314,6 +330,18 @@ namespace TestVNGPortal
             }
 
             return null;
+        }
+
+        private static string? GetWorkflowTTLId(string ttlFilePath)
+        {
+            var content = File.ReadAllText(ttlFilePath);
+
+            var match = System.Text.RegularExpressions.Regex.Match(
+                content,
+                @"\ba\s+wf:Workflow\b[^.]*?\bwf:id\s+(?<id>\d+)",
+                System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+            return match.Success ? match.Groups["id"].Value : null;
         }
 
         private void Status_StatusUpdateReceived(string json)

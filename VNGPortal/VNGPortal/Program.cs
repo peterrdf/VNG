@@ -41,7 +41,7 @@ namespace VNGPortal
             }
             Directory.CreateDirectory(workflowsDir);
 
-            // Copy always seed workflow XML files from the SeedData/Workflows directory to the configured workflows directory
+            // Copy always seed workflow XML/TTL files from the SeedData/Workflows directory to the configured workflows directory
             var seedWorfklowsDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "Workflows");
             if (Directory.Exists(seedWorfklowsDir))
             {
@@ -65,7 +65,7 @@ namespace VNGPortal
             }
             Directory.CreateDirectory(sparqlDir);
 
-            // Copy always seed SPARQL XML files from the SeedData/SPARQL directory to the configured SPARQL directory
+            // Copy always seed SPARQL XML/TTL files from the SeedData/SPARQL directory to the configured SPARQL directory
             var seedSPARQLDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "SPARQL");
             if (Directory.Exists(seedSPARQLDir))
             {
@@ -89,7 +89,7 @@ namespace VNGPortal
             }
             Directory.CreateDirectory(shaclDir);
 
-            // Copy always seed SHACL XML files from the SeedData/SHACL directory to the configured SHACL directory
+            // Copy always seed SHACL XML/TTL files from the SeedData/SHACL directory to the configured SHACL directory
             var seedSHACLDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "SHACL");
             if (Directory.Exists(seedSHACLDir))
             {
@@ -113,7 +113,7 @@ namespace VNGPortal
             }
             Directory.CreateDirectory(idsDir);
 
-            // Copy always seed IDS XML files from the SeedData/IDS directory to the configured IDS directory
+            // Copy always seed IDS XML/TTL files from the SeedData/IDS directory to the configured IDS directory
             var seedIdsSourceDir = Path.Combine(AppContext.BaseDirectory, "SeedData", "IDS");
             if (Directory.Exists(seedIdsSourceDir))
             {

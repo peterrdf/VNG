@@ -77,7 +77,7 @@ namespace VNGPortal.Workflows
                         }
                         catch (Exception ex)
                         {
-                            _logger?.LogError(ex, "Error de-serializing workflow XML file: {WorkflowXML}", workflowXML.PhysicalPath);
+                            _logger?.LogError(ex, "Error de-serializing workflow XML/TTL file: {WorkflowFile}", workflowXML.PhysicalPath);
                         }
                     }
                 }

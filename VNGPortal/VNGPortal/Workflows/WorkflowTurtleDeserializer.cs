@@ -14,7 +14,7 @@ public static class WorkflowTurtleDeserializer
     private static readonly Dictionary<string, string> ParameterMap = new()
     {
         ["idsFile"] = "idsFile",
-        ["queryRef"] = "queryRef",
+        ["queryUri"] = "queryUri",
         ["shaclValidationRef"] = "shaclValidationRef"
     };
 

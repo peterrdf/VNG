@@ -53,7 +53,7 @@ namespace VNGPortal.Workflows
             //
 
             WorkflowStorage workflowStorage = new WorkflowStorage(_configuration, _logger);
-            SPARQLQueries = workflowStorage.LoadSPARQLQueries();
+            SPARQLQueries = workflowStorage.LoadSPARQLs();
             var shaclShapes = workflowStorage.LoadSHACLs();
 
             for (int i = 0; _workflow.Steps != null && i < _workflow.Steps.Count; i++)
@@ -151,12 +151,15 @@ namespace VNGPortal.Workflows
 
                                 if (string.IsNullOrEmpty(query))
                                 {
-                                    if (step.Parameters.ContainsKey("queryRef"))
+                                    if (step.Parameters.ContainsKey("queryUri"))
                                     {
-                                        string queryRef = step.Parameters["queryRef"];
-                                        if (!string.IsNullOrEmpty(queryRef) && SPARQLQueries.TryGetValue(queryRef, out var sparqlQuery))
+                                        string queryUri = step.Parameters["queryUri"];
+                                        if (!string.IsNullOrEmpty(queryUri) && SPARQLQueries.TryGetValue(queryUri, out var sparqlQueryPath))
                                         {
-                                            query = sparqlQuery.Query;
+                                            _logger.LogInformation("Loading SPARQL query from file: '{SPARQLQueryPath}'", sparqlQueryPath);
+                                            SPARQLQuery? sparqlQuery = SPARQLQueryTurtleDeserializer.Deserialize(sparqlQueryPath);
+                                            query = sparqlQuery?.Query ?? string.Empty;
+                                            _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
                                         }
                                     }
                                 }
@@ -732,7 +735,7 @@ namespace VNGPortal.Workflows
         private TaskDescriptor? TaskDescriptor { get; set; } = null;
         private SPARQL.Server? SPARQLServer { get; set; } = null;
         private string DatasetName { get; set; } = string.Empty;
-        private IDictionary<string, SPARQLQuery> SPARQLQueries { get; set; } = new Dictionary<string, SPARQLQuery>();
+        private IDictionary<string, string> SPARQLQueries { get; set; } = new Dictionary<string, string>();
         private string ModelDir { get; set; } = string.Empty;
         #endregion
 

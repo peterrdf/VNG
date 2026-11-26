@@ -90,9 +90,9 @@ namespace VNGPortal.Workflows
             return workflows;
         }
 
-        public IDictionary<string, SPARQLQuery> LoadSPARQLQueries()
+        public IDictionary<string, string> LoadSPARQLs()
         {
-            Dictionary<string, SPARQLQuery> sparqlQueries = new();
+            Dictionary<string, string> sparqlQueries = new();
 
             try
             {
@@ -101,49 +101,19 @@ namespace VNGPortal.Workflows
                 var fileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
 
                 var provider = new PhysicalFileProvider(_configuration![$"{fileStorage}:SPARQLDir"]!);
-                var sparqlXMLs = provider.GetDirectoryContents("/").Where((fileInfo) =>
+                var sparqlTTLs = provider.GetDirectoryContents("/").Where((fileInfo) =>
                 {
                     if (fileInfo.IsDirectory)
                         return false;
 
-                    return fileInfo.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) || 
-                        fileInfo.Name.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase);
+                    return fileInfo.Name.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase);
                 });
 
-                foreach (var sparqlXML in sparqlXMLs)
+                foreach (var sparqlTTL in sparqlTTLs)
                 {
-                    if (sparqlXML?.PhysicalPath != null)
+                    if (sparqlTTL?.PhysicalPath != null)
                     {
-                        try
-                        {
-                            SPARQLQuery? sparqlQuery = sparqlXML.PhysicalPath.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase)
-                                ? SPARQLQueryTurtleDeserializer.Deserialize(sparqlXML.PhysicalPath)
-                                : SPARQLQueryDeserializer.Deserialize(sparqlXML.PhysicalPath);
-                            if (sparqlQuery != null)
-                            {
-                                if (string.IsNullOrWhiteSpace(sparqlQuery.Id))
-                                {
-                                    _logger?.LogWarning("SPARQLQuery ID is null or empty for file: {SPARQLXML}", sparqlXML.PhysicalPath);
-                                    continue;
-                                }
-
-                                if (sparqlQueries.ContainsKey(sparqlQuery.Id))
-                                {
-                                    _logger?.LogWarning("Duplicate SPARQLQuery ID '{SPARQLQueryId}' found in file: {SPARQLXML}. Skipping this SPARQLQuery.", sparqlQuery.Id, sparqlXML.PhysicalPath);
-                                    continue;
-                                }
-
-                                sparqlQueries[sparqlQuery.Id] = sparqlQuery;
-                            }
-                            else
-                            {
-                                _logger?.LogWarning("SPARQLQuery deserialization returned null for file: {SPARQLXML}", sparqlXML.PhysicalPath);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger?.LogError(ex, "Error deserializing SPARQLQuery XML file: {SPARQLXML}", sparqlXML.PhysicalPath);
-                        }
+                        sparqlQueries[Path.GetFileName(sparqlTTL.PhysicalPath)] = sparqlTTL.PhysicalPath;
                     }
                 }
             }

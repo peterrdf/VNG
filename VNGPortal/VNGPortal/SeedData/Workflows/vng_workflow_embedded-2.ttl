@@ -92,35 +92,35 @@ wf:step-13 a wf:Step ;
     wf:name "Insert IFC4ADD2" ;
     wf:description "Inserts the IFC4ADD2 ontology into the SPARQL dataset." ;
     wf:type "SPARQL" ;
-    wf:queryRef "InsertIFC4ADD2Ontology" .
+    wf:queryUri "insert-ifc4-add2-ontology.ttl" .
 
 wf:step-14 a wf:Step ;
     wf:id 14 ;
     wf:name "Insert Areas" ;
     wf:description "Retrieves residential ('wonen') planning zones based on the location of the building in the IFC model." ;
     wf:type "SPARQL" ;
-    wf:queryRef "InsertAreas" .
+    wf:queryUri "insert-areas.ttl" .
 
 wf:step-15 a wf:Step ;
     wf:id 15 ;
     wf:name "Insert BBoxes" ;
     wf:description "Calculates the 3D bounding box for every geometry." ;
     wf:type "SPARQL" ;
-    wf:queryRef "InsertBBoxes" .
+    wf:queryUri "insert-bboxes.ttl" .
 
 wf:step-16 a wf:Step ;
     wf:id 16 ;
     wf:name "Insert Projections" ;
     wf:description "Generates a 2D map projection for every 3D geometry." ;
     wf:type "SPARQL" ;
-    wf:queryRef "InsertProjections" .
+    wf:queryUri "insert-projections.ttl" .
 
 wf:step-17 a wf:Step ;
     wf:id 17 ;
     wf:name "Insert Topological Relations" ;
     wf:description "Calculates whether every geometry in the building model spatially overlaps with residential (\"wonen\") planning zones." ;
     wf:type "SPARQL" ;
-    wf:queryRef "InsertTopologicalRelations-IfcWall-IfcRoof" .
+    wf:queryUri "insert-topological-relations-ifcwall-ifcroof.ttl" .
 
 wf:step-18 a wf:Step ;
     wf:id 18 ;

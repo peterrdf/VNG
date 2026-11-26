@@ -15,7 +15,7 @@ public static class WorkflowTurtleDeserializer
     {
         ["idsFile"] = "idsFile",
         ["queryRef"] = "queryRef",
-        ["shapeRef"] = "shapeRef"
+        ["shaclValidationRef"] = "shaclValidationRef"
     };
 
     public static Workflow? Deserialize(string ttlFilePath)

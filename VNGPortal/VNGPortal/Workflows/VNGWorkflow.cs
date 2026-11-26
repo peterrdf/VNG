@@ -296,10 +296,10 @@ namespace VNGPortal.Workflows
                                 }
 
                                 SHACLValidation? shaclValidation = null;
-                                if (step.Parameters.ContainsKey("shapeRef"))
+                                if (step.Parameters.ContainsKey("shaclValidationRef"))
                                 {
-                                    var shapeRef = step.Parameters["shapeRef"];
-                                    if (!string.IsNullOrEmpty(shapeRef) && shaclShapes.TryGetValue(shapeRef, out var shaclValidationPath))
+                                    var shaclValidationRef = step.Parameters["shaclValidationRef"];
+                                    if (!string.IsNullOrEmpty(shaclValidationRef) && shaclShapes.TryGetValue(shaclValidationRef, out var shaclValidationPath))
                                     {
                                         _logger.LogInformation("Loading SHACL validation from file: '{SHACLValidationPath}'", shaclValidationPath);
 

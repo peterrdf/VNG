@@ -188,6 +188,6 @@ wf:step-23 a wf:Step ;
 wf:step-24 a wf:Step ;
     wf:id 24 ;
     wf:name "Validate Model BBox" ;
-    wf:description "Validates that the combined geometry of the entire building has a realistic size — not too small and not too large." ;
+    wf:description "Validates that the combined geometry of the entire building has a realistic size - not too small and not too large." ;
     wf:type "SHACL" ;
     wf:shaclValidationRef "ValidateModelBBoxes.ttl" .

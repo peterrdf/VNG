@@ -296,34 +296,31 @@ namespace VNGPortal.Workflows
                                 }
 
                                 SHACLValidation? shaclValidation = null;
-                                if (string.IsNullOrEmpty(shape))
+                                if (step.Parameters.ContainsKey("shapeRef"))
                                 {
-                                    if (step.Parameters.ContainsKey("shapeRef"))
+                                    var shapeRef = step.Parameters["shapeRef"];
+                                    if (!string.IsNullOrEmpty(shapeRef) && shaclShapes.TryGetValue(shapeRef, out var shaclValidationPath))
                                     {
-                                        var shapeRef = step.Parameters["shapeRef"];
-                                        if (!string.IsNullOrEmpty(shapeRef) && shaclShapes.TryGetValue(shapeRef, out var shaclValidationPath))
+                                        _logger.LogInformation("Loading SHACL validation from file: '{SHACLValidationPath}'", shaclValidationPath);
+
+                                        shaclValidation = SHACLValidationTurtleDeserializer.Deserialize(shaclValidationPath);
+                                        if (shaclValidation != null)
                                         {
-                                            _logger.LogInformation("Loading SHACL validation from file: '{SHACLValidationPath}'", shaclValidationPath);
-
-                                            shaclValidation = SHACLValidationTurtleDeserializer.Deserialize(shaclValidationPath);
-                                            if (shaclValidation != null)
+                                            if (!string.IsNullOrEmpty(shaclValidation.ShapeUri))
                                             {
-                                                if (!string.IsNullOrEmpty(shaclValidation.ShapeUri))
-                                                {
-                                                    _logger.LogInformation("Loading SHACL shape from file: '{SHACLShapePath}'", Path.Combine(shaclDir, shaclValidation.ShapeUri));
+                                                _logger.LogInformation("Loading SHACL shape from file: '{SHACLShapePath}'", Path.Combine(shaclDir, shaclValidation.ShapeUri));
 
-                                                    // #todo: use http source instead of local file
-                                                    var shapeFilePath = Path.Combine(shaclDir, shaclValidation.ShapeUri);
-                                                    _logger.LogInformation("Loading SHACL shape from file: '{ShapeFilePath}'", shapeFilePath);
+                                                // #todo: use http source instead of local file
+                                                var shapeFilePath = Path.Combine(shaclDir, shaclValidation.ShapeUri);
+                                                _logger.LogInformation("Loading SHACL shape from file: '{ShapeFilePath}'", shapeFilePath);
 
-                                                    var shachlShape = SHACLShapeTurtleDeserializer.Deserialize(shapeFilePath);
-                                                    shape = shachlShape?.Shape ?? string.Empty;
-                                                    _logger.LogInformation("SHACL shape loaded: '{Shape}'", shape);
-                                                }
-                                                else
-                                                {
-                                                    shape = shaclValidation.Shape;
-                                                }
+                                                var shachlShape = SHACLShapeTurtleDeserializer.Deserialize(shapeFilePath);
+                                                shape = shachlShape?.Shape ?? string.Empty;
+                                                _logger.LogInformation("SHACL shape loaded: '{Shape}'", shape);
+                                            }
+                                            else
+                                            {
+                                                shape = shaclValidation.Shape;
                                             }
                                         }
                                     }
@@ -355,7 +352,7 @@ namespace VNGPortal.Workflows
 
                         case "IDS":
                             {
-                                string idsFile = step.Parameters["ids_file"];
+                                string idsFile = step.Parameters["idsFile"];
                                 var idsPath = Path.Combine(idsDir, idsFile);
                                 var idsFileContent = await File.ReadAllTextAsync(idsPath);
                                 await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, $"IDS File: '{idsFile}'", FormatXML(idsFileContent), "", false);

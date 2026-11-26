@@ -13,7 +13,7 @@ public static class WorkflowTurtleDeserializer
     // TTL predicate local name -> Step.Parameters key (same keys the XML format produces)
     private static readonly Dictionary<string, string> ParameterMap = new()
     {
-        ["idsFile"] = "ids_file",
+        ["idsFile"] = "idsFile",
         ["queryRef"] = "queryRef",
         ["shapeRef"] = "shapeRef"
     };

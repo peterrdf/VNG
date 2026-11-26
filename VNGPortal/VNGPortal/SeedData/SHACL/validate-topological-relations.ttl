@@ -1,3 +1,18 @@
+@prefix shacl: <https://vng.nl/shacl/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+shacl:ValidateTopologicalRelationsShape a shacl:Shape ;
+    shacl:id "ValidateTopologicalRelationsShape" ;
+    shacl:description """
+        This SHACL shape validates the topological relation of geometries to the living areas.
+        1. geom:GeometryShape targets every subject that has a geom:globalId (sh:targetSubjectsOf).
+        2. A SPARQL-based constraint (sh:sparql) reads geom:globalId and geom:topologicalRelation of each target.
+        3. A target is reported as a violation when geom:topologicalRelation is not "CONTAINED BY", which means the element is not fully inside the "wonen" (residential) areas.
+        4. The result message is "geom:topologicalRelation is NOT 'CONTAINED BY'. GlobalId: ...".
+        5. The severity is sh:Violation.
+        """ ;
+    shacl:shape """
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
 @prefix geom: <https://vng.nl/geometry/> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -6,7 +21,7 @@
 
 geom:GeometryShape
     a sh:NodeShape ;
-	sh:targetClass ifc:IfcWall, ifc:IfcRoof ;
+    sh:targetClass ifc:IfcWall, ifc:IfcRoof ;
     sh:targetSubjectsOf geom:globalId ;
 
     sh:sparql [
@@ -20,14 +35,15 @@ geom:GeometryShape
                 sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI
             ]
         ] ;
-        sh:select """
+        sh:select \"\"\"
             SELECT $this ?value ?globalId
             WHERE {
                 $this geom:globalId              ?globalId ;
                       geom:topologicalRelation   ?value .
                 FILTER(?value NOT IN ("CONTAINED BY", "INVALID INPUT"))
             }
-        """ ;
+        \"\"\" ;
         sh:message "geom:topologicalRelation is NOT 'CONTAINED BY'. GlobalId: {?globalId}" ;
     ] ;
     sh:severity sh:Violation .
+""" .

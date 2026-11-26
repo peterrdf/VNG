@@ -1,3 +1,10 @@
+@prefix shacl: <https://vng.nl/shacl/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+shacl:ValidateBBoxesIfcWallShape a shacl:Shape ;
+    shacl:id "ValidateBBoxesIfcWallShape" ;
+    shacl:shape """
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
 @prefix geom: <https://vng.nl/geometry/> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -6,7 +13,7 @@
 
 geom:GeometryShape
     a sh:NodeShape ;
-	sh:targetClass ifc:IfcWall ;
+    sh:targetClass ifc:IfcWall ;
 
     sh:sparql [
         sh:prefixes [
@@ -15,7 +22,7 @@ geom:GeometryShape
                 sh:namespace "https://vng.nl/geometry/"^^xsd:anyURI
             ]
         ] ;
-        sh:select """
+        sh:select \"\"\"
             SELECT $this ?globalId ?deltaX ?deltaY ?deltaZ
             WHERE {
                 $this   geom:globalId   ?globalId ;
@@ -35,7 +42,8 @@ geom:GeometryShape
                     ?deltaZ < 1 || ?deltaZ > 100
                 )
             }
-        """ ;
+        \"\"\" ;
         sh:message "BBox violation for GlobalId=[{?globalId}]: deltaX={?deltaX}, deltaY={?deltaY}, deltaZ={?deltaZ}. All axis deltas must be in [1, 100]." ;
     ] ;
     sh:severity sh:Violation .
+""" .

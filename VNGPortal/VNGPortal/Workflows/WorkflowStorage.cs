@@ -84,7 +84,7 @@ namespace VNGPortal.Workflows
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error loading workflows from XML files.");
+                _logger?.LogError(ex, "Error loading workflows.");
             }
 
             return workflows;
@@ -149,68 +149,40 @@ namespace VNGPortal.Workflows
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error loading workflows from XML files.");
+                _logger?.LogError(ex, "Error loading SPARQL queries.");
             }
 
             return sparqlQueries;
         }
 
-        public IDictionary<string, SHACLShape> LoadSHACLShapes()
+        public IDictionary<string, string> LoadSHACLs()
         {
-            Dictionary<string, SHACLShape> shaclShapes = new();
+            Dictionary<string, string> shaclShapes = new();
             try
             {
                 var isLinuxPlatform = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
                 var fileStorage = isLinuxPlatform ? "FileStorageLinux" : "FileStorage";
 
                 var provider = new PhysicalFileProvider(_configuration![$"{fileStorage}:SHACLDir"]!);
-                var shaclXMLs = provider.GetDirectoryContents("/").Where((fileInfo) =>
+                var shaclTTLs = provider.GetDirectoryContents("/").Where((fileInfo) =>
                 {
                     if (fileInfo.IsDirectory)
                         return false;
 
-                    return fileInfo.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) || 
-                       fileInfo.Name.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase);
+                    return fileInfo.Name.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase);
                 });
 
-                foreach (var shaclXML in shaclXMLs)
+                foreach (var shaclTTL in shaclTTLs)
                 {
-                    if (shaclXML?.PhysicalPath != null)
+                    if (shaclTTL?.PhysicalPath != null)
                     {
-                        try
-                        {
-                            SHACLShape? shaclShape = shaclXML.PhysicalPath.EndsWith(".ttl", StringComparison.OrdinalIgnoreCase)
-                                ? SHACLShapeTurtleDeserializer.Deserialize(shaclXML.PhysicalPath)
-                                : SHACLShapeDeserializer.Deserialize(shaclXML.PhysicalPath);
-                            if (shaclShape != null)
-                            {
-                                if (string.IsNullOrWhiteSpace(shaclShape.Id))
-                                {
-                                    _logger?.LogWarning("SHACLShape ID is null or empty for file: {SHACLXML}", shaclXML.PhysicalPath);
-                                    continue;
-                                }
-                                if (shaclShapes.ContainsKey(shaclShape.Id))
-                                {
-                                    _logger?.LogWarning("Duplicate SHACLShape ID '{SHACLShapeId}' found in file: {SHACLXML}. Skipping this SHACLShape.", shaclShape.Id, shaclXML.PhysicalPath);
-                                    continue;
-                                }
-                                shaclShapes[shaclShape.Id] = shaclShape;
-                            }
-                            else
-                            {
-                                _logger?.LogWarning("SHACLShape deserialization returned null for file: {SHACLXML}", shaclXML.PhysicalPath);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger?.LogError(ex, "Error deserializing SHACLShape XML file: {SHACLXML}", shaclXML.PhysicalPath);
-                        }
+                        shaclShapes[Path.GetFileName(shaclTTL.PhysicalPath)] = shaclTTL.PhysicalPath;
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error loading workflows from XML files.");
+                _logger?.LogError(ex, "Error loading SHACL shapes.");
             }
 
             return shaclShapes;

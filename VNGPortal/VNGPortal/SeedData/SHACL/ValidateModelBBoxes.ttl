@@ -2,19 +2,6 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-shacl:ValidateModelBBoxes a shacl:Shape ;
-    shacl:id "ValidateModelBBoxes" ;
-    shacl:description """
-This SHACL shape validates the overall bounding box of the whole model (dataset).
-1. geom:DatasetBBoxShape targets a single node, the graph IRI <https://vng.nl/geometries/> (sh:targetNode).
-2. A SPARQL-based constraint (sh:sparql) runs one query for that node.
-3. A subquery goes over all geometries that have geom:eastings, geom:northings and the six bbox properties (geom:bboxMinX/Y/Z and geom:bboxMaxX/Y/Z). It calculates the global extent:
-   - X: min and max of (bbox X - eastings)
-   - Y: min and max of (bbox Y - northings)
-   - Z: min and max of the bbox Z values
-   The eastings and northings are subtracted, so X and Y are relative to the model origin.
-4. The model is reported as a violation when the total size of the extent is smaller than 1 or larger than 100 on any axis (for example, globalMaxX - globalMinX).
-5. The result message lists the six global values ("Dataset BBox violation: globalMinX=..., globalMaxX=..., ...").
-6. The severity is sh:Violation.
-""" ;
+shacl:ValidateModelBBoxes a shacl:Validation ;
+    shacl:id "ValidateModelBBoxes" ;    
     shacl:shapeUri "validate-model-bboxes.ttl" .

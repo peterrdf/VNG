@@ -40,7 +40,8 @@ public static class SHACLShapeTurtleDeserializer
 
         var shape = new SHACLShape
         {
-            Id = GetString(graph, shapeNode, "id")
+            Id = GetString(graph, shapeNode, "id"),
+            Description = GetString(graph, shapeNode, "description")
         };
 
         // Same as <shape uri="..."> in the XML format (SHACLShape.ShapeUri)
@@ -50,54 +51,24 @@ public static class SHACLShapeTurtleDeserializer
             shape.ShapeElement.Attributes["uri"] = shapeUri;
         }
 
-        var viewsHead = GetObject(graph, shapeNode, "views");
-        if (viewsHead != null)
+        // Inline plain SHACL, same as the text of <shape>...</shape> in the XML format (SHACLShape.Shape)
+        var inlineShape = GetString(graph, shapeNode, "shape");
+        if (inlineShape.Length > 0)
         {
-            // RDF list keeps the original view order
-            foreach (var viewNode in graph.GetListItems(viewsHead))
-            {
-                shape.Views.Add(ReadView(graph, viewNode));
-            }
+            shape.Shape = inlineShape;
         }
 
         return shape;
     }
 
-    private static SHACLView ReadView(IGraph graph, INode viewNode)
-    {
-        var view = new SHACLView
-        {
-            Id = GetString(graph, viewNode, "id"),
-            Type = GetString(graph, viewNode, "type"),
-            Visualization = GetString(graph, viewNode, "visualization")
-        };
-
-        var queriesHead = GetObject(graph, viewNode, "queries");
-        if (queriesHead != null)
-        {
-            foreach (var queryNode in graph.GetListItems(queriesHead))
-            {
-                view.Queries.Add(ReadQuery(graph, queryNode));
-            }
-        }
-
-        return view;
-    }
-
-    private static SPARQLGeometryQuery ReadQuery(IGraph graph, INode queryNode) =>
-        SPARQLQueryTurtleReader.ReadGeometryQuery(graph, queryNode, Ns);
-
-    private static INode? GetObject(IGraph graph, INode subject, string localName)
-    {
-        var predicate = graph.CreateUriNode(new Uri(Ns + localName));
-        return graph.GetTriplesWithSubjectPredicate(subject, predicate)
-                    .Select(t => t.Object)
-                    .FirstOrDefault();
-    }
-
     private static string GetString(IGraph graph, INode subject, string localName)
     {
-        return GetObject(graph, subject, localName) switch
+        var predicate = graph.CreateUriNode(new Uri(Ns + localName));
+        var node = graph.GetTriplesWithSubjectPredicate(subject, predicate)
+                        .Select(t => t.Object)
+                        .FirstOrDefault();
+
+        return node switch
         {
             ILiteralNode literal => literal.Value.Trim(),
             IUriNode uri => uri.Uri.ToString(),

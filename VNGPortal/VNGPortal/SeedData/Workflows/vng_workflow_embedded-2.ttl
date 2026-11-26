@@ -127,11 +127,11 @@ wf:step-18 a wf:Step ;
     wf:name "Validate Topological Relations" ;
     wf:description "Validates that every geometry in the building is fully contained within residential (\"wonen\") planning zones." ;
     wf:type "SHACL" ;
-    wf:shapeRef "ValidateTopologicalRelations" .
+    wf:shapeRef "ValidateTopologicalRelations.ttl" .
 
 wf:step-19 a wf:Step ;
     wf:id 19 ;
     wf:name "Validate Height" ;
     wf:description "Validates that every geometry in the model has a height within the allowed range." ;
     wf:type "SHACL" ;
-    wf:shapeRef "ValidateHeight" .
+    wf:shapeRef "ValidateHeight.ttl" .

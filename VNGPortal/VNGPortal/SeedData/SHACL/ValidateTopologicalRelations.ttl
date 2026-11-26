@@ -2,16 +2,8 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-shacl:ValidateTopologicalRelations a shacl:Shape ;
-    shacl:id "ValidateTopologicalRelations" ;
-    shacl:description """
-This SHACL shape validates the topological relation of geometries to the living areas.
-1. geom:GeometryShape targets every subject that has a geom:globalId (sh:targetSubjectsOf).
-2. A SPARQL-based constraint (sh:sparql) reads geom:globalId and geom:topologicalRelation of each target.
-3. A target is reported as a violation when geom:topologicalRelation is not "CONTAINED BY", which means the element is not fully inside the "wonen" (residential) areas.
-4. The result message is "geom:topologicalRelation is NOT 'CONTAINED BY'. GlobalId: ...".
-5. The severity is sh:Violation.
-""" ;
+shacl:ValidateTopologicalRelations a shacl:Validation ;
+    shacl:id "ValidateTopologicalRelations" ;    
     shacl:shapeUri "validate-topological-relations.ttl" ;
     shacl:views ( shacl:ValidateTopologicalRelations-view-0 ) .
 

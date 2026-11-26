@@ -1,3 +1,23 @@
+@prefix shacl: <https://vng.nl/shacl/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+shacl:ValidateModelBBoxesShape a shacl:Shape ;
+    shacl:id "ValidateModelBBoxesShape" ;
+    shacl:description """
+        This SHACL shape validates the overall bounding box of the whole model (dataset).
+        1. geom:DatasetBBoxShape targets a single node, the graph IRI <https://vng.nl/geometries/> (sh:targetNode).
+        2. A SPARQL-based constraint (sh:sparql) runs one query for that node.
+        3. A subquery goes over all geometries that have geom:eastings, geom:northings and the six bbox properties (geom:bboxMinX/Y/Z and geom:bboxMaxX/Y/Z). It calculates the global extent:
+           - X: min and max of (bbox X - eastings)
+           - Y: min and max of (bbox Y - northings)
+           - Z: min and max of the bbox Z values
+           The eastings and northings are subtracted, so X and Y are relative to the model origin.
+        4. The model is reported as a violation when the total size of the extent is smaller than 1 or larger than 100 on any axis (for example, globalMaxX - globalMinX).
+        5. The result message lists the six global values ("Dataset BBox violation: globalMinX=..., globalMaxX=..., ...").
+        6. The severity is sh:Violation.
+        """ ;
+    shacl:shape """
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
 @prefix geom: <https://vng.nl/geometry/> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -11,7 +31,7 @@ geom:DatasetBBoxShape
         sh:prefixes [
             sh:declare [ sh:prefix "geom" ; sh:namespace "https://vng.nl/geometry/"^^xsd:anyURI ]
         ] ;
-        sh:select """
+        sh:select \"\"\"
             SELECT ?this ?globalMinX ?globalMaxX ?globalMinY ?globalMaxY ?globalMinZ ?globalMaxZ
             WHERE {
 
@@ -41,7 +61,8 @@ geom:DatasetBBoxShape
                     ?globalMaxZ - ?globalMinZ < 1 || ?globalMaxZ - ?globalMinZ > 100
                 )
             }
-        """ ;
+        \"\"\" ;
         sh:message "Dataset BBox violation: globalMinX={?globalMinX}, globalMaxX={?globalMaxX}, globalMinY={?globalMinY}, globalMaxY={?globalMaxY}, globalMinZ={?globalMinZ}, globalMaxZ={?globalMaxZ}. All values must be in [1, 100]." ;
     ] ;
     sh:severity sh:Violation .
+""" .

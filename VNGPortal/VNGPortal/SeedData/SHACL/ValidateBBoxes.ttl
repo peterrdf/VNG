@@ -2,7 +2,7 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-shacl:ValidateBBoxes a shacl:Shape ;
+shacl:ValidateBBoxes a shacl:Validation ;
     shacl:id "ValidateBBoxes" ;
     shacl:description """
 This SHACL shape validates the bounding boxes of geometries.

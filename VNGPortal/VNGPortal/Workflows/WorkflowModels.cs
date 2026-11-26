@@ -103,17 +103,6 @@ public class SPARQLQuery
     /// <summary>Typed parameters from the Turtle format (sp:parameters).</summary>
     [XmlIgnore]
     public List<SPARQLQueryParameter> ParameterList { get; set; } = new();
-
-    /// <summary>Attributes of the &lt;sparql&gt; element.</summary>
-    [XmlIgnore]
-    public AttributeDictionary Attributes { get; set; } = new AttributeDictionary();
-
-    [XmlAnyAttribute]
-    public XmlAttribute[] XmlAttributes
-    {
-        get => Attributes.ToXmlAttributes();
-        set => Attributes = AttributeDictionary.FromXmlAttributes(value);
-    }
 }
 
 public class SHACLShapeElement
@@ -140,6 +129,30 @@ public class SHACLShape
     [XmlElement("id")]
     public string Id { get; set; } = string.Empty;
 
+    public string? Description { get; set; } = null;
+
+    [XmlElement("shape")]
+    public SHACLShapeElement ShapeElement { get; set; } = new SHACLShapeElement();
+
+    [XmlIgnore]
+    public string Shape
+    {
+        get => ShapeElement.Text.Trim();
+        set => ShapeElement.Text = value;
+    }
+
+    [XmlIgnore]
+    public string? ShapeUri => ShapeElement.Attributes.GetValueOrDefault("uri");
+}
+
+[XmlRoot("shacl")]
+public class SHACLValidation
+{
+    [XmlElement("id")]
+    public string Id { get; set; } = string.Empty;
+
+    public string? Description { get; set; } = null;
+
     [XmlElement("shape")]
     public SHACLShapeElement ShapeElement { get; set; } = new SHACLShapeElement();
 
@@ -155,17 +168,6 @@ public class SHACLShape
 
     [XmlElement("parameters")]
     public ParameterDictionary Parameters { get; set; } = new ParameterDictionary();
-
-    /// <summary>Attributes of the &lt;shacl&gt; element.</summary>
-    [XmlIgnore]
-    public AttributeDictionary Attributes { get; set; } = new AttributeDictionary();
-
-    [XmlAnyAttribute]
-    public XmlAttribute[] XmlAttributes
-    {
-        get => Attributes.ToXmlAttributes();
-        set => Attributes = AttributeDictionary.FromXmlAttributes(value);
-    }
 
     [XmlArray("views")]
     [XmlArrayItem("view")]
@@ -192,8 +194,7 @@ public class SPARQLGeometryQuery : SPARQLQuery
             Id = e.Element("id")?.Value.Trim() ?? "",
             QueryElement = SPARQLQueryElement.FromXml(e.Element("query")),
             GeometryVariable = e.Element("geometryVariable")?.Value.Trim() ?? "",
-            ZoomTo = e.Element("zoomTo")?.Value.Trim().ToLower() == "true",
-            Attributes = AttributeDictionary.FromXElement(e)
+            ZoomTo = e.Element("zoomTo")?.Value.Trim().ToLower() == "true"
         };
     }
 
@@ -230,8 +231,7 @@ public class SPARQLVariableQuery : SPARQLQuery
             Id = e.Element("id")?.Value.Trim() ?? "",
             QueryElement = SPARQLQueryElement.FromXml(e.Element("query")),
             ValueVariable = e.Element("valueVariable")?.Value.Trim() ?? "",
-            ValueVariableLabel = e.Element("valueVariableLabel")?.Value.Trim() ?? "",
-            Attributes = AttributeDictionary.FromXElement(e)
+            ValueVariableLabel = e.Element("valueVariableLabel")?.Value.Trim() ?? ""
         };
     }
 }

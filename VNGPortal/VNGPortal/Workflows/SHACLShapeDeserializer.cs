@@ -4,18 +4,18 @@ using VNGPortal.Workflows;
 
 public static class SHACLShapeDeserializer
 {
-    public static SHACLShape? Deserialize(string xmlFilePath)
+    public static SHACLValidation? Deserialize(string xmlFilePath)
     {
-        var serializer = new XmlSerializer(typeof(SHACLShape));
+        var serializer = new XmlSerializer(typeof(SHACLValidation));
         using var reader = new StreamReader(xmlFilePath);
-        return (SHACLShape?)serializer.Deserialize(reader);
+        return (SHACLValidation?)serializer.Deserialize(reader);
     }
 
-    public static SHACLShape? DeserializeFromString(string xmlContent)
+    public static SHACLValidation? DeserializeFromString(string xmlContent)
     {
-        var serializer = new XmlSerializer(typeof(SHACLShape));
+        var serializer = new XmlSerializer(typeof(SHACLValidation));
 
         using var reader = new StringReader(xmlContent);
-        return (SHACLShape?)serializer.Deserialize(reader);
+        return (SHACLValidation?)serializer.Deserialize(reader);
     }
 }

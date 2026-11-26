@@ -1,3 +1,19 @@
+@prefix shacl: <https://vng.nl/shacl/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+shacl:ValidateHeightShape a shacl:Shape ;
+    shacl:id "ValidateHeightShape" ;
+    shacl:description """
+        This SHACL shape validates the height of geometries against the highest wall.
+        1. geom:IfcElementHeightShape targets every subject that has a geom:globalId (sh:targetSubjectsOf).
+        2. A SPARQL-based constraint (sh:sparql) reads geom:globalId and geom:bboxMaxZ (the top of the bounding box) of each target.
+        3. A sub-query calculates ?globalMaxZ, the maximum geom:bboxMaxZ over all elements whose rdf:type is ifc:IfcWall (the VALUES list can be extended with more IFC types).
+        4. A target is reported as a violation when ?bboxMaxZ - ?globalMaxZ > 1, which means its top is more than 1 unit above the highest wall.
+        5. The result message is "Height violation for GlobalId=[...]: bboxMaxZ=... minus globalMaxZ=... exceeds 1."
+        6. The severity is sh:Violation.
+        """ ;
+    shacl:shape """
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
 @prefix geom: <https://vng.nl/geometry/> .
 @prefix ifc:  <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#> .
@@ -6,7 +22,7 @@
 
 geom:IfcElementHeightShape
     a sh:NodeShape ;
-	sh:targetSubjectsOf geom:globalId ;
+    sh:targetSubjectsOf geom:globalId ;
 
     sh:sparql [
         sh:prefixes [
@@ -14,12 +30,12 @@ geom:IfcElementHeightShape
             sh:declare [ sh:prefix "ifc"  ; sh:namespace "https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2/OWL#"^^xsd:anyURI ] ;
             sh:declare [ sh:prefix "rdf"  ; sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI ]
         ] ;
-        sh:select """
+        sh:select \"\"\"
             SELECT $this ?globalId ?bboxMaxZ ?globalMaxZ
             WHERE {
-				$this geom:globalId ?globalId .
+                $this geom:globalId ?globalId .
                 $this geom:bboxMaxZ ?bboxMaxZ .
-                                        										
+
                 {
                     SELECT (MAX(?z) AS ?globalMaxZ)
                     WHERE {
@@ -33,8 +49,9 @@ geom:IfcElementHeightShape
 
                 FILTER(?bboxMaxZ - ?globalMaxZ > 1)
             }
-        """ ;
+        \"\"\" ;
         sh:message "Height violation for GlobalId=[{?globalId}]: bboxMaxZ={?bboxMaxZ} minus globalMaxZ={?globalMaxZ} exceeds 1." ;
     ] ;
 
     sh:severity sh:Violation .
+""" .

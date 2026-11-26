@@ -54,7 +54,7 @@ namespace VNGPortal.Workflows
 
             WorkflowStorage workflowStorage = new WorkflowStorage(_configuration, _logger);
             SPARQLQueries = workflowStorage.LoadSPARQLQueries();
-            var shaclShapes = workflowStorage.LoadSHACLShapes();
+            var shaclShapes = workflowStorage.LoadSHACLs();
 
             for (int i = 0; _workflow.Steps != null && i < _workflow.Steps.Count; i++)
             {
@@ -154,21 +154,9 @@ namespace VNGPortal.Workflows
                                     if (step.Parameters.ContainsKey("queryRef"))
                                     {
                                         string queryRef = step.Parameters["queryRef"];
-                                        if (!string.IsNullOrEmpty(queryRef) &&
-                                            SPARQLQueries.TryGetValue(queryRef, out var sparqlQuery))
+                                        if (!string.IsNullOrEmpty(queryRef) && SPARQLQueries.TryGetValue(queryRef, out var sparqlQuery))
                                         {
-                                            if (!string.IsNullOrEmpty(sparqlQuery.QueryUri))
-                                            {
-                                                // #todo: use http source instead of local file
-                                                var queryFilePath = Path.Combine(sparqlDir, sparqlQuery.QueryUri);
-                                                _logger.LogInformation("Loading SPARQL query from file: '{QueryFilePath}'", queryFilePath);
-                                                query = await File.ReadAllTextAsync(queryFilePath);
-                                                _logger.LogInformation("SPARQL query loaded: '{Query}'", query);
-                                            }
-                                            else
-                                            {
-                                                query = sparqlQuery.Query;
-                                            }
+                                            query = sparqlQuery.Query;
                                         }
                                     }
                                 }
@@ -307,26 +295,35 @@ namespace VNGPortal.Workflows
                                     shape = step.Parameters["shape"];
                                 }
 
-                                SHACLShape? shaclShape = null;
+                                SHACLValidation? shaclValidation = null;
                                 if (string.IsNullOrEmpty(shape))
                                 {
                                     if (step.Parameters.ContainsKey("shapeRef"))
                                     {
                                         var shapeRef = step.Parameters["shapeRef"];
-                                        if (!string.IsNullOrEmpty(shapeRef) &&
-                                            shaclShapes.TryGetValue(shapeRef, out shaclShape))
+                                        if (!string.IsNullOrEmpty(shapeRef) && shaclShapes.TryGetValue(shapeRef, out var shaclValidationPath))
                                         {
-                                            if (!string.IsNullOrEmpty(shaclShape.ShapeUri))
+                                            _logger.LogInformation("Loading SHACL validation from file: '{SHACLValidationPath}'", shaclValidationPath);
+
+                                            shaclValidation = SHACLValidationTurtleDeserializer.Deserialize(shaclValidationPath);
+                                            if (shaclValidation != null)
                                             {
-                                                // #todo: use http source instead of local file
-                                                var shapeFilePath = Path.Combine(shaclDir, shaclShape.ShapeUri);
-                                                _logger.LogInformation("Loading SHACL shape from file: '{ShapeFilePath}'", shapeFilePath);
-                                                shape = await File.ReadAllTextAsync(shapeFilePath);
-                                                _logger.LogInformation("SHACL shape loaded: '{Shape}'", shape);
-                                            }
-                                            else
-                                            {
-                                                shape = shaclShape.Shape;
+                                                if (!string.IsNullOrEmpty(shaclValidation.ShapeUri))
+                                                {
+                                                    _logger.LogInformation("Loading SHACL shape from file: '{SHACLShapePath}'", Path.Combine(shaclDir, shaclValidation.ShapeUri));
+
+                                                    // #todo: use http source instead of local file
+                                                    var shapeFilePath = Path.Combine(shaclDir, shaclValidation.ShapeUri);
+                                                    _logger.LogInformation("Loading SHACL shape from file: '{ShapeFilePath}'", shapeFilePath);
+
+                                                    var shachlShape = SHACLShapeTurtleDeserializer.Deserialize(shapeFilePath);
+                                                    shape = shachlShape?.Shape ?? string.Empty;
+                                                    _logger.LogInformation("SHACL shape loaded: '{Shape}'", shape);
+                                                }
+                                                else
+                                                {
+                                                    shape = shaclValidation.Shape;
+                                                }
                                             }
                                         }
                                     }
@@ -343,7 +340,7 @@ namespace VNGPortal.Workflows
                                     bool hasViolations = result.IndexOf("sh:Violation") != -1;
                                     await _signalRStatus.SendQueryUpdate(taskDescriptor.GroupName, $"{step.Name} - SHACL Validation Report", "", result, hasViolations);
                                     await CreateSHACLViews(
-                                        shaclShape,
+                                        shaclValidation,
                                         result);
                                 }
 
@@ -411,7 +408,7 @@ namespace VNGPortal.Workflows
         }
 
         private async Task CreateSHACLViews(
-            SHACLShape? shaclShape,
+            SHACLValidation? shaclValidation,
             string shaclResult)
         {
             if (TaskDescriptor == null)
@@ -434,7 +431,7 @@ namespace VNGPortal.Workflows
                 throw new InvalidOperationException("Mode Directory is not initialized.");
             }
 
-            if (shaclShape == null)
+            if (shaclValidation == null)
             {
                 return;
             }
@@ -451,7 +448,7 @@ namespace VNGPortal.Workflows
             bool hasViolations = shaclResult.IndexOf("sh:Violation") != -1;
             if (hasViolations)
             {
-                var shaclViolationViews = shaclShape.Views.FindAll(v => v.Type == "violation").ToList();
+                var shaclViolationViews = shaclValidation.Views.FindAll(v => v.Type == "violation").ToList();
                 if ((shaclViolationViews != null) && (shaclViolationViews.Count > 0))
                 {
                     foreach (var shaclViolationView in shaclViolationViews)
@@ -487,9 +484,9 @@ namespace VNGPortal.Workflows
 
                                 if (string.IsNullOrEmpty(query))
                                 {
-                                    throw new Exception($"SPARQL query is empty for SHACL Validation - SPARQL Query: '{shaclShape.Id} - {sparqlQueryDefinition!.Id}'");
+                                    throw new Exception($"SPARQL query is empty for SHACL Validation - SPARQL Query: '{shaclValidation.Id} - {sparqlQueryDefinition!.Id}'");
                                 }
-                                _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclShape.Id, sparqlQueryDefinition!.Id, query);
+                                _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclValidation.Id, sparqlQueryDefinition!.Id, query);
 
                                 //
                                 // Template Arguments
@@ -530,8 +527,8 @@ namespace VNGPortal.Workflows
                                     Regex.Matches(shaclResult, templateArgRegExprParam.RegExpr)
                                         .Select(m => $"'{m.Groups[templateArgRegExprMatchParam.RegExprGroup]}'"));
                                     query = query.Replace(templateArgTargetParam.Target, templateArgValue);
-                                    _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Template Argument: '{TemplateArgName}' = '{TemplateArgValue}'", shaclShape.Id, sparqlQueryDefinition.Id, templateArgTargetParam.Target, templateArgValue);
-                                    _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclShape.Id, sparqlQueryDefinition.Id, query);
+                                    _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Template Argument: '{TemplateArgName}' = '{TemplateArgValue}'", shaclValidation.Id, sparqlQueryDefinition.Id, templateArgTargetParam.Target, templateArgValue);
+                                    _logger.LogInformation("SPARQL Query: '{ShapeId} - {QueryId}' - Query: '{Query}'", shaclValidation.Id, sparqlQueryDefinition.Id, query);
                                 }
 
                                 var geometryParam = sparqlQueryDefinition.ParameterList.FirstOrDefault((p) =>
@@ -565,7 +562,7 @@ namespace VNGPortal.Workflows
                                         }
                                     }
 
-                                    _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Model Bounding Box: {ModelBBox}", shaclShape.Id, sparqlQueryDefinition.Id, modelBBox);
+                                    _logger.LogInformation("SHACL Validation - SPARQL Query: '{ShapeId} - {QueryId}' - Model Bounding Box: {ModelBBox}", shaclValidation.Id, sparqlQueryDefinition.Id, modelBBox);
                                 } // foreach (var geometryQuery in shaclViolationView.Queries)
                             }
 
@@ -601,7 +598,7 @@ namespace VNGPortal.Workflows
             //
             // Success Views
             //
-            var shaclSuccessViews = shaclShape.Views.FindAll(v => v.Type == "success").ToList();
+            var shaclSuccessViews = shaclValidation.Views.FindAll(v => v.Type == "success").ToList();
             if ((shaclSuccessViews != null) && (shaclSuccessViews.Count > 0))
             {
                 throw new NotImplementedException("Success Views");

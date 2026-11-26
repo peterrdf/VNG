@@ -401,7 +401,7 @@ namespace VNGService.Pages
                     for (int k = 0; k < groupFilters.Length; k++)
                     {
                         var groupFilter = groupFilters[k];
-                        if (await MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
+                        if (MatchesFilterAsync(httpClient, planDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
                         {
                             long geometryInstance = RetrieveGeometry(
                                 owlModel,
@@ -458,7 +458,7 @@ namespace VNGService.Pages
                             for (int k = 0; k < groupFilters.Length; k++)
                             {
                                 var groupFilter = groupFilters[k];
-                                if (await MatchesFilterAsync(httpClient, nextPlanDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
+                                if (MatchesFilterAsync(httpClient, nextPlanDetails.Embedded.Bestemmingsvlakken[j], groupFilter))
                                 {
                                     long geometryInstance = RetrieveGeometry(
                                     owlModel,
@@ -506,7 +506,7 @@ namespace VNGService.Pages
             return zoningAreas;
         }
 
-        private async Task<bool> MatchesFilterAsync(
+        private bool MatchesFilterAsync(
             HttpClient httpClient,
             Bestemmingsvlak zoningArea,
             string? groupFilter)

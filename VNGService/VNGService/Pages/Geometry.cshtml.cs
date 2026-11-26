@@ -420,52 +420,52 @@ namespace VNGService.Pages
 
                 // bit 16:   Contains (Closed) Solid(s)
                 content += "(Closed) Solid(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit16) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit16) > 0 ? "YES" : "NO";
                 content += ";";
 
                 // bit 18:   Contains (Closed) Infinite Solid(s)
                 content += "(Closed) Infinite Solid(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit18) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit18) > 0 ? "YES" : "NO";
                 content += ";";
 
                 // bit 20:   Contains Closed Surface(s)
                 content += "Closed Surface(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit20) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit20) > 0 ? "YES" : "NO";
                 content += ";";
 
                 // bit 21:   Contains Open Surface(s)
                 content += "Open Surface(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit21) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit21) > 0 ? "YES" : "NO";
                 content += ";";
 
                 // bit 22:   Contains Closed Infinite Surface(s)
                 content += "Closed Infinite Surface(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit22) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit22) > 0 ? "YES" : "NO";
                 content += ";";
 
                 // bit 23:   Contains Open Infinite Surface(s)
                 content += "Open Infinite Surface(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit23) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit23) > 0 ? "YES" : "NO";
                 content += ";";
 
                 // bit 25:   Contains Open Line(s)
                 content += "Open Line(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit25) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit25) > 0 ? "YES" : "NO";
                 content += ";";
 
                 // bit 26:   Contains Closed Infinite Line(s) [i.e. both ends in infinity]
                 content += "Closed Infinite Line(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit26) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit26) > 0 ? "YES" : "NO";
                 content += ";";
 
                 // bit 27:   Contains Open Infinite Line(s) [i.e. one end in infinity]
                 content += "Open Infinite Line(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit27) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit27) > 0 ? "YES" : "NO";
                 content += ";";
 
                 // bit 28:   Contains (Closed) Point(s)
                 content += "(Closed) Point(s): ";
-                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit28) > 0 ? "YES" : "-";
+                content += Engine.CheckInstanceConsistency(owlInstance, Engine.flagbit28) > 0 ? "YES" : "NO";
 
                 return new JsonResult(new { Content = content });
             }

@@ -741,6 +741,15 @@
             }
         }
 
+        function fsExists(path) {
+            try {
+                Module.FS.stat(path);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
         g_onWebGLInitializedEvent = function () {
             try {
                 setTimeout(() => {
@@ -774,7 +783,7 @@
                             }).then(async function (data) {
                                 window.logInfo(`Received data size: ${data.byteLength}`);
 
-                                if (!Module.FS.analyzePath('/data').exists) {
+                                if (!fsExists('/data')) {
                                     Module.FS.mkdir('/data');
                                 }
                                 const wasmFSModel = '/data/' + getFileNameWithExtension(model);
